@@ -1,6 +1,6 @@
-import { View, Text, Button } from "react-native";
-import { useRouter } from "expo-router";
 import { PageLayout } from "@/components/PageLayout";
+import { useRouter } from "expo-router";
+import { Button, Text } from "react-native";
 
 export default function ProfileScreen() {
   const router = useRouter();

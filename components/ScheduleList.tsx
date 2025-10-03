@@ -1,34 +1,32 @@
-import { ScrollView, StyleSheet } from 'react-native';
-import { ScheduleCard } from './ScheduleCard';
+import { ScrollView, StyleSheet } from "react-native";
+import ScheduleInfoCard from "./ScheduleInfoCard";
 
 interface Schedule {
   id: number;
   title: string;
   room: string;
-  teachers: string;
+  teachers: string[];
   datetime: string;
 }
 
 interface ScheduleListProps {
   schedules: Schedule[];
-  onSchedulePress?: (scheduleId: number) => void;
 }
 
-export function ScheduleList({ schedules, onSchedulePress }: ScheduleListProps) {
+export function ScheduleList({ schedules }: ScheduleListProps) {
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.scrollView}
       contentContainerStyle={styles.scheduleList}
       showsVerticalScrollIndicator={false}
     >
       {schedules.map((schedule) => (
-        <ScheduleCard
+        <ScheduleInfoCard
           key={schedule.id}
-          title={schedule.title}
+          subject={schedule.title}
           room={schedule.room}
           teachers={schedule.teachers}
           datetime={schedule.datetime}
-          onPress={() => onSchedulePress?.(schedule.id)}
         />
       ))}
     </ScrollView>

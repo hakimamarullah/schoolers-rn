@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 export default function TabBarIcon({ name, focused }: { name: any; focused: boolean }) {
   return (
