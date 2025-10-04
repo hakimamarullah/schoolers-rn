@@ -1,14 +1,10 @@
 import TabBarIcon from '@/components/TabBarIcon';
 import { Tabs } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 export default function TabsLayout() {
-  const insets = useSafeAreaInsets();
-
   return (
-    <View style={styles.container}>
+ 
       <Tabs
         screenOptions={{
           animation: "none",
@@ -18,17 +14,11 @@ export default function TabsLayout() {
           tabBarStyle: {
             backgroundColor: '#FFB800',
             borderTopWidth: 0,
-            elevation: 12,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.15,
-            shadowRadius: 12,
-            height: 65,
+            height: 80,
             paddingBottom: 8,
             paddingTop: 8,
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            marginBottom: insets.bottom,
+            borderTopLeftRadius: 25,
+            borderTopRightRadius: 25,
           },
           tabBarLabelStyle: {
             fontSize: 11,
@@ -87,17 +77,6 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-    </View>
+
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  iconContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
