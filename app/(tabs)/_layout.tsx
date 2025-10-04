@@ -1,38 +1,43 @@
-import TabBarIcon from '@/components/TabBarIcon';
-import { Tabs } from 'expo-router';
-
+import TabBarIcon from "@/components/TabBarIcon";
+import { useSession } from "@/hooks/useSession";
+import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
+  const { session, isHostSet } = useSession();
+  const canAccess: boolean = !!session && !!isHostSet;
   return (
- 
-      <Tabs
-        screenOptions={{
-          animation: "none",
-          headerShown: false,
-          tabBarActiveTintColor: '#000',
-          tabBarInactiveTintColor: '#806B00',
-          tabBarStyle: {
-            backgroundColor: '#FFB800',
-            borderTopWidth: 0,
-            height: 80,
-            paddingBottom: 8,
-            paddingTop: 8,
-            borderTopLeftRadius: 25,
-            borderTopRightRadius: 25,
-          },
-          tabBarLabelStyle: {
-            fontSize: 11,
-            fontWeight: '500',
-            marginTop: 4,
-          },
-        }}
-      >
+    <Tabs
+      screenOptions={{
+        animation: "none",
+        headerShown: false,
+        tabBarActiveTintColor: "#000",
+        tabBarInactiveTintColor: "#806B00",
+        tabBarStyle: {
+          backgroundColor: "#FFB800",
+          borderTopWidth: 0,
+          height: 80,
+          paddingBottom: 8,
+          paddingTop: 8,
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "500",
+          marginTop: 4,
+        },
+      }}
+    >
+      <Tabs.Protected guard={canAccess}>
         <Tabs.Screen
           name="home"
           options={{
-            title: 'Home',
+            title: "Home",
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon name={focused ? "home" : "home-outline"} focused={focused} />
+              <TabBarIcon
+                name={focused ? "home" : "home-outline"}
+                focused={focused}
+              />
             ),
           }}
         />
@@ -40,9 +45,12 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="schedules"
           options={{
-            title: 'Schedules',
+            title: "Schedules",
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon name={focused ? "calendar" : "calendar-outline"} focused={focused} />
+              <TabBarIcon
+                name={focused ? "calendar" : "calendar-outline"}
+                focused={focused}
+              />
             ),
           }}
         />
@@ -50,9 +58,12 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="assignments"
           options={{
-            title: 'Assignments',
+            title: "Assignments",
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon name={focused ? "book" : "book-outline"} focused={focused} />
+              <TabBarIcon
+                name={focused ? "book" : "book-outline"}
+                focused={focused}
+              />
             ),
           }}
         />
@@ -60,9 +71,12 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="info"
           options={{
-            title: 'Info',
+            title: "Info",
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon name={focused ? "notifications-sharp" : "notifications-outline"} focused={focused} />
+              <TabBarIcon
+                name={focused ? "notifications-sharp" : "notifications-outline"}
+                focused={focused}
+              />
             ),
           }}
         />
@@ -70,13 +84,16 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Profile',
+            title: "Profile",
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon name={focused ? "person" : "person-outline"} focused={focused} />
+              <TabBarIcon
+                name={focused ? "person" : "person-outline"}
+                focused={focused}
+              />
             ),
           }}
         />
-      </Tabs>
-
+      </Tabs.Protected>
+    </Tabs>
   );
 }

@@ -7,6 +7,7 @@ import { PageLayout } from "@/components/PageLayout";
 import ProfilePicture from "@/components/ProfilePicture";
 import ScheduleSection from "@/components/ScheduleSection";
 import { MAIN_MENU } from "@/constants/menuConfig";
+import { useSession } from "@/hooks/useSession";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -21,6 +22,7 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
+  const { signOut } = useSession();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -76,7 +78,7 @@ export default function HomeScreen() {
   return (
     <PageLayout
       title="Schoolers"
-      headerRight={<LogoutBtn handler={() => console.log("Logout")} />}
+      headerRight={<LogoutBtn handler={async () => signOut()} />}
     >
       <ScrollView
         style={styles.container}
