@@ -16,11 +16,11 @@ export default function TabsLayout() {
           tabBarActiveTintColor: '#000',
           tabBarInactiveTintColor: '#806B00',
           tabBarStyle: {
-            backgroundColor: '#FFD800',
+            backgroundColor: '#FFB800',
             borderTopWidth: 0,
             elevation: 12,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: 0 }, // centered shadow
+            shadowOffset: { width: 0, height: 0 },
             shadowOpacity: 0.15,
             shadowRadius: 12,
             height: 65,

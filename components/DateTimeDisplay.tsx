@@ -22,6 +22,6 @@ const DateTimeDisplay = () => {
 export default DateTimeDisplay;
 
 const styles = StyleSheet.create({
-  dateText: { fontSize: 12, color: "#333" },
-  timeText: { fontSize: 14, fontWeight: "600" },
+  dateText: { fontSize: 12, color: "#333", lineHeight: 16 },
+  timeText: { fontSize: 14, fontWeight: "600", lineHeight: 18 },
 });

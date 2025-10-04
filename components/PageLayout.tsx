@@ -9,6 +9,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useSegments } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PageLayoutProps {
   title?: string;
@@ -45,6 +46,13 @@ export function PageLayout({
     <View style={styles.container}>
       {/* Yellow background fills whole screen */}
       <View style={styles.headerBackground} />
+
+      <LinearGradient
+        colors={["#FFD800", "#FFB800"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={StyleSheet.absoluteFill}
+      />
 
       {/* Header */}
       {showHeader && (

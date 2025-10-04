@@ -4,12 +4,12 @@ import { View, Text, StyleSheet } from "react-native";
 interface FinishedClassInfoProps {
   finished?: number;
   total?: number;
-  style?: any; // optional extra style
+  style?: any;
 }
 
 const FinishedClassInfo = ({ finished = 0, total = 0, style }: FinishedClassInfoProps) => (
   <View style={[styles.container, style]}>
-    <Text style={styles.finishedLabel}>Finished Class: </Text>
+    <Text style={styles.finishedLabel}>Finished Class</Text>
     <Text style={styles.finishedCount}>{finished}/{total}</Text>
   </View>
 );
@@ -17,7 +17,17 @@ const FinishedClassInfo = ({ finished = 0, total = 0, style }: FinishedClassInfo
 export default memo(FinishedClassInfo);
 
 const styles = StyleSheet.create({
-  container: { flexDirection: "row", alignItems: "center" }, // inline layout
-  finishedLabel: { fontSize: 12, color: "#444" },
-  finishedCount: { fontSize: 14, fontWeight: "600" },
+  container: { 
+    alignItems: "flex-start",
+  },
+  finishedLabel: { 
+    fontSize: 12, 
+    color: "#444",
+    lineHeight: 16,
+  },
+  finishedCount: { 
+    fontSize: 14, 
+    fontWeight: "600",
+    lineHeight: 18,
+  },
 });

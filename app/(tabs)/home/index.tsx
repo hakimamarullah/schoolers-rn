@@ -1,13 +1,15 @@
-import CheckInButton from "@/components/CheckInButton";
 import DateTimeDisplay from "@/components/DateTimeDisplay";
 import FinishedClassInfo from "@/components/FinishedClassInfo";
 import Greeting from "@/components/Greeting";
 import LogoutBtn from "@/components/LogoutBtn";
+import MenuSection from "@/components/MenuSection";
 import { PageLayout } from "@/components/PageLayout";
 import ProfilePicture from "@/components/ProfilePicture";
 import ScheduleSection from "@/components/ScheduleSection";
+import { MAIN_MENU } from "@/constants/menuConfig";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -56,6 +58,21 @@ export default function HomeScreen() {
     },
   ];
 
+  const mainMenu = useMemo(
+    () =>
+      MAIN_MENU.map((it) => ({
+        ...it,
+        onPress: () => {
+          if (it.route) {
+            router.push(it.route);
+          } else {
+            it.onPress;
+          }
+        },
+      })),
+    [router]
+  );
+
   return (
     <PageLayout
       title="Schoolers"
@@ -70,8 +87,12 @@ export default function HomeScreen() {
         }
       >
         {/* Top Summary Card */}
-        <View style={styles.summaryCard}>
-          {/* Header */}
+        <LinearGradient
+          colors={["#FFD800", "#FFB800"]} // gradient from bright to darker yellow
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.summaryCard}
+        >
           <View style={styles.header}>
             <Text style={styles.schoolName}>SMAN 1 Jakarta</Text>
             <Text style={styles.className}>XII IPA-2</Text>
@@ -85,15 +106,14 @@ export default function HomeScreen() {
 
           {/* Row 3: Date + FinishedInfo */}
           <View style={styles.rowTight}>
-            <DateTimeDisplay />
-            <FinishedClassInfo finished={1} total={5} />
+            <View style={styles.bottomInfo}>
+              <DateTimeDisplay />
+              <FinishedClassInfo finished={1} total={5} />
+            </View>
           </View>
+        </LinearGradient>
+        <MenuSection title="Main Menu" data={mainMenu} />
 
-          {/* Check-In component (stays wrapped) */}
-          <CheckInButton onPress={() => router.push("/home/checkin")} />
-        </View>
-
-        {/* Sections */}
         <ScheduleSection title="Ongoing" data={ongoing} />
         <ScheduleSection title="Upcoming" data={upcoming} />
         <ScheduleSection title="Cancelled" data={cancelled} />
@@ -139,8 +159,16 @@ const styles = StyleSheet.create({
   rowTight: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingHorizontal: 16,
-    marginBottom: 8, // reduced spacing
+    marginBottom: 10,
+    gap: 1,
+    borderColor: "red",
+    flex: 1,
+  },
+  bottomInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "60%",
   },
 });
