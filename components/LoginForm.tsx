@@ -1,15 +1,37 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import PasswordInput from "./PasswordInput";
+import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 
 interface LoginFormProps {
   onSubmit: (password: string) => void;
-  onFingerprintPress?: (fingerprint: any) => void;
+  onBiometricSuccess?: () => void;
+  onBiometricError?: (error: string) => void;
 }
 
-export default function LoginForm({ onSubmit, onFingerprintPress }: LoginFormProps) {
+export default function LoginForm({ 
+  onSubmit, 
+  onBiometricSuccess,
+  onBiometricError 
+}: LoginFormProps) {
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const { isBiometricSupported, authenticate } = useBiometricAuth();
+
+  const handleBiometricPress = async () => {
+    if (!isBiometricSupported) {
+      onBiometricError?.("Biometric authentication is not supported on this device");
+      return;
+    }
+
+    const result = await authenticate();
+    
+    if (result.success) {
+      onBiometricSuccess?.();
+    } else {
+      onBiometricError?.(result.error || "Authentication failed");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -18,26 +40,11 @@ export default function LoginForm({ onSubmit, onFingerprintPress }: LoginFormPro
       <Text style={styles.account}>11*****24</Text>
 
       {/* Password field */}
-      <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity
-          style={styles.eyeButton}
-          onPress={() => setShowPassword(!showPassword)}
-        >
-          <Ionicons
-            name={showPassword ? "eye-off-outline" : "eye-outline"}
-            size={20}
-            color="#333"
-          />
-        </TouchableOpacity>
-      </View>
+      <PasswordInput 
+        label="Password"
+        value={password} 
+        onChangeText={setPassword}
+      />
 
       <View style={styles.actionRow}>
         {/* Login Button */}
@@ -48,13 +55,15 @@ export default function LoginForm({ onSubmit, onFingerprintPress }: LoginFormPro
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
 
-        {/* Fingerprint Button */}
-        <TouchableOpacity
-          style={styles.fpButton}
-          onPress={() => onFingerprintPress?.("test")}
-        >
-          <Ionicons name="finger-print-outline" size={26} color="#000" />
-        </TouchableOpacity>
+        {/* Fingerprint Button - Only show if supported */}
+        {isBiometricSupported && (
+          <TouchableOpacity
+            style={styles.fpButton}
+            onPress={handleBiometricPress}
+          >
+            <Ionicons name="finger-print-outline" size={26} color="#000" />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -75,27 +84,6 @@ const styles = StyleSheet.create({
     color: "#555",
     marginBottom: 20,
   },
-  inputWrapper: {
-    position: "relative",
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#FFD800",
-  },
-  label: {
-    fontSize: 12,
-    color: "#555",
-    marginBottom: 5,
-  },
-  input: {
-    paddingVertical: 6,
-    fontSize: 14,
-    paddingRight: 30,
-  },
-  eyeButton: {
-    position: "absolute",
-    right: 0,
-    bottom: 8,
-  },
   actionRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -103,7 +91,7 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     flex: 1,
-    backgroundColor: "#FFD800",
+    backgroundColor: "#FFB800",
     borderRadius: 25,
     alignItems: "center",
     paddingVertical: 12,
@@ -118,7 +106,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#FFD800",
+    backgroundColor: "#FFB800",
     alignItems: "center",
     justifyContent: "center",
   },

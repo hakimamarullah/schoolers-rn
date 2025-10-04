@@ -1,21 +1,22 @@
 // app/_layout.tsx
-import { SplashScreenController } from '@/components/SplashScreenController';
-import { SessionProvider, useSession } from '@/hooks/useSession';
-import { Stack } from 'expo-router';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-
+import { SplashScreenController } from "@/components/SplashScreenController";
+import { AppProvider } from "@/hooks/useApp";
+import { SessionProvider, useSession } from "@/hooks/useSession";
+import { Stack } from "expo-router";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function Root() {
   return (
     <SafeAreaProvider>
       <SessionProvider>
-        <SplashScreenController/>
-         <RootNavigator/>
+        <AppProvider>
+          <SplashScreenController />
+          <RootNavigator />
+        </AppProvider>
       </SessionProvider>
     </SafeAreaProvider>
-  )
+  );
 }
-
 
 function RootNavigator() {
   const { session, isHostSet, isLoading } = useSession();
@@ -37,7 +38,8 @@ function RootNavigator() {
 
       {/* ✅ 2. Host is set but not logged in → show login */}
       <Stack.Protected guard={isHostSet && !session}>
-        <Stack.Screen name="login" />
+        <Stack.Screen name="login" options={{ navigationBarHidden: false }}/>
+        <Stack.Screen name="register" options={{ navigationBarHidden: false }}/>
       </Stack.Protected>
 
       {/* ✅ 3. Host set & logged in → main app */}

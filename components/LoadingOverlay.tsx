@@ -1,6 +1,7 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useState, useRef } from "react";
 import {
   ActivityIndicator,
+  Animated,
   Modal,
   StyleSheet,
   Text,
@@ -12,33 +13,53 @@ export interface LoadingOverlayRef {
   hide: () => void;
 }
 
-const LoadingOverlay = forwardRef<LoadingOverlayRef>((_, ref) => {
+const LoadingOverlay = forwardRef<LoadingOverlayRef, {}>((_, ref) => {
   const [visible, setVisible] = useState(false);
-  const [message, setMessage] = useState<string>("Loading...");
+  const [message, setMessage] = useState("Loading...");
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  const fadeIn = () =>
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 150,
+      useNativeDriver: true,
+    }).start();
+
+  const fadeOut = (onEnd?: () => void) =>
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => onEnd && onEnd());
 
   useImperativeHandle(ref, () => ({
     show(msg?: string) {
-      if (msg) setMessage(msg);
+      setMessage(msg || "Loading...");
       setVisible(true);
+      requestAnimationFrame(() => fadeIn());
     },
     hide() {
-      setVisible(false);
+      fadeOut(() => {
+        setVisible(false);
+        // Reset to default message after hiding
+        setMessage("Loading...");
+      });
     },
   }));
 
   return (
     <Modal
-      transparent
       visible={visible}
-      animationType="fade"
+      transparent
+      animationType="none"
       statusBarTranslucent
     >
-      <View style={styles.overlay}>
+      <Animated.View style={[styles.overlay, { opacity }]}>
         <View style={styles.loaderBox}>
           <ActivityIndicator size="large" color="#FFD800" />
           <Text style={styles.text}>{message}</Text>
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 });

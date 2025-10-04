@@ -1,11 +1,18 @@
-import React, { useState, forwardRef, useImperativeHandle, memo } from "react";
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  memo,
+  useRef,
+} from "react";
 import {
+  Animated,
   Modal,
   View,
   Text,
-  StyleSheet,
   Pressable,
-  TouchableWithoutFeedback,
+  StatusBar,
+  StyleSheet,
 } from "react-native";
 
 export type AppModalRef = {
@@ -13,59 +20,86 @@ export type AppModalRef = {
   hide: () => void;
 };
 
-const AppModal = forwardRef<AppModalRef>((_, ref) => {
+const AppModal = forwardRef<AppModalRef, {}>((_, ref) => {
   const [visible, setVisible] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
+  const opacity = useRef(new Animated.Value(0)).current;
 
-  // Expose functions without causing re-renders in parent
-  useImperativeHandle(ref, () => ({
-    show: (t, m) => {
-      setTitle(t);
-      setMessage(m);
-      setVisible(true);
-    },
-    hide: () => setVisible(false),
-  }), []);
+  const fadeIn = () =>
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 150,
+      useNativeDriver: true,
+    }).start();
+
+  const fadeOut = (onEnd?: () => void) =>
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => onEnd && onEnd());
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      show: (t, m) => {
+        setTitle(t);
+        setMessage(m);
+        setVisible(true);
+        // Start fade in after modal is visible
+        requestAnimationFrame(() => fadeIn());
+      },
+      hide: () => fadeOut(() => {
+        setVisible(false);
+        setTitle("");
+        setMessage("");
+      }),
+    }),
+    [opacity]
+  );
 
   return (
-    <Modal transparent visible={visible} animationType="fade">
-      <TouchableWithoutFeedback onPress={() => setVisible(false)}>
-        <View style={styles.backdrop}>
-          <TouchableWithoutFeedback>
-            <View style={styles.modalContainer}>
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.message}>{message}</Text>
-              <Pressable style={styles.button} onPress={() => setVisible(false)}>
-                <Text style={styles.buttonText}>OK</Text>
-              </Pressable>
-            </View>
-          </TouchableWithoutFeedback>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      statusBarTranslucent
+      onRequestClose={() => fadeOut(() => setVisible(false))}
+    >
+      <Animated.View style={[styles.overlay, { opacity }]}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => fadeOut(() => setVisible(false))} />
+        <View style={styles.contentBox}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.message}>{message}</Text>
+          <Pressable
+            style={styles.button}
+            onPress={() => fadeOut(() => setVisible(false))}
+          >
+            <Text style={styles.buttonText}>OK</Text>
+          </Pressable>
         </View>
-      </TouchableWithoutFeedback>
+      </Animated.View>
     </Modal>
   );
 });
 
-// `memo` ensures the modal itself doesn’t cause parent to re-render
 export default memo(AppModal);
 
 const styles = StyleSheet.create({
-  backdrop: {
+  overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
   },
-  modalContainer: {
+  contentBox: {
     backgroundColor: "#fff",
     borderRadius: 20,
-    width: "90%",
-    alignItems: "center",
     paddingVertical: 30,
     paddingHorizontal: 20,
-    elevation: 5,
+    width: "85%",
+    alignItems: "center",
   },
   title: {
     fontSize: 17,

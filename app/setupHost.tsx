@@ -1,28 +1,27 @@
-import React, { useCallback, useRef } from "react";
-import { StyleSheet, View } from "react-native";
 import { PageLayout } from "@/components/PageLayout";
-import AppModal, { AppModalRef } from "@/components/AppModal";
 import SetupHostForm from "@/components/SetupHostForm";
+import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
-import LoadingOverlay, { LoadingOverlayRef } from "@/components/LoadingOverlay";
+import React, { useCallback } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function SetupHostScreen() {
   const { setHost } = useSession();
-  const modalRef = useRef<AppModalRef>(null);
-  const overlayRef = useRef<LoadingOverlayRef>(null);
+  const app  = useApp();
+
 
   const handleSubmit = useCallback(
     async (host: string) => {
       try {
         if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(host)) {
-          modalRef.current?.show(
+          app.showModal(
             "Invalid URL",
             "Please enter a valid host URL (e.g., https://your-server.com)"
           );
           return;
         }
 
-        overlayRef.current?.show("Validating host...");
+        app.showOverlay("Validating host...");
 
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 4000);
@@ -38,12 +37,12 @@ export default function SetupHostScreen() {
           throw new Error("Unreachable");
         }
 
-        overlayRef.current?.hide();
+        app.hideOverlay();
         setHost(host);
       } catch (err) {
         console.warn("Host validation failed:", err);
-        overlayRef.current?.hide();
-        modalRef.current?.show(
+        app.hideOverlay();
+        app.showModal(
           "Invalid Host",
           "The server could not be reached. Please check your host URL and try again."
         );
@@ -55,9 +54,7 @@ export default function SetupHostScreen() {
   return (
     <PageLayout title="Setup Host">
       <View style={styles.container}>
-        <AppModal ref={modalRef} />
         <SetupHostForm onSubmit={handleSubmit} />
-        <LoadingOverlay ref={overlayRef} />
       </View>
     </PageLayout>
   );

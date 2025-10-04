@@ -68,9 +68,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const subscription = AppState.addEventListener(
       "change",
       (nextState: AppStateStatus) => {
-        console.log("App state:", nextState);
         if (nextState === "inactive") {
-          handleSignOut(); // auto sign-out on app close/background
+          handleSignOut();
         }
       }
     );
