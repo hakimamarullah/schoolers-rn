@@ -1,3 +1,4 @@
+import { getGreetingText } from "@/scripts/utils";
 import React, { memo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
@@ -5,12 +6,6 @@ interface GreetingProps {
   name?: string;
 }
 
-const getGreetingText = (hour: number) => {
-  if (hour >= 5 && hour < 12) return "Good Morning";
-  if (hour >= 12 && hour < 17) return "Good Afternoon";
-  if (hour >= 17 && hour < 22) return "Good Evening";
-  return "Good Night";
-};
 
 const Greeting = ({ name = 'Kid' }: GreetingProps) => {
   const hour = new Date().getHours();

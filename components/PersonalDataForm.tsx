@@ -1,14 +1,10 @@
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useState, useCallback } from "react";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import SearchableDropdown, { Option } from "./SearchableDropdown";
 import PasswordInput from "./PasswordInput";
 import InputGroup from "./InputGroup";
+import ProfilePicker from "./ProfilePicker";
+import SubmitButton from "./SubmitButton";
 
 interface PersonalDataFormProps {
   onSubmit: (data: {
@@ -18,6 +14,7 @@ interface PersonalDataFormProps {
     classroom: string;
     email: string;
     password: string;
+    profilePicUri?: string;
   }) => void;
 }
 
@@ -28,6 +25,7 @@ export default function PersonalDataForm({ onSubmit }: PersonalDataFormProps) {
   const [classroom, setClassroom] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [profilePicUri, setProfilePicUri] = useState<string | null>(null);
 
   const classroomOptions: Option[] = [
     { label: "Class A", value: "A" },
@@ -36,12 +34,19 @@ export default function PersonalDataForm({ onSubmit }: PersonalDataFormProps) {
     { label: "Class D", value: "D" },
   ];
 
-  const handleSubmit = () => {
-    onSubmit({ fullName, nisn, gender, classroom, email, password });
-  };
+  const handleSubmit = useCallback(() => {
+    onSubmit({
+      fullName,
+      nisn,
+      gender,
+      classroom,
+      email,
+      password,
+      profilePicUri: profilePicUri || undefined,
+    });
+  }, [fullName, nisn, gender, classroom, email, password, profilePicUri, onSubmit]);
 
-  // Check if all required fields are filled
-  const isFormValid = 
+  const isFormValid =
     fullName.trim() !== "" &&
     nisn.trim() !== "" &&
     gender !== "" &&
@@ -51,6 +56,9 @@ export default function PersonalDataForm({ onSubmit }: PersonalDataFormProps) {
 
   return (
     <View style={styles.container}>
+      {/* Profile Picker */}
+      <ProfilePicker onImagePicked={setProfilePicUri} />
+
       {/* Full Name */}
       <InputGroup label="Fullname" required>
         <TextInput
@@ -76,29 +84,12 @@ export default function PersonalDataForm({ onSubmit }: PersonalDataFormProps) {
       {/* Gender */}
       <InputGroup label="Gender" required>
         <View style={styles.genderRow}>
-          <TouchableOpacity
-            style={styles.radioOption}
-            onPress={() => setGender("Female")}
-          >
-            <View
-              style={[
-                styles.radioCircle,
-                gender === "Female" && styles.radioSelected,
-              ]}
-            />
+          <TouchableOpacity style={styles.radioOption} onPress={() => setGender("Female")}>
+            <View style={[styles.radioCircle, gender === "Female" && styles.radioSelected]} />
             <Text style={styles.radioText}>Female</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.radioOption}
-            onPress={() => setGender("Male")}
-          >
-            <View
-              style={[
-                styles.radioCircle,
-                gender === "Male" && styles.radioSelected,
-              ]}
-            />
+          <TouchableOpacity style={styles.radioOption} onPress={() => setGender("Male")}>
+            <View style={[styles.radioCircle, gender === "Male" && styles.radioSelected]} />
             <Text style={styles.radioText}>Male</Text>
           </TouchableOpacity>
         </View>
@@ -107,7 +98,6 @@ export default function PersonalDataForm({ onSubmit }: PersonalDataFormProps) {
       {/* Classroom */}
       <SearchableDropdown
         label="Classroom"
-        selectedValue={classroom}
         options={classroomOptions}
         onSelect={setClassroom}
       />
@@ -130,71 +120,18 @@ export default function PersonalDataForm({ onSubmit }: PersonalDataFormProps) {
         <PasswordInput label="" value={password} onChangeText={setPassword} />
       </InputGroup>
 
-      {/* Submit */}
-      <TouchableOpacity 
-        style={[styles.button, !isFormValid && styles.buttonDisabled]} 
-        onPress={handleSubmit}
-        disabled={!isFormValid}
-      >
-        <Text style={[styles.buttonText, !isFormValid && styles.buttonTextDisabled]}>
-          Submit
-        </Text>
-      </TouchableOpacity>
+      {/* Submit Button */}
+      <SubmitButton label="Submit" onPress={handleSubmit} disabled={!isFormValid}/>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#FFD800",
-    paddingVertical: 8,
-    fontSize: 16,
-  },
-  genderRow: {
-    flexDirection: "row",
-    marginTop: 4,
-  },
-  radioOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 20,
-  },
-  radioCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1,
-    borderColor: "#000",
-    marginRight: 8,
-  },
-  radioSelected: {
-    backgroundColor: "#FFB800",
-  },
-  radioText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  button: {
-    backgroundColor: "#FFB800",
-    paddingVertical: 14,
-    borderRadius: 25,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    backgroundColor: "#ffb800",
-    opacity: 0.6,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  buttonTextDisabled: {
-    color: "#666",
-  },
+  container: { padding: 20 },
+  input: { borderBottomWidth: 1, borderBottomColor: "#FFD800", paddingVertical: 8, fontSize: 16 },
+  genderRow: { flexDirection: "row", marginTop: 4 },
+  radioOption: { flexDirection: "row", alignItems: "center", marginRight: 20 },
+  radioCircle: { width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: "#000", marginRight: 8 },
+  radioSelected: { backgroundColor: "#FFB800" },
+  radioText: { fontSize: 14, color: "#333" },
 });

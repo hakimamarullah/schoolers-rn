@@ -1,6 +1,7 @@
 import { PageLayout } from "@/components/PageLayout";
 import PersonalDataForm from "@/components/PersonalDataForm";
 import { useApp } from "@/hooks/useApp";
+import { useRouter } from "expo-router";
 import React from "react";
 import { 
   KeyboardAvoidingView, 
@@ -11,11 +12,15 @@ import {
 
 export default function RegisterScreen() {
   const app = useApp();
+  const router = useRouter();
   
   const handleSubmit = (data: any) => {
     app.showOverlay();
     console.log({data});
-    setTimeout(() => app.hideOverlay(), 3000);
+    setTimeout(() => {
+      app.hideOverlay();
+      router.replace("/login");
+    }, 3000);
   };
 
   return (

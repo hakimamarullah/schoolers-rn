@@ -41,13 +41,16 @@ export default memo(MenuSection);
 
 const styles = StyleSheet.create({
   section: {
-    marginVertical: 8,
+    marginTop: 20,
     paddingHorizontal: 16,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 18,
+    paddingBottom: 6,
+    borderBottomColor: "#ffd800",
+    borderBottomWidth: 1
   },
   menuGrid: {
     flexDirection: "row",

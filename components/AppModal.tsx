@@ -1,22 +1,27 @@
 import React, {
-  useState,
   forwardRef,
-  useImperativeHandle,
   memo,
+  useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 import {
   Animated,
   Modal,
-  View,
-  Text,
   Pressable,
-  StatusBar,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export type AppModalRef = {
-  show: (title: string, message: string) => void;
+  show: (
+    title: string,
+    message: string,
+    onConfirm?: () => void,
+    closable?: boolean
+  ) => void;
   hide: () => void;
 };
 
@@ -24,6 +29,8 @@ const AppModal = forwardRef<AppModalRef, {}>((_, ref) => {
   const [visible, setVisible] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
+  const [onConfirm, setOnConfirm] = useState<(() => void) | undefined>();
+  const [dismissable, setDismissable] = useState(true);
   const opacity = useRef(new Animated.Value(0)).current;
 
   const fadeIn = () =>
@@ -40,21 +47,35 @@ const AppModal = forwardRef<AppModalRef, {}>((_, ref) => {
       useNativeDriver: true,
     }).start(() => onEnd && onEnd());
 
+  const handleClose = () => {
+    fadeOut(() => {
+      setVisible(false);
+      setTitle("");
+      setMessage("");
+      setOnConfirm(undefined);
+      setDismissable(true);
+    });
+  };
+
+  const handleConfirm = () => {
+    if (onConfirm) {
+      onConfirm();
+    }
+    handleClose();
+  };
+
   useImperativeHandle(
     ref,
     () => ({
-      show: (t, m) => {
+      show: (t, m, callback, closable) => {
         setTitle(t);
         setMessage(m);
+        setOnConfirm(() => callback);
         setVisible(true);
-        // Start fade in after modal is visible
+        setDismissable(closable ?? true);
         requestAnimationFrame(() => fadeIn());
       },
-      hide: () => fadeOut(() => {
-        setVisible(false);
-        setTitle("");
-        setMessage("");
-      }),
+      hide: handleClose,
     }),
     [opacity]
   );
@@ -65,17 +86,21 @@ const AppModal = forwardRef<AppModalRef, {}>((_, ref) => {
       transparent
       animationType="none"
       statusBarTranslucent
-      onRequestClose={() => fadeOut(() => setVisible(false))}
+      onRequestClose={handleClose}
     >
       <Animated.View style={[styles.overlay, { opacity }]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={() => fadeOut(() => setVisible(false))} />
+        <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
         <View style={styles.contentBox}>
+          {/* Close Button */}
+          {dismissable && (
+            <Pressable style={styles.closeButton} onPress={handleClose}>
+              <MaterialIcons name="close" size={24} color="#666" />
+            </Pressable>
+          )}
+
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
-          <Pressable
-            style={styles.button}
-            onPress={() => fadeOut(() => setVisible(false))}
-          >
+          <Pressable style={styles.button} onPress={handleConfirm}>
             <Text style={styles.buttonText}>OK</Text>
           </Pressable>
         </View>
@@ -100,6 +125,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     width: "85%",
     alignItems: "center",
+    position: "relative",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
   },
   title: {
     fontSize: 17,

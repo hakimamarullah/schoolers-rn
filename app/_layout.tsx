@@ -38,16 +38,19 @@ function RootNavigator() {
 
       {/* ✅ 2. Host is set but not logged in → show login */}
       <Stack.Protected guard={isHostSet && !session}>
-        <Stack.Screen name="login" options={{ navigationBarHidden: false }}/>
-        <Stack.Screen name="register" options={{ navigationBarHidden: false }}/>
+        <Stack.Screen name="login"/>
+        <Stack.Screen name="register"/>
       </Stack.Protected>
 
       {/* ✅ 3. Host set & logged in → main app */}
       <Stack.Protected guard={isHostSet && !!session}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="home/checkin" />
+        <Stack.Screen name="checkin" />
         <Stack.Screen name="assignments/[id]" />
         <Stack.Screen name="info/[id]" />
+        <Stack.Screen name="change-language" />
+        <Stack.Screen name="change-classroom" />
+        <Stack.Screen name="personal-data" />
       </Stack.Protected>
     </Stack>
   );

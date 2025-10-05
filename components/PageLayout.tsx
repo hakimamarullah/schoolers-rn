@@ -34,7 +34,7 @@ export function PageLayout({
   const parent = segments[segments.length - 2];
   const isTabRoot = parent?.startsWith("(");
 
-  const canGoBack = !isTabRoot && segments.length > 1;
+  const canGoBack = !isTabRoot && router.canGoBack();
 
   const rights = Array.isArray(headerRight)
     ? headerRight

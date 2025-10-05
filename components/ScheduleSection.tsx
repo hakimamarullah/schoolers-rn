@@ -19,6 +19,6 @@ const ScheduleSection = ({ title, data }: SectionProps) => (
 export default memo(ScheduleSection);
 
 const styles = StyleSheet.create({
-  section: { marginVertical: 8, paddingHorizontal: 16 },
-  sectionTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 18 },
+  section: { marginTop: 50, paddingHorizontal: 16},
+  sectionTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 18, borderBottomColor: "#ffd800", borderBottomWidth: 1, paddingBottom: 6 },
 });

@@ -26,6 +26,6 @@ export const MAIN_MENU: MenuItemConfig[] = [
     id: "check-in",
     iconName: "time",
     title: "Check In",
-    route: "/home/checkin" as RelativePathString,
+    route: "/checkin" as RelativePathString,
   }
 ];

@@ -1,12 +1,25 @@
 import React, { memo } from "react";
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, ImageStyle } from "react-native";
 
-const ProfilePicture = ({ uri = 'https://avatar.iran.liara.run/public/73'}: { uri?: string }) => (
-  <Image source={{ uri }} style={styles.profileImage} />
-);
+interface ProfilePictureProps {
+  uri?: string;
+  size?: number; // optional size
+}
+
+const ProfilePicture = ({ uri = 'https://avatar.iran.liara.run/public/73', size = 60 }: ProfilePictureProps) => {
+  const dynamicStyle: ImageStyle = {
+    width: size,
+    height: size,
+    borderRadius: size / 2,
+  };
+
+  return <Image source={{ uri }} style={[styles.profileImage, dynamicStyle]} />;
+};
 
 export default memo(ProfilePicture);
 
 const styles = StyleSheet.create({
-  profileImage: { width: 60, height: 60, borderRadius: 30 },
+  profileImage: {
+    resizeMode: "cover",
+  },
 });

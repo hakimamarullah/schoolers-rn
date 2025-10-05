@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
@@ -12,7 +12,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // ✅ added icon
+import { Ionicons } from "@expo/vector-icons";
 
 export interface Option {
   label: string;
@@ -22,32 +22,41 @@ export interface Option {
 interface SearchableDropdownProps {
   label?: string;
   placeholder?: string;
-  selectedValue?: string;
   options: Option[];
+  selectedValue?: string;
   onSelect: (value: string) => void;
 }
 
 export default function SearchableDropdown({
   label,
   placeholder = "Select option",
-  selectedValue,
   options,
+  selectedValue,
   onSelect,
 }: SearchableDropdownProps) {
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState("");
+
+  // Update selected when selectedValue prop changes
+  useEffect(() => {
+    if (selectedValue) {
+      setSelected(selectedValue);
+    }
+  }, [selectedValue]);
 
   const selectedLabel =
-    options.find((opt) => opt.value === selectedValue)?.label || "";
+    options.find((opt) => opt.value === selected)?.label || "";
 
   const filtered = options.filter((opt) =>
     opt.label.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSelect = (value: string) => {
-    onSelect(value);
     setVisible(false);
     setSearch("");
+    setSelected(value);
+    onSelect(value);
   };
 
   return (
@@ -60,7 +69,7 @@ export default function SearchableDropdown({
         onPress={() => setVisible(true)}
         activeOpacity={0.7}
       >
-        <Text style={selectedValue ? styles.value : styles.placeholder}>
+        <Text style={selected ? styles.value : styles.placeholder}>
           {selectedLabel || placeholder}
         </Text>
         <Ionicons

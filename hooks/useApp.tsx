@@ -5,7 +5,7 @@ import LoadingOverlay, { LoadingOverlayRef } from "@/components/LoadingOverlay";
 type AppContextType = {
   modalRef: React.RefObject<AppModalRef | null>;
   overlayRef: React.RefObject<LoadingOverlayRef | null>;
-  showModal: (title: string, message: string) => void;
+  showModal: (title: string, message: string, onConfirm?: () => void, closable?: boolean) => void;
   hideModal: () => void;
   showOverlay: (message?: string) => void;
   hideOverlay: () => void;
@@ -17,7 +17,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const modalRef = useRef<AppModalRef>(null);
   const overlayRef = useRef<LoadingOverlayRef>(null);
 
-  const showModal = (title: string, message: string) => modalRef.current?.show(title, message);
+  const showModal = (title: string, message: string, onConfirm?: () => void, closable?: boolean) => modalRef.current?.show(title, message, onConfirm, closable);
   const hideModal = () => modalRef.current?.hide();
   const showOverlay = (message? : string) => overlayRef.current?.show(message);
   const hideOverlay = () => overlayRef.current?.hide();
