@@ -90,7 +90,7 @@ export default function SearchableDropdown({
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.modalOverlay}>
             <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : undefined}
+              behavior={"padding"}
               style={styles.keyboardAvoid}
             >
               <View style={styles.modalContainer}>

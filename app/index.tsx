@@ -1,14 +1,13 @@
 import { PageLayout } from "@/components/PageLayout";
 import SetupHostForm from "@/components/SetupHostForm";
-import { getApiClient, initializeApiClient, setSignOutCallback } from "@/config/apiClient.config";
+import { initializeApiClient } from "@/config/apiClient.config";
 import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
-import storageService from "@/services/storage.service";
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function SetupHostScreen() {
-  const { setHost, signOut } = useSession();
+  const { setHost } = useSession();
   const app  = useApp();
 
 
@@ -44,7 +43,6 @@ export default function SetupHostScreen() {
         app.hideOverlay();
         setHost(host);
         await initializeApiClient();
-        setSignOutCallback(signOut);
       } catch (err) {
         console.warn("Host validation failed:", err);
         app.hideOverlay();

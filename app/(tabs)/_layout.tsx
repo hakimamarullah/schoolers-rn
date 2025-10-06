@@ -4,7 +4,6 @@ import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
   const { session, isHostSet } = useSession();
-  const canAccess: boolean = !!session && !!isHostSet;
   return (
     <Tabs
       screenOptions={{
@@ -28,7 +27,7 @@ export default function TabsLayout() {
         },
       }}
     >
-      <Tabs.Protected guard={canAccess}>
+      <Tabs.Protected guard={isHostSet && !!session}>
         <Tabs.Screen
           name="home"
           options={{

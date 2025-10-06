@@ -14,7 +14,7 @@ import {
 } from '@/types/auth.type';
 import { getApiClient } from '@/config/apiClient.config';
 import { ApiResponse } from '@/types/api.type';
-import { inferFileMeta } from '@/scripts/utils';
+import { handleResponse, inferFileMeta } from '@/scripts/utils';
 
 
 class AuthService {
@@ -180,7 +180,7 @@ class AuthService {
   /**
    * Register biometric credential
    */
-  async registerBiometric(): Promise<void> {
+  async registerBiometric(): Promise<ApiResponse<number>> {
     try {
       const apiClient = getApiClient();
       const token = await StorageService.getAccessToken();
@@ -217,10 +217,13 @@ class AuthService {
         keySize: 2048,
       };
 
-      await apiClient.post('/auth/biometric/register', request);
+      const response = await apiClient.post<ApiResponse<number>>('/auth/biometric/register', request);
 
       // Save credentials locally
-      await StorageService.saveBiometricCredentials(publicKey, privateKey, publicKeyHash);
+      if (handleResponse(response.data).ok) {
+        await StorageService.saveBiometricCredentials(publicKey, privateKey, publicKeyHash);
+      }
+      return response.data;
     } catch (error) {
       await StorageService.clearBiometricCredentials();
       return this.handleError(error);

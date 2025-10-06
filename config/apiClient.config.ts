@@ -2,13 +2,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
 import StorageService from '../services/storage.service';
 import { CONFIG } from '@/constants/common';
 import configService from '@/services/config.service';
-
-// Reference to auth context
-let signOutCallback: (() => void) | null = null;
-
-export const setSignOutCallback = (callback: () => void) => {
-  signOutCallback = callback;
-};
+import sessionService from '@/services/session.service';
 
 // API client instance (initially null)
 let apiClientInstance: AxiosInstance | null = null;
@@ -66,10 +60,7 @@ export const initializeApiClient = async (): Promise<void> => {
       console.log({response_code: error.response?.status})
       if (error.response?.status === 401) {
         await StorageService.clearAll();
-        console.log({signOutCallback})
-        if (signOutCallback) {
-          signOutCallback();
-        }
+        await sessionService.signOut();
       }
       return Promise.reject(error);
     }

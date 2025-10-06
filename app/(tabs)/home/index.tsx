@@ -6,9 +6,9 @@ import MenuSection from "@/components/MenuSection";
 import { PageLayout } from "@/components/PageLayout";
 import ProfilePicture from "@/components/ProfilePicture";
 import ScheduleSection from "@/components/ScheduleSection";
-import { setSignOutCallback } from "@/config/apiClient.config";
 import { MAIN_MENU } from "@/constants/menuConfig";
 import { useSession } from "@/hooks/useSession";
+import sessionService from "@/services/session.service";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -76,7 +76,7 @@ export default function HomeScreen() {
   );
 
   const handleLogout = () => {
-    setSignOutCallback(() => {});
+    sessionService.setSignOutCallback(() => {});
     signOut();
   }
 

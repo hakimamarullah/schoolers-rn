@@ -164,8 +164,9 @@ class StorageService {
     await this.setRegular(STORAGE_KEYS.BIOMETRIC_ENABLED, status);
   }
 
-  async getBiometricEnabledStatus(): Promise<string | null> {
-    return await this.getRegular(STORAGE_KEYS.BIOMETRIC_ENABLED);
+  async getBiometricEnabledStatus(): Promise<boolean> {
+    const enabled = await this.getRegular(STORAGE_KEYS.BIOMETRIC_ENABLED);
+    return enabled === "true";
   }
 
   async clearBiometricCredentials(): Promise<void> {

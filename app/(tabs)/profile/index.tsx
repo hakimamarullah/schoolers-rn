@@ -3,6 +3,7 @@ import ProfileMenu from "@/components/ProfileMenu";
 import ProfilePicture from "@/components/ProfilePicture";
 import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
+import { handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
 import biometricService from "@/services/biometric.service";
 
@@ -22,8 +23,16 @@ export default function ProfileScreen() {
 
   const handleRegisterBiometric = async () => {
     try {
-      await authService.registerBiometric();
-      await authService.enableBiometric();
+      const response  = await authService.registerBiometric();
+      if (handleResponse(response).ok) {
+        await authService.enableBiometric();
+        return;
+      }
+      if (response.code === 400) {
+        app.showModal("Error", response.message, undefined, false);
+      } else {
+        throw Error(response.message);
+      }
     } catch (error: any) {
       app.showModal("Error", error.message, undefined, false);
     }

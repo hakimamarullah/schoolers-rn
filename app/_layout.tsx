@@ -2,10 +2,14 @@
 import { SplashScreenController } from "@/components/SplashScreenController";
 import { AppProvider } from "@/hooks/useApp";
 import { SessionProvider, useSession } from "@/hooks/useSession";
-import { Stack } from "expo-router";
+import sessionService from "@/services/session.service";
+import { SplashScreen, Stack } from "expo-router";
+import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+
 export default function Root() {
+  SplashScreen.preventAutoHideAsync();
   return (
     <SafeAreaProvider>
       <SessionProvider>
@@ -18,10 +22,15 @@ export default function Root() {
   );
 }
 
-function RootNavigator() {
-  const { session, isHostSet, isLoading, loginId } = useSession();
 
-  if (isLoading) return null; // or a SplashScreen component
+function RootNavigator() {
+  const { session, isHostSet, isLoading, loginId, signOut } = useSession();
+
+  if (isLoading) return null;
+
+  useEffect(() => {
+    sessionService.setSignOutCallback(signOut);
+  }, [signOut])
 
   return (
     <Stack
@@ -33,7 +42,7 @@ function RootNavigator() {
     >
       {/* ✅ 1. Host not set yet → show setupHost */}
       <Stack.Protected guard={!isHostSet}>
-        <Stack.Screen name="setupHost" />
+        <Stack.Screen name="index" />
       </Stack.Protected>
 
       {/* ✅ 2. Host is set but not logged in → show login */}

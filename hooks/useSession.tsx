@@ -1,5 +1,5 @@
-import { setSignOutCallback } from '@/config/apiClient.config';
 import authService from '@/services/auth.service';
+import sessionService from '@/services/session.service';
 import storageService from '@/services/storage.service';
 import { useStorageState } from '@/store/storageState';
 import { LoginId, UserInfo } from '@/types/auth.type';
@@ -48,7 +48,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
   
 
   const handleSignOut = useCallback(async () => {
-    console.log({fuck: "calllllled"})
     setSession(null);
     setToken(null);
     try {
@@ -64,7 +63,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
     setSession(JSON.stringify(session));
     setToken(token);
     setHost(apiHost);
-    setSignOutCallback(handleSignOut)
   }, [setSession, setToken]);
 
   const handleSetHost = useCallback(async (host: string) => {
@@ -91,8 +89,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const subscription = AppState.addEventListener(
       "change",
       (nextState: AppStateStatus) => {
-        if (nextState == "active") {
-          
+        if (nextState === "active" || nextState === "background") {
+          sessionService.setSignOutCallback(handleSignOut);
         }
         if (nextState === "inactive") {
           handleSignOut();

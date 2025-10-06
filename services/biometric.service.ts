@@ -123,7 +123,7 @@ class BiometricService {
     const available = await this.isAvailable();
     const enrolled = available ? await this.isEnrolled() : false;
     const types = enrolled ? await this.getSupportedTypes() : [];
-    const isEnabled = Boolean(await storageService.getBiometricEnabledStatus()) ?? false;
+    const isEnabled = await storageService.getBiometricEnabledStatus();
 
     return { available, enrolled, types, isEnabled };
   }
