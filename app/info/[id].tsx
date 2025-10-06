@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { useLocalSearchParams } from 'expo-router'
 import { PageLayout } from '@/components/PageLayout';
+import { useLocalSearchParams } from 'expo-router';
+import React from 'react';
+import { Text, View } from 'react-native';
 
 export default function InfoDetails() {
   const { id } = useLocalSearchParams();
@@ -13,5 +13,3 @@ export default function InfoDetails() {
     </PageLayout>
   )
 }
-
-const styles = StyleSheet.create({})

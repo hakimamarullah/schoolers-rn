@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import MapView, { Marker, Region } from "react-native-maps";
 import * as Location from "expo-location";
+import React, { useEffect, useRef, useState } from "react";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 const { width } = Dimensions.get("window");
 

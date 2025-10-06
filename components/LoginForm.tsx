@@ -1,13 +1,12 @@
+import { useApp } from "@/hooks/useApp";
+import { useBiometricAuth } from "@/hooks/useBiometricAuth";
+import { useSession } from "@/hooks/useSession";
+import { censorString } from "@/scripts/utils";
+import biometricService from "@/services/biometric.service";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import PasswordInput from "./PasswordInput";
-import { useBiometricAuth } from "@/hooks/useBiometricAuth";
-import { useSession } from "@/hooks/useSession";
-import { censorString } from "@/scripts/utils";
-import authService from "@/services/auth.service";
-import biometricService from "@/services/biometric.service";
-import { useApp } from "@/hooks/useApp";
 
 interface LoginFormProps {
   onSubmit: (password: string) => void;

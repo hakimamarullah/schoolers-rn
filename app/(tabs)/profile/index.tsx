@@ -46,6 +46,7 @@ export default function ProfileScreen() {
         await authService.disableBiometric();
       }
     } catch (error: any) {
+      console.log(error.message)
       app.showModal("Failed", "Failed to disable biometric", undefined, false);
     }
   }
@@ -63,6 +64,7 @@ export default function ProfileScreen() {
       }
     } catch (error: any) {
       app.showModal("Error", error.message, undefined, false);
+      console.log(error.message)
       return;
     }
     app.showModal("Biometric", "Disable biometric ?", handleDisableBiometric);

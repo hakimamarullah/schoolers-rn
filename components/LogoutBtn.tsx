@@ -1,6 +1,6 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { TouchableOpacity } from "react-native";
 
 interface LogoutBtnProps {
   handler: () => void; // simple click handler type
@@ -16,4 +16,3 @@ export default function LogoutBtn({ handler } : LogoutBtnProps) {
   );
 }
 
-const styles = StyleSheet.create({});
