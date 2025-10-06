@@ -1,12 +1,14 @@
 import { PageLayout } from "@/components/PageLayout";
 import SetupHostForm from "@/components/SetupHostForm";
+import { getApiClient, initializeApiClient, setSignOutCallback } from "@/config/apiClient.config";
 import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
+import storageService from "@/services/storage.service";
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function SetupHostScreen() {
-  const { setHost } = useSession();
+  const { setHost, signOut } = useSession();
   const app  = useApp();
 
 
@@ -26,7 +28,7 @@ export default function SetupHostScreen() {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 4000);
 
-        const response = await fetch(`${host}`, {
+        const response = await fetch(`${host}/api/info`, {
           method: "GET",
           signal: controller.signal,
         });
@@ -37,8 +39,12 @@ export default function SetupHostScreen() {
           throw new Error("Unreachable");
         }
 
+        await response.json();
+      
         app.hideOverlay();
         setHost(host);
+        await initializeApiClient();
+        setSignOutCallback(signOut);
       } catch (err) {
         console.warn("Host validation failed:", err);
         app.hideOverlay();

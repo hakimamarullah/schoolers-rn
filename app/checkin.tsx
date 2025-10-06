@@ -1,18 +1,13 @@
-import React from "react";
-import { ScrollView, Alert, StyleSheet } from "react-native";
-import ClockInForm from "../components/ClockInForm";
 import { PageLayout } from "@/components/PageLayout";
 import { useApp } from "@/hooks/useApp";
 import { format } from "date-fns";
+import React from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import ClockInForm from "../components/ClockInForm";
 
 const ClockInScreen = () => {
   const app = useApp();
-  const studentData = {
-    fullName: "Steve Rogers",
-    classroom: "Class A",
-    grade: "10",
-    profilePicUri: "https://avatar.iran.liara.run/public/73",
-  };
+ 
 
 
   const submitAttendance = (location : { latitude: number; longitude: number; address?: string}) => {
@@ -44,7 +39,7 @@ const ClockInScreen = () => {
   return (
     <PageLayout title='Check In'>
       <ScrollView style={styles.container}>
-        <ClockInForm data={studentData} onSubmit={handleClockIn} />
+        <ClockInForm onSubmit={handleClockIn} />
       </ScrollView>
     </PageLayout>
   );

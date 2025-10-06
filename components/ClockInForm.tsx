@@ -3,27 +3,23 @@ import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import ClockInCard from "./ClockInCard";
 import CurrentLocationMap from "./CurrentLocationMap";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useSession } from "@/hooks/useSession";
 
 interface ClockInFormProps {
-  data: {
-    fullName: string;
-    classroom: string;
-    grade?: string;
-    profilePicUri?: string;
-  };
   onSubmit: (location: { latitude: number; longitude: number, address?: string } | null) => void;
 }
 
-const ClockInForm: React.FC<ClockInFormProps> = ({ data, onSubmit }) => {
+const ClockInForm: React.FC<ClockInFormProps> = ({ onSubmit }) => {
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number, address?: string } | null>(null);
+  const { session } = useSession();
 
   return (
     <View>
       <ClockInCard
-        fullName={data.fullName}
-        classroom={data.classroom}
-        grade={data.grade}
-        profilePicUri={data.profilePicUri}
+        fullName={session?.fullName ?? "-"}
+        classroom={session?.className ?? "-"}
+        grade={session?.grade ?? "-"}
+        profilePicUri={session?.profilePictUri}
       />
 
       <CurrentLocationMap onLocationUpdate={setCurrentLocation} />

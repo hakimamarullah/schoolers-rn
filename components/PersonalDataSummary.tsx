@@ -1,34 +1,36 @@
-import React, { useRef } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import ProfilePicture from "./ProfilePicture";
-import * as MediaLibrary from "expo-media-library";
-import { captureRef } from "react-native-view-shot";
 import { useApp } from "@/hooks/useApp";
+import { useSession } from "@/hooks/useSession";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as MediaLibrary from "expo-media-library";
+import React, { useRef } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { captureRef } from "react-native-view-shot";
+import ProfilePicture from "./ProfilePicture";
 
-interface PersonalDataSummaryProps {
-  data: {
-    fullName: string;
-    nisn: string;
-    gender: string;
-    classroom: string;
-    email: string;
-    grade?: string;
-    schoolName?: string;
-    profilePicUri?: string;
-  };
-}
 
-const PersonalDataSummary: React.FC<PersonalDataSummaryProps> = ({ data }) => {
+
+const PersonalDataSummary: React.FC = () => {
   const cardRef = useRef<View>(null);
   const app = useApp();
+  const { session } = useSession();
 
   const handleSaveImage = async () => {
     try {
       // Request permission
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        app.showModal("Permission Denied", "Cannot save image without permission", undefined, false);
+        app.showModal(
+          "Permission Denied",
+          "Cannot save image without permission",
+          undefined,
+          false
+        );
         return;
       }
 
@@ -40,13 +42,19 @@ const PersonalDataSummary: React.FC<PersonalDataSummaryProps> = ({ data }) => {
 
       // Save to media library
       await MediaLibrary.saveToLibraryAsync(uri);
-      console.log({uri})
-      app.showModal("Success", "Personal data card saved to gallery!", undefined, false);
+    
+      app.showModal(
+        "Success",
+        "Personal data card saved to gallery!",
+        undefined,
+        false
+      );
     } catch (error) {
       console.error("Error saving image:", error);
       app.showModal("Error", "Failed to save image", undefined, false);
     }
   };
+
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -56,44 +64,52 @@ const PersonalDataSummary: React.FC<PersonalDataSummaryProps> = ({ data }) => {
           {/* Card Header with Profile */}
           <View style={styles.cardHeader}>
             <View style={styles.headerContent}>
-              <ProfilePicture uri={data.profilePicUri} size={60} />
+              <ProfilePicture uri={session?.profilePictUri} size={60} />
               <View style={styles.headerText}>
-                <Text style={styles.cardTitle}>{data.schoolName ?? ""}</Text>
-                <Text style={styles.profileName}>{data.fullName}</Text>
+                <Text style={styles.cardTitle}>
+                  {session?.schoolName}
+                </Text>
+                <Text style={styles.profileName}>{session?.fullName}</Text>
               </View>
             </View>
           </View>
-          
+
           {/* Card Content */}
           <View style={styles.cardContent}>
             <View style={styles.detailsGrid}>
               <View style={styles.detailColumn}>
                 <Text style={styles.detailLabel}>Full Name</Text>
-                <Text style={styles.detailValue}>{data.fullName}</Text>
-                
+                <Text style={styles.detailValue}>{session?.fullName}</Text>
+
                 <Text style={[styles.detailLabel, styles.marginTop]}>NISN</Text>
-                <Text style={styles.detailValue}>{data.nisn}</Text>
-                
-                <Text style={[styles.detailLabel, styles.marginTop]}>Gender</Text>
-                <Text style={styles.detailValue}>{data.gender}</Text>
+                <Text style={styles.detailValue}>{session?.loginId}</Text>
+
+                <Text style={[styles.detailLabel, styles.marginTop]}>
+                  Gender
+                </Text>
+                <Text style={styles.detailValue}>{session?.gender}</Text>
               </View>
 
               <View style={styles.detailColumn}>
                 <Text style={[styles.detailLabel]}>Classroom</Text>
-                <Text style={styles.detailValue}>{data.classroom}</Text>
-                
-                <Text style={[styles.detailLabel, styles.marginTop]}>Grade</Text>
-                <Text style={styles.detailValue}>{data.grade ?? "-"}</Text> 
+                <Text style={styles.detailValue}>{session?.className}</Text>
 
-                <Text style={[styles.detailLabel, styles.marginTop]}>Email</Text>
-                <Text style={styles.detailValue}>{data.email}</Text>
+                <Text style={[styles.detailLabel, styles.marginTop]}>
+                  Grade
+                </Text>
+                <Text style={styles.detailValue}>{session?.grade ?? "-"}</Text>
+
+                <Text style={[styles.detailLabel, styles.marginTop]}>
+                  Email
+                </Text>
+                <Text style={styles.detailValue}>{session?.email}</Text>
               </View>
             </View>
           </View>
         </View>
 
         {/* Save Button */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.saveButton}
           onPress={handleSaveImage}
           activeOpacity={0.7}
@@ -108,16 +124,16 @@ const PersonalDataSummary: React.FC<PersonalDataSummaryProps> = ({ data }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   cardContainer: {
     padding: 16,
   },
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -125,17 +141,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   cardHeader: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 12,
   },
   headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   headerText: {
     marginLeft: 12,
@@ -143,54 +159,54 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontWeight: "500",
+    color: "#666",
     marginBottom: 2,
   },
   profileName: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   cardContent: {
-    backgroundColor: '#FFFBEA',
+    backgroundColor: "#FFFBEA",
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   detailsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   detailColumn: {
     flex: 1,
   },
   detailLabel: {
     fontSize: 11,
-    color: '#999',
+    color: "#999",
     marginBottom: 3,
   },
   detailValue: {
     fontSize: 13,
-    color: '#333',
+    color: "#333",
     lineHeight: 18,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   marginTop: {
     marginTop: 10,
   },
   saveButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFD800',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFD800",
     paddingVertical: 14,
     borderRadius: 25,
     marginTop: 8,
   },
   saveButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
+    fontWeight: "600",
+    color: "#000",
     marginLeft: 8,
   },
 });

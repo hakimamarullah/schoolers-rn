@@ -6,6 +6,7 @@ import MenuSection from "@/components/MenuSection";
 import { PageLayout } from "@/components/PageLayout";
 import ProfilePicture from "@/components/ProfilePicture";
 import ScheduleSection from "@/components/ScheduleSection";
+import { setSignOutCallback } from "@/config/apiClient.config";
 import { MAIN_MENU } from "@/constants/menuConfig";
 import { useSession } from "@/hooks/useSession";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,13 +23,12 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  const { signOut } = useSession();
+  const { signOut, session } = useSession();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-      console.log("Page refreshed");
     }, 1500);
   }, []);
 
@@ -75,10 +75,15 @@ export default function HomeScreen() {
     [router]
   );
 
+  const handleLogout = () => {
+    setSignOutCallback(() => {});
+    signOut();
+  }
+
   return (
     <PageLayout
       title="Schoolers"
-      headerRight={<LogoutBtn handler={async () => signOut()} />}
+      headerRight={<LogoutBtn handler={handleLogout} />}
     >
       <ScrollView
         style={styles.container}
@@ -96,14 +101,14 @@ export default function HomeScreen() {
           style={styles.summaryCard}
         >
           <View style={styles.header}>
-            <Text style={styles.schoolName}>SMAN 1 Jakarta</Text>
-            <Text style={styles.className}>XII IPA-2</Text>
+            <Text style={styles.schoolName}>{session?.schoolName}</Text>
+            <Text style={styles.className}>{session?.className}</Text>
           </View>
 
           {/* Row 2: Greeting + ProfilePic */}
           <View style={styles.rowBetween}>
-            <Greeting name="Steve Roger" />
-            <ProfilePicture uri="https://avatar.iran.liara.run/public/73" />
+            <Greeting name={session?.fullName} />
+            <ProfilePicture uri={session?.profilePictUri} />
           </View>
 
           {/* Row 3: Date + FinishedInfo */}

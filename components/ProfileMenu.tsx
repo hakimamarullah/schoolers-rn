@@ -1,29 +1,32 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 interface ProfileMenuProps {
   iconName: keyof typeof MaterialIcons.glyphMap;
   label: string;
-  onPress: () => void;
+  onPress?: () => void;
   showBorder?: boolean;
+  /** Optional custom component to replace chevron */
+  rightComponent?: React.ReactNode;
 }
 
-const ProfileMenu: React.FC<ProfileMenuProps> = ({ 
-  iconName, 
-  label, 
+const ProfileMenu: React.FC<ProfileMenuProps> = ({
+  iconName,
+  label,
   onPress,
-  showBorder = true 
+  showBorder = true,
+  rightComponent,
 }) => {
   return (
-    <Pressable 
+    <Pressable
       onPress={onPress}
       style={({ pressed }) => [
         styles.container,
         showBorder && styles.borderBottom,
-        pressed && styles.pressed
+        pressed && styles.pressed,
       ]}
-      android_ripple={{ color: '#f0f0f0' }}
+      android_ripple={{ color: "#f0f0f0" }}
     >
       <View style={styles.leftContent}>
         <View style={styles.iconContainer}>
@@ -31,8 +34,11 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
         </View>
         <Text style={styles.label}>{label}</Text>
       </View>
-      
-      <MaterialIcons name="chevron-right" size={22} color="#999" />
+
+      {/* ✅ Use custom component if provided, otherwise chevron */}
+      {rightComponent ?? (
+        <MaterialIcons name="chevron-right" size={22} color="#999" />
+      )}
     </Pressable>
   );
 };

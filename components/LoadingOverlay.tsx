@@ -21,14 +21,14 @@ const LoadingOverlay = forwardRef<LoadingOverlayRef, {}>((_, ref) => {
   const fadeIn = () =>
     Animated.timing(opacity, {
       toValue: 1,
-      duration: 150,
+      duration: 100,
       useNativeDriver: true,
     }).start();
 
   const fadeOut = (onEnd?: () => void) =>
     Animated.timing(opacity, {
       toValue: 0,
-      duration: 150,
+      duration: 100,
       useNativeDriver: true,
     }).start(() => onEnd && onEnd());
 

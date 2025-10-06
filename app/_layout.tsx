@@ -19,7 +19,7 @@ export default function Root() {
 }
 
 function RootNavigator() {
-  const { session, isHostSet, isLoading } = useSession();
+  const { session, isHostSet, isLoading, loginId } = useSession();
 
   if (isLoading) return null; // or a SplashScreen component
 
@@ -37,9 +37,12 @@ function RootNavigator() {
       </Stack.Protected>
 
       {/* ✅ 2. Host is set but not logged in → show login */}
-      <Stack.Protected guard={isHostSet && !session}>
+      <Stack.Protected guard={isHostSet && !session && !!loginId}>
         <Stack.Screen name="login"/>
-        <Stack.Screen name="register"/>
+      </Stack.Protected>
+
+      <Stack.Protected guard={isHostSet && !loginId && !session}>
+        <Stack.Screen name="register" options={{ navigationBarHidden: true }}/>
       </Stack.Protected>
 
       {/* ✅ 3. Host set & logged in → main app */}

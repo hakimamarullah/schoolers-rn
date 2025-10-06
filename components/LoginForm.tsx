@@ -3,6 +3,11 @@ import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import PasswordInput from "./PasswordInput";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
+import { useSession } from "@/hooks/useSession";
+import { censorString } from "@/scripts/utils";
+import authService from "@/services/auth.service";
+import biometricService from "@/services/biometric.service";
+import { useApp } from "@/hooks/useApp";
 
 interface LoginFormProps {
   onSubmit: (password: string) => void;
@@ -17,6 +22,8 @@ export default function LoginForm({
 }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const { isBiometricSupported, authenticate } = useBiometricAuth();
+  const { loginId } = useSession();
+  const app = useApp();
 
   const handleBiometricPress = async () => {
     if (!isBiometricSupported) {
@@ -24,6 +31,12 @@ export default function LoginForm({
       return;
     }
 
+    const { isEnabled }= await biometricService.getBiometricInfo();
+
+    if (!isEnabled) {
+      app.showModal("Info", "Biometric login is disabled", undefined, false);
+      return;
+    }
     const result = await authenticate();
     
     if (result.success) {
@@ -36,8 +49,8 @@ export default function LoginForm({
   return (
     <View style={styles.container}>
       {/* User info */}
-      <Text style={styles.name}>STEVE ROGER</Text>
-      <Text style={styles.account}>11*****24</Text>
+      <Text style={styles.name}>{loginId?.fullName}</Text>
+      <Text style={styles.account}>{censorString(loginId?.loginId)}</Text>
 
       {/* Password field */}
       <PasswordInput 
@@ -78,6 +91,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
     color: "#000",
+    textTransform: "uppercase"
   },
   account: {
     fontSize: 12,

@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useRef } from "react";
+import React, { createContext, useContext, useEffect, useRef } from "react";
 import AppModal, { AppModalRef } from "@/components/AppModal";
 import LoadingOverlay, { LoadingOverlayRef } from "@/components/LoadingOverlay";
+import { initializeApiClient } from "@/config/apiClient.config";
 
 type AppContextType = {
   modalRef: React.RefObject<AppModalRef | null>;
@@ -21,6 +22,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const hideModal = () => modalRef.current?.hide();
   const showOverlay = (message? : string) => overlayRef.current?.show(message);
   const hideOverlay = () => overlayRef.current?.hide();
+
+  useEffect(() => {
+     const initClient = async () => {
+      try {
+        await initializeApiClient();
+
+      } catch(error: any) {
+        console.log(error.message);
+      }
+     }
+     initClient();
+  }, [])
 
   return (
     <AppContext.Provider
