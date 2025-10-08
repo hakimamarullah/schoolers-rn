@@ -1,6 +1,5 @@
 export const LANGUAGE_KEY = "user_language";
 
-export const CLASSROOM_KEY = "user_classroom";
 
 export const CONFIG = {
   API_TIMEOUT: 30000,

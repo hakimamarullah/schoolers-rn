@@ -4,3 +4,19 @@ export interface SimpleClassroomInfo {
   grade: string;
   academicYear: string;
 }
+
+
+export interface ScheduleInfo {
+  id: number;
+  subjectName: string;
+  teacherName: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+
+}
+export interface ClassroomSchedulesInfo {
+  classromId: number;
+  classroomName: string;
+  schedules: Record<string, ScheduleInfo[]>;
+}

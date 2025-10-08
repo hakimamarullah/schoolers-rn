@@ -4,6 +4,7 @@ import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
 import { handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
+import biometricService from "@/services/biometric.service";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -19,7 +20,10 @@ export default function LoginScreen() {
       }
 
       app.showOverlay("Logging in...");
-      const response = await authService.login(loginId?.loginId ?? "", password);
+      const response = await authService.login(
+        loginId?.loginId ?? "",
+        password
+      );
       if (response.code === 401) {
         app.showModal("Failed Login", response.message, undefined, false);
         return;
@@ -29,34 +33,49 @@ export default function LoginScreen() {
       }
 
       if (handleResponse(response).ok) {
-        signIn({session: response.data?.user, token: response.data.accessToken})
+        signIn({
+          session: response.data?.user,
+          token: response.data.accessToken,
+        });
       } else {
         throw new Error(response.message);
       }
     } catch (error: any) {
-      app.showModal("Error", "Login failed. Please try again later", undefined, false);
-    }
-    finally {
+      app.showModal(
+        "Error",
+        "Login failed. Please try again later",
+        undefined,
+        false
+      );
+    } finally {
       app.hideOverlay();
     }
   };
 
-  const handleBiometricSuccess = async () => {
-   try {
-     // Biometric verified by OS - now authenticate with backend
-    app.showOverlay("Logging in...");
-    const response = await authService.loginWithBiometric(loginId?.loginId ?? "");
-    signIn({session: response?.user, token: response.accessToken});
-   } catch(error: any) {
-     app.showModal("Error", error.message, undefined, false);
-   } finally {
-    app.hideOverlay();
-   }
-    
-  };
-
-  const handleBiometricError = (error: string) => {
-    app.showModal("Authentication Failed", error);
+  const handleBiometricLogin = async () => {
+    try {
+      // Biometric verified by OS - now authenticate with backend
+      const authenticated = await biometricService.authenticate();
+      if (!authenticated) {
+        throw new Error('Biometric authentication was cancelled or failed');
+      }
+      app.showOverlay("Logging in...");
+      const response = await authService.loginWithBiometric(
+        loginId?.loginId ?? ""
+      );
+      
+      if (response?.accessToken) {
+         signIn({ session: response.user, token: response.accessToken });
+         return;
+      } else {
+        throw new Error("Error login using biometric. no access token on response.");
+      }
+    } catch (error: any) {
+      app.showModal("Error", "Sign in with Biometric failed. Please try again.", undefined, false);
+      console.log(error.message);
+    } finally {
+      app.hideOverlay();
+    }
   };
 
   return (
@@ -64,8 +83,7 @@ export default function LoginScreen() {
       <View style={styles.container}>
         <LoginForm
           onSubmit={handlePasswordLogin}
-          onBiometricSuccess={handleBiometricSuccess}
-          onBiometricError={handleBiometricError}
+          onBiometricLogin={handleBiometricLogin}
         />
       </View>
     </PageLayout>

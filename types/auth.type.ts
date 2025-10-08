@@ -105,3 +105,8 @@ export interface LoginId {
   loginId: string;
   fullName: string;
 }
+
+export interface BiometricRegistrationResponse {
+   credentialId: number;
+   publicKeyHash: string;
+}

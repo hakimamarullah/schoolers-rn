@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 type ClassCardProps = {
   subject?: string;
   room?: string;
-  teachers?: string[];
+  teacher?: string;
   datetime?: string;
   attendance?: string;
 };
@@ -12,7 +12,7 @@ type ClassCardProps = {
 const ScheduleInfoCard = ({
   subject = "N/A",
   room = "N/A",
-  teachers = [],
+  teacher = "N/A",
   datetime = "N/A",
   attendance,
 }: ClassCardProps) => (
@@ -30,7 +30,7 @@ const ScheduleInfoCard = ({
         </View>
         <View style={styles.infoBlock}>
           <Text style={styles.label}>Datetime</Text>
-          <Text style={styles.value}>{datetime}</Text>
+          <Text style={[styles.value, styles.datetime]}>{datetime}</Text>
         </View>
         {attendance && (
           <View style={styles.infoBlock}>
@@ -43,15 +43,7 @@ const ScheduleInfoCard = ({
       {/* Right Side: Teachers stacked */}
       <View style={styles.rightInfo}>
         <Text style={styles.label}>Teachers</Text>
-        {teachers.length > 0 ? (
-          teachers.map((t, i) => (
-            <Text key={i} style={styles.value}>
-              {t}
-            </Text>
-          ))
-        ) : (
-          <Text style={styles.value}>N/A</Text>
-        )}
+        <Text style={styles.value}>{teacher}</Text>
       </View>
     </View>
   </View>
@@ -73,8 +65,9 @@ const styles = StyleSheet.create({
   subject: {
     fontSize: 16,
     fontWeight: "700",
-    marginBottom: 8,
+    marginBottom: 14,
     color: "#222",
+    textTransform: "capitalize"
   },
   infoContainer: {
     flexDirection: "row",
@@ -85,11 +78,11 @@ const styles = StyleSheet.create({
     borderColor: "#FFD800",
   },
   leftInfo: {
-    flex: 1.2, // slightly smaller so right side can expand
-    paddingRight: 8,
+    flex: 1, // balanced to give adequate space for datetime
+    paddingRight: 4,
   },
   rightInfo: {
-    flex: 1.8, // give teachers more space
+    flex: 1, // increased to give more space for teachers
     justifyContent: "flex-start",
   },
   infoBlock: {
@@ -106,4 +99,7 @@ const styles = StyleSheet.create({
     color: "#222",
     marginTop: 2,
   },
+  datetime: {
+    textTransform: "capitalize"
+  }
 });

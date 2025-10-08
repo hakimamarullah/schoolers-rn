@@ -1,5 +1,4 @@
 import { useApp } from "@/hooks/useApp";
-import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { useSession } from "@/hooks/useSession";
 import { censorString } from "@/scripts/utils";
 import biometricService from "@/services/biometric.service";
@@ -10,39 +9,25 @@ import PasswordInput from "./PasswordInput";
 
 interface LoginFormProps {
   onSubmit: (password: string) => void;
-  onBiometricSuccess?: () => void;
-  onBiometricError?: (error: string) => void;
+  onBiometricLogin?: () => void;
 }
 
-export default function LoginForm({ 
-  onSubmit, 
-  onBiometricSuccess,
-  onBiometricError 
+export default function LoginForm({
+  onSubmit,
+  onBiometricLogin,
 }: LoginFormProps) {
   const [password, setPassword] = useState("");
-  const { isBiometricSupported, authenticate } = useBiometricAuth();
   const { loginId } = useSession();
   const app = useApp();
 
   const handleBiometricPress = async () => {
-    if (!isBiometricSupported) {
-      onBiometricError?.("Biometric authentication is not supported on this device");
-      return;
-    }
-
-    const { isEnabled }= await biometricService.getBiometricInfo();
+    const { isEnabled } = await biometricService.getBiometricInfo();
 
     if (!isEnabled) {
       app.showModal("Info", "Biometric login is disabled", undefined, false);
       return;
     }
-    const result = await authenticate();
-    
-    if (result.success) {
-      onBiometricSuccess?.();
-    } else {
-      onBiometricError?.(result.error || "Authentication failed");
-    }
+    onBiometricLogin?.();
   };
 
   return (
@@ -52,9 +37,9 @@ export default function LoginForm({
       <Text style={styles.account}>{censorString(loginId?.loginId)}</Text>
 
       {/* Password field */}
-      <PasswordInput 
+      <PasswordInput
         label="Password"
-        value={password} 
+        value={password}
         onChangeText={setPassword}
       />
 
@@ -67,15 +52,12 @@ export default function LoginForm({
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
 
-        {/* Fingerprint Button - Only show if supported */}
-        {isBiometricSupported && (
-          <TouchableOpacity
-            style={styles.fpButton}
-            onPress={handleBiometricPress}
-          >
-            <Ionicons name="finger-print-outline" size={26} color="#000" />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.fpButton}
+          onPress={handleBiometricPress}
+        >
+          <Ionicons name="finger-print-outline" size={26} color="#000" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -90,7 +72,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
     color: "#000",
-    textTransform: "uppercase"
+    textTransform: "uppercase",
   },
   account: {
     fontSize: 12,

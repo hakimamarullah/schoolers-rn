@@ -1,20 +1,21 @@
-import StorageService from './storage.service';
-import BiometricService from './biometric.service';
-import DeviceService from './device.service';
+import { getApiClient, getSecureApiClient } from '@/config/apiClient.config';
+import { handleResponse, inferFileMeta } from '@/scripts/utils';
+import { ApiResponse } from '@/types/api.type';
 import {
   AuthResponse,
-  LoginRequest,
-  BiometricAuthInitRequest,
   BiometricAuthCompleteRequest,
-  BiometricRegistrationRequest,
+  BiometricAuthInitRequest,
   BiometricChallengeResponse,
-  UserInfo,
+  BiometricRegistrationRequest,
+  BiometricRegistrationResponse,
+  LoginRequest,
   RegistrationRequest,
   RegistrationResponse,
+  UserInfo,
 } from '@/types/auth.type';
-import { getApiClient } from '@/config/apiClient.config';
-import { ApiResponse } from '@/types/api.type';
-import { handleResponse, inferFileMeta } from '@/scripts/utils';
+import BiometricService from './biometric.service';
+import DeviceService from './device.service';
+import StorageService from './storage.service';
 
 
 class AuthService {
@@ -126,18 +127,10 @@ class AuthService {
    * Complete biometric login
    */
   async completeBiometricLogin(
-    challengeToken: string,
-    promptMessage?: string
+    challengeToken: string
   ): Promise<AuthResponse> {
     try {
       const apiClient = getApiClient();
-      
-      // Authenticate with biometric
-      const authenticated = await BiometricService.authenticate(promptMessage);
-      if (!authenticated) {
-        throw new Error('Biometric authentication was cancelled or failed');
-      }
-
       // Get private key
       const privateKey = await StorageService.getBiometricPrivateKey();
       if (!privateKey) {
@@ -164,7 +157,7 @@ class AuthService {
 
       return response.data?.data;
     } catch (error) {
-      throw this.handleError(error);
+      return this.handleError(error);
     }
   }
 
@@ -180,9 +173,9 @@ class AuthService {
   /**
    * Register biometric credential
    */
-  async registerBiometric(): Promise<ApiResponse<number>> {
+  async registerBiometric(): Promise<ApiResponse<BiometricRegistrationResponse>> {
     try {
-      const apiClient = getApiClient();
+      const apiClient = getSecureApiClient();
       const token = await StorageService.getAccessToken();
       if (!token) {
         throw new Error('You must be logged in to register biometric');
@@ -203,7 +196,7 @@ class AuthService {
 
       // Generate RSA key pair
       const { publicKey, privateKey } = await BiometricService.generateKeyPair();
-      const publicKeyHash = await BiometricService.hashPublicKey(publicKey);
+    
 
       const deviceInfo = await DeviceService.getDeviceInfo();
 
@@ -217,15 +210,15 @@ class AuthService {
         keySize: 2048,
       };
 
-      const response = await apiClient.post<ApiResponse<number>>('/auth/biometric/register', request);
+      const response = await apiClient.post<ApiResponse<BiometricRegistrationResponse>>('/auth/biometric/register', request);
 
       // Save credentials locally
       if (handleResponse(response.data).ok) {
-        await StorageService.saveBiometricCredentials(publicKey, privateKey, publicKeyHash);
+        const { publicKeyHash, credentialId } = response.data.data;
+        await StorageService.saveBiometricCredentials(publicKey, privateKey, publicKeyHash, credentialId);
       }
       return response.data;
     } catch (error) {
-      await StorageService.clearBiometricCredentials();
       return this.handleError(error);
     }
   }
@@ -235,7 +228,7 @@ class AuthService {
    */
   async logout(): Promise<void> {
     try {
-      const apiClient = getApiClient();
+      const apiClient = getSecureApiClient();
       const sessionId = await StorageService.getSessionId();
       console.log({sessionToLogout: sessionId})
       if (sessionId) {

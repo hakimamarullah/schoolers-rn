@@ -19,7 +19,8 @@ export const STORAGE_KEYS = {
   CLASSROOM: 'user_classroom',
   SCHOOL_NAME: 'school_name',
   LOGIN_ID: 'loginId',
-  BIOMETRIC_ENABLED: 'biometric_enabled'
+  BIOMETRIC_ENABLED: 'biometric_enabled',
+  BIOMETRIC_CREDENTIAL_ID: 'biometric_id'
 };
 
 class StorageService {
@@ -135,18 +136,21 @@ class StorageService {
   async saveBiometricCredentials(
     publicKey: string,
     privateKey: string,
-    publicKeyHash: string
+    publicKeyHash: string,
+    credentialId: number,
   ): Promise<void> {
     await this.setSecure(KEYS.BIOMETRIC_PUBLIC_KEY, publicKey);
     await this.setSecure(KEYS.BIOMETRIC_PRIVATE_KEY, privateKey);
     await this.setSecure(KEYS.BIOMETRIC_PUBLIC_KEY_HASH, publicKeyHash);
     await this.setRegular(KEYS.BIOMETRIC_REGISTERED, 'true');
+    await this.setSecure(STORAGE_KEYS.BIOMETRIC_CREDENTIAL_ID, JSON.stringify(credentialId));
+  
   }
 
   async getBiometricPublicKey(): Promise<string | null> {
     return await this.getSecure(KEYS.BIOMETRIC_PUBLIC_KEY);
+    
   }
-
   async getBiometricPrivateKey(): Promise<string | null> {
     return await this.getSecure(KEYS.BIOMETRIC_PRIVATE_KEY);
   }
@@ -174,6 +178,8 @@ class StorageService {
     await this.deleteSecure(KEYS.BIOMETRIC_PRIVATE_KEY);
     await this.deleteSecure(KEYS.BIOMETRIC_PUBLIC_KEY_HASH);
     await this.deleteRegular(KEYS.BIOMETRIC_REGISTERED);
+    await this.deleteSecure(STORAGE_KEYS.BIOMETRIC_CREDENTIAL_ID);
+    console.log("BIOMETRIC CLEARED")
   }
 
   // Clear all
@@ -181,7 +187,6 @@ class StorageService {
     await Promise.all([
       this.clearAuthTokens(),
       this.clearUserInfo(),
-      this.clearBiometricCredentials(),
     ]);
   }
 }

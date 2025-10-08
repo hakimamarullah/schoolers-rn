@@ -6,6 +6,7 @@ import { useSession } from "@/hooks/useSession";
 import { handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
 import biometricService from "@/services/biometric.service";
+import storageService from "@/services/storage.service";
 
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -18,23 +19,33 @@ export default function ProfileScreen() {
   const [enableBiometric, setEnableBiometric] = useState(false);
 
   const handleLogout = () => {
-    app.showModal("Logout", "Are you sure want to sign out?", () => signOut());
+    app.showModal("Logout", "Sign out now ?", () => signOut());
   };
 
   const handleRegisterBiometric = async () => {
     try {
+      const isRegistered = await authService.isBiometricRegistered();
+      if (isRegistered) {
+          await authService.enableBiometric();
+          setEnableBiometric(true);
+          return;
+        }
+
       const response  = await authService.registerBiometric();
       if (handleResponse(response).ok) {
         await authService.enableBiometric();
+        setEnableBiometric(true);
+        app.showModal("Info", response.message, undefined, false);
         return;
       }
-      if (response.code === 400) {
+      if (response.code === 400 || response.code === 409) {
         app.showModal("Error", response.message, undefined, false);
       } else {
         throw Error(response.message);
       }
     } catch (error: any) {
-      app.showModal("Error", error.message, undefined, false);
+      await storageService.clearBiometricCredentials();
+      app.showModal("Error", error.message ?? "Failed to register biometric", undefined, false);
     }
   };
 
@@ -52,18 +63,17 @@ export default function ProfileScreen() {
   }
   const handleEnableBiometric = async (status: boolean) => {
     try {
-      const isRegistered = await authService.isBiometricRegistered();
       if (status) {
         app.showModal(
           "Biometric",
           "Enable biometric authentication ?",
-          isRegistered ? undefined : handleRegisterBiometric,
+          handleRegisterBiometric,
           false
         );
         return;
       }
     } catch (error: any) {
-      app.showModal("Error", error.message, undefined, false);
+      app.showModal("Error", error.message ?? "Failed to enable biometric.", undefined, false);
       console.log(error.message)
       return;
     }

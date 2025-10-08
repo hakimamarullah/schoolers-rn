@@ -1,25 +1,24 @@
-import { StyleSheet, View } from "react-native";
-import React, { useState, useEffect } from "react";
-import { Option } from "@/components/SearchableDropdown";
 import ChangeClassroomForm from "@/components/ChangeClassroomForm";
 import { PageLayout } from "@/components/PageLayout";
+import { Option } from "@/components/SearchableDropdown";
 import { useApp } from "@/hooks/useApp";
-import * as SecureStore from "expo-secure-store";
-import { CLASSROOM_KEY } from "@/constants/common";
+import { useSession } from "@/hooks/useSession";
 import classroomService from "@/services/classroom.service";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function ChangeClassroomScreen() {
   const [defaultClassroom, setDefaultClassroom] = useState<string>("");
   const [classroomOptions, setClassroomOptions] = useState<Option[]>([]);
   const app = useApp();
+  const { session, signOut } = useSession();
 
   useEffect(() => {
     const loadClassroom = async () => {
       try {
         app.showOverlay("Loading...");
-        const savedClassroom = await SecureStore.getItemAsync(CLASSROOM_KEY);
-        if (savedClassroom) {
-          setDefaultClassroom(savedClassroom);
+        if (session?.classroomId) {
+          setDefaultClassroom(String(session?.classroomId));
         }
       } catch (error: any) {
         app.showModal("Error", "Failed to load classroom", undefined, false);
@@ -51,20 +50,23 @@ export default function ChangeClassroomScreen() {
   }, []);
 
 
+ 
   const handleSubmit = async (value: string) => {
     try {
-      app.showOverlay("Saving...");
-      await SecureStore.setItemAsync(CLASSROOM_KEY, value);
-      app.hideOverlay();
+      await classroomService.changeClassroom(Number(value));
       app.showModal(
         "Success",
-        "Classroom updated successfully",
+        "Classroom updated successfully. You will be signed out now.",
         undefined,
         false
       );
+      setTimeout( () => {
+        app.hideModal();
+        signOut();
+      }, 2000);
     } catch (error: any) {
-      app.hideOverlay();
-      app.showModal("Error", "Failed to save classroom", undefined, false);
+      app.showModal("Error", "Failed to save classroom. Please try again later", undefined, false);
+      console.log(error.message);
     }
   };
 

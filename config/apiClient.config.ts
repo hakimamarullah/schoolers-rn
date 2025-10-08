@@ -1,11 +1,16 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import StorageService from '../services/storage.service';
 import { CONFIG } from '@/constants/common';
 import configService from '@/services/config.service';
 import sessionService from '@/services/session.service';
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import StorageService from '../services/storage.service';
 
 // API client instance (initially null)
 let apiClientInstance: AxiosInstance | null = null;
+let apiClientInstanceInsecure: AxiosInstance | null = null;
+const clients: Record<string, AxiosInstance | null> = {
+  secure: apiClientInstance,
+  insecure: apiClientInstanceInsecure
+}
 
 /**
  * Initialize API client with host from storage
@@ -28,36 +33,54 @@ export const initializeApiClient = async (): Promise<void> => {
     baseURL,
     timeout: CONFIG.API_TIMEOUT,
   });
+
+  apiClientInstanceInsecure = axios.create({
+    baseURL,
+    timeout: CONFIG.API_TIMEOUT,
+  });
   
+  setupInterceptor(apiClientInstance, true);
+  setupInterceptor(apiClientInstanceInsecure, false);
+
+  clients["secure"] = apiClientInstance;
+  clients["insecure"] = apiClientInstanceInsecure;
+
+  
+  console.log('API Client initialized with base URL:', baseURL);
+};
+
+const setupInterceptor = (instance: AxiosInstance, isSecure: boolean) => {
 
   // Request interceptor - Add auth token
-  apiClientInstance.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    console.log(
-      config.headers,
-      config.method?.toUpperCase(),
-      config.baseURL,
-      config.url,
-      config.data || ''
-    );
+  if (isSecure) {
+    instance.interceptors.request.use(
+        async (config: InternalAxiosRequestConfig) => {
+        console.log(
+          isSecure,
+          config.headers,
+          config.method?.toUpperCase(),
+          config.baseURL,
+          config.url,
+          config.data || ''
+        );
 
-    const token = await StorageService.getAccessToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error: AxiosError) => {
-    console.error('[Request Error]', error);
-    return Promise.reject(error);
+        const token = await StorageService.getAccessToken();
+        if (token && config.headers) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error: AxiosError) => {
+        console.error('[Request Error]', error);
+        return Promise.reject(error);
+      }
+    );
   }
-);
 
   // Response interceptor - Handle 401
-  apiClientInstance.interceptors.response.use(
+  instance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
-      console.log({response_code: error.response?.status})
       if (error.response?.status === 401) {
         await StorageService.clearAll();
         await sessionService.signOut();
@@ -66,25 +89,34 @@ export const initializeApiClient = async (): Promise<void> => {
     }
   );
 
-  console.log('API Client initialized with base URL:', baseURL);
-};
+}
 
 /**
  * Get API client instance
  * Throws error if not initialized
  */
-export const getApiClient = (): AxiosInstance => {
-  if (!apiClientInstance) {
-    throw new Error('API client not initialized. Call initializeApiClient() first.');
+
+
+
+export const getSecureApiClient = (): AxiosInstance => getClient("secure");
+
+export const getApiClient = (): AxiosInstance => getClient("insecure");
+
+const getClient = (name: keyof typeof clients): AxiosInstance => {
+  const instance = clients[name];
+  if (!instance) {
+    throw new Error(`API client ${name} not initialized. Call initializeApiClient() first.`);
   }
-  return apiClientInstance;
+  return instance;
 };
+
+
 
 /**
  * Check if API client is initialized
  */
 export const isApiClientInitialized = (): boolean => {
-  return apiClientInstance !== null;
+  return apiClientInstance !== null && apiClientInstanceInsecure !== null;
 };
 
 /**
@@ -92,14 +124,6 @@ export const isApiClientInitialized = (): boolean => {
  */
 export const destroyApiClient = (): void => {
   apiClientInstance = null;
+  apiClientInstanceInsecure = null;
 };
 
-// Export default for backward compatibility
-export default {
-  get client() {
-    return getApiClient();
-  },
-  initialize: initializeApiClient,
-  isInitialized: isApiClientInitialized,
-  destroy: destroyApiClient,
-};
