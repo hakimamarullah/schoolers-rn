@@ -1,19 +1,41 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Stack, useRouter } from "expo-router";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
-
+import { PageLayout } from "@/components/PageLayout";
+import { useSession } from "@/hooks/useSession";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function NotFoundScreen() {
+  const { session, isHostSet, isLoading, loginId } = useSession();
+  const router = useRouter();
+
+  const handleRecovery = () => {
+    if (!isHostSet) return router.replace("/");
+    if (isHostSet && !session && !!loginId) return router.replace("/login");
+    if (isHostSet && !loginId && !session) return router.replace("/register");
+    if (isHostSet && !!session) return router.replace("/home");
+  };
+
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!', headerStyle: { backgroundColor: "#ffb800"} }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
+      <Stack.Screen options={{ headerShown: false }} />
+      <PageLayout title="Oops">
+        <View style={styles.container}>
+       
+          <MaterialIcons
+            name="error-outline"
+            size={64}
+            color="#9e9e9e" 
+            style={styles.icon}
+          />
 
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Setup host!</Text>
-        </Link>
-      </View>
+          <Text style={styles.title}>This screen doesn't exist.</Text>
+
+          <TouchableOpacity style={styles.link} onPress={handleRecovery}>
+            <Text style={styles.linkText}>Bring me back!</Text>
+          </TouchableOpacity>
+        </View>
+      </PageLayout>
     </>
   );
 }
@@ -21,13 +43,19 @@ export default function NotFoundScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
+  },
+  icon: {
+    marginBottom: 20,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#9e9e9e"
   },
   link: {
     marginTop: 15,
@@ -35,6 +63,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: '#2e78b7',
+    color: "#2e78b7",
   },
 });

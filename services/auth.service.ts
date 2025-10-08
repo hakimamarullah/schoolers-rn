@@ -11,11 +11,15 @@ import {
   LoginRequest,
   RegistrationRequest,
   RegistrationResponse,
-  UserInfo,
+  ValidateSessionRequest,
+  ValidateSessionResponse
 } from '@/types/auth.type';
 import BiometricService from './biometric.service';
 import DeviceService from './device.service';
 import StorageService from './storage.service';
+import deviceService from './device.service';
+import storageService from './storage.service';
+import sessionService from './session.service';
 
 
 class AuthService {
@@ -37,7 +41,7 @@ class AuthService {
       
       const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth/login', request);
       
-      await this.saveAuthData(response.data?.data);
+      await StorageService.saveSessionId(response.data?.data?.sessionId);
 
       return response.data;
     } catch (error: any) {
@@ -153,7 +157,7 @@ class AuthService {
         request
       );
 
-      await this.saveAuthData(response.data?.data);
+      await StorageService.saveSessionId(response.data?.data?.sessionId);
 
       return response.data?.data;
     } catch (error) {
@@ -230,7 +234,6 @@ class AuthService {
     try {
       const apiClient = getSecureApiClient();
       const sessionId = await StorageService.getSessionId();
-      console.log({sessionToLogout: sessionId})
       if (sessionId) {
         await apiClient.post(`/auth/logout`, null, {
           params: { sessionId },
@@ -259,12 +262,7 @@ class AuthService {
      await StorageService.setBiometricEnabled(String(false));
   }
 
-  /**
-   * Get current user
-   */
-  async getCurrentUser(): Promise<UserInfo | null> {
-    return await StorageService.getUserInfo();
-  }
+
 
   /**
    * Check if biometric is registered
@@ -273,13 +271,28 @@ class AuthService {
     return await StorageService.isBiometricRegistered();
   }
 
-  /**
-   * Save auth data
-   */
-  private async saveAuthData(data: AuthResponse): Promise<void> {
-    await StorageService.saveAuthTokens(data.accessToken, data.sessionId);
-    await StorageService.saveUserInfo(data.user);
+  async validateSession(onError?: (value: string) => void): Promise<void> {
+    try {
+
+      const request: ValidateSessionRequest = {
+        sessionId: await storageService.getSessionId(),
+        deviceId: await deviceService.getDeviceIdAsync()
+      }
+      const api = getSecureApiClient();
+      const response = await api.post<ApiResponse<ValidateSessionResponse>>("/sessions/validate", request);
+      const { isValid } = response.data?.data ?? {};
+      if (!isValid) {
+        onError?.(response.data?.message);
+        await sessionService.signOut();
+      }
+    } catch(error: any) {
+      console.log({valSession: error.response?.data})
+      onError?.(error.response?.data?.message ?? error.message);
+      await sessionService.signOut();
+    }
   }
+
+
 
   /**
    * Handle errors

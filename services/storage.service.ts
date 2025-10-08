@@ -1,10 +1,10 @@
-import * as SecureStore from 'expo-secure-store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LoginId, UserInfo } from '@/types/auth.type';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 
 const KEYS = {
-  ACCESS_TOKEN: 'auth_access_token',
+  ACCESS_TOKEN: 'token',
   SESSION_ID: 'auth_session_id',
   USER_INFO: 'auth_user_info',
   BIOMETRIC_PUBLIC_KEY: 'biometric_public_key',
@@ -100,8 +100,7 @@ class StorageService {
   }
 
   // Auth tokens
-  async saveAuthTokens(accessToken: string, sessionId: string): Promise<void> {
-    await this.setSecure(KEYS.ACCESS_TOKEN, accessToken);
+  async saveSessionId(sessionId: string): Promise<void> {
     await this.setSecure(KEYS.SESSION_ID, sessionId);
   }
 
@@ -121,11 +120,6 @@ class StorageService {
   // User info
   async saveUserInfo(user: UserInfo): Promise<void> {
     await this.setRegular(KEYS.USER_INFO, JSON.stringify(user));
-  }
-
-  async getUserInfo(): Promise<UserInfo | null> {
-    const userStr = await this.getRegular(KEYS.USER_INFO);
-    return userStr ? JSON.parse(userStr) : null;
   }
 
   async clearUserInfo(): Promise<void> {

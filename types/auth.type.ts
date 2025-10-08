@@ -110,3 +110,13 @@ export interface BiometricRegistrationResponse {
    credentialId: number;
    publicKeyHash: string;
 }
+
+
+export interface ValidateSessionRequest {
+  sessionId: string | null;
+  deviceId: string | null;
+}
+
+export interface ValidateSessionResponse {
+  isValid: boolean;
+}

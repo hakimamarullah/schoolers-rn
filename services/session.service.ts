@@ -1,3 +1,4 @@
+
 class SessionService {
   private static instance: SessionService;
   private signOutCallback: (() => void) | null = null;

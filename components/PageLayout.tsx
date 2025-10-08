@@ -1,15 +1,18 @@
-import React from "react";
+import { useApp } from "@/hooks/useApp";
+import { useSession } from "@/hooks/useSession";
+import authService from "@/services/auth.service";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter, useSegments } from "expo-router";
+import React, { useEffect } from "react";
 import {
-  View,
-  Text,
   StyleSheet,
-  ViewStyle,
+  Text,
   TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter, useSegments } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 
 interface PageLayoutProps {
   title?: string;
@@ -29,6 +32,8 @@ export function PageLayout({
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const segments = useSegments();
+  const app = useApp();
+  const { session } = useSession();
 
   // figure out if we are at the root of a tab stack
   const parent = segments[segments.length - 2];
@@ -41,6 +46,20 @@ export function PageLayout({
     : headerRight
     ? [headerRight]
     : [];
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        if (session) {
+           await authService.validateSession((message) => app.showModal("Info", message, undefined, false));
+        }
+        
+      } catch(error: any) {
+        console.log({error: error.message});
+      }
+    }
+    checkSession();
+  }, []);
 
   return (
     <View style={styles.container}>

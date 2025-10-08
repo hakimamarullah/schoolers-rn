@@ -2,9 +2,8 @@
 import { SplashScreenController } from "@/components/SplashScreenController";
 import { AppProvider } from "@/hooks/useApp";
 import { SessionProvider, useSession } from "@/hooks/useSession";
-import sessionService from "@/services/session.service";
+import { useSetupLocationPermission } from "@/hooks/useSetupLocationPermission";
 import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 
@@ -24,13 +23,11 @@ export default function Root() {
 
 
 function RootNavigator() {
-  const { session, isHostSet, isLoading, loginId, signOut } = useSession();
+  const { session, isHostSet, isLoading, loginId } = useSession();
+
+  useSetupLocationPermission();
 
   if (isLoading) return null;
-
-  useEffect(() => {
-    sessionService.setSignOutCallback(signOut);
-  }, [signOut])
 
   return (
     <Stack

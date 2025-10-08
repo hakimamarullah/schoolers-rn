@@ -49,11 +49,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const handleSignOut = useCallback(async () => {
     setSession(null);
-    setToken(null);
     try {
       await authService.logout();
     } catch(error: any) {
       console.log(`Error logout ${error.message}`);
+    } finally {
+      setToken(null);
     }
   }, [setSession, setToken]);
 
@@ -63,6 +64,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
     setSession(JSON.stringify(session));
     setToken(token);
     setHost(apiHost);
+    sessionService.setSignOutCallback(handleSignOut);
   }, [setSession, setToken]);
 
   const handleSetHost = useCallback(async (host: string) => {
