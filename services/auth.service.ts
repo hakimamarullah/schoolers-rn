@@ -15,11 +15,9 @@ import {
   ValidateSessionResponse
 } from '@/types/auth.type';
 import BiometricService from './biometric.service';
-import DeviceService from './device.service';
-import StorageService from './storage.service';
-import deviceService from './device.service';
-import storageService from './storage.service';
+import { default as DeviceService, default as deviceService } from './device.service';
 import sessionService from './session.service';
+import { default as StorageService, default as storageService } from './storage.service';
 
 
 class AuthService {
