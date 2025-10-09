@@ -1,7 +1,7 @@
 import * as Location from "expo-location";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 const { width } = Dimensions.get("window");
 
@@ -59,6 +59,8 @@ const CurrentLocationMap: React.FC<CurrentLocationMapProps> = ({ onLocationUpdat
       <MapView
         ref={mapRef}
         style={styles.map}
+        provider={PROVIDER_GOOGLE}
+        loadingEnabled={false}
         initialRegion={{
           latitude: location.latitude,
           longitude: location.longitude,

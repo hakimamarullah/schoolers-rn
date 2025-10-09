@@ -284,7 +284,6 @@ class AuthService {
         await sessionService.signOut();
       }
     } catch(error: any) {
-      console.log({valSession: error.response?.data})
       onError?.(error.response?.data?.message ?? error.message);
       await sessionService.signOut();
     }
