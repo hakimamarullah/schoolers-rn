@@ -5,13 +5,16 @@ import LogoutBtn from "@/components/LogoutBtn";
 import MenuSection from "@/components/MenuSection";
 import { PageLayout } from "@/components/PageLayout";
 import ProfilePicture from "@/components/ProfilePicture";
-import ScheduleSection from "@/components/ScheduleSection";
+import SessionInfoSection from "@/components/ScheduleSection";
 import { MAIN_MENU } from "@/constants/menuConfig";
+import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
+import homepageInfoService from "@/services/homepageInfo.service";
 import sessionService from "@/services/session.service";
+import { AttendanceStats, SessionInfo } from "@/types/classroom.type";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -23,42 +26,22 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add this
   const { signOut, session } = useSession();
+  const [ongoingSessions, setOngoingSessions] = useState<SessionInfo[]>([]);
+  const [upcomingSessions, setUpcomingSessions] = useState<SessionInfo[]>([]);
+  const [cancelledSessions, setCancelledSessions] = useState<SessionInfo[]>([]);
+  const [sessionStats, setSessionStats] = useState<AttendanceStats | undefined>(undefined);
+  const [finishedSession, setFinishedSession] = useState<SessionInfo[]>([]);
+  const app = useApp();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    setRefreshTrigger(prev => prev + 1); // Trigger data refetch
     setTimeout(() => {
       setRefreshing(false);
     }, 1500);
   }, []);
-
-  const ongoing = [
-    {
-      subject: "Ilmu Pengetahuan Alam",
-      room: "XII IPA-2",
-      teachers: ["Kim Ji Won S.pd.", "Song Hye Kyo M.pd."],
-      datetime: "Monday, 08.00-09.00",
-      attendance: "2/2",
-    },
-  ];
-
-  const upcoming = Array.from({ length: 6 }).map(() => ({
-    subject: "Sejarah Pengetahuan Islam",
-    room: "XII IPA-2",
-    teachers: ["Kim Ji Won S.pd.", "Song Hye Kyo M.pd."],
-    datetime: "Monday, 08.00-09.00",
-    attendance: "2/2",
-  }));
-
-  const cancelled = [
-    {
-      subject: "Matematika Dasar",
-      room: "XII IPA-2",
-      teachers: ["N/A"],
-      datetime: "Cancelled",
-      attendance: "-",
-    },
-  ];
 
   const mainMenu = useMemo(
     () =>
@@ -78,7 +61,30 @@ export default function HomeScreen() {
   const handleLogout = () => {
     sessionService.setSignOutCallback(() => {});
     signOut();
-  }
+  };
+
+  useEffect(() => {
+    const fetchHomepageInfo = async () => {
+      try {
+        const data = await homepageInfoService.getHomepageInfo();
+        setSessionStats(data?.attendanceStats);
+        setOngoingSessions(data?.ongoingSessions);
+        setUpcomingSessions(data?.upcomingSessions);
+        setCancelledSessions(data?.cancelledSessions);
+        setFinishedSession(data?.finishedSessions);
+      } catch (error: any) {
+        console.log({ error: error.message });
+        app.showModal(
+          "Info",
+          "Oops can't get sessions info :(",
+          undefined,
+          false
+        );
+      }
+    };
+
+    fetchHomepageInfo();
+  }, [refreshTrigger]); // Changed dependency
 
   return (
     <PageLayout
@@ -95,7 +101,7 @@ export default function HomeScreen() {
       >
         {/* Top Summary Card */}
         <LinearGradient
-          colors={["#FFD800", "#FFB800"]} // gradient from bright to darker yellow
+          colors={["#FFD800", "#FFB800"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.summaryCard}
@@ -115,15 +121,19 @@ export default function HomeScreen() {
           <View style={styles.rowTight}>
             <View style={styles.bottomInfo}>
               <DateTimeDisplay />
-              <FinishedClassInfo finished={1} total={5} />
+              <FinishedClassInfo 
+                finished={sessionStats?.finishedClasses ?? 0} 
+                total={sessionStats?.totalClasses ?? 0} 
+              />
             </View>
           </View>
         </LinearGradient>
         <MenuSection title="Main Menu" data={mainMenu} />
 
-        <ScheduleSection title="Ongoing" data={ongoing} />
-        <ScheduleSection title="Upcoming" data={upcoming} />
-        <ScheduleSection title="Cancelled" data={cancelled} />
+        <SessionInfoSection title="Ongoing" data={ongoingSessions} />
+        <SessionInfoSection title="Upcoming" data={upcomingSessions} />
+        <SessionInfoSection title="Cancelled" data={cancelledSessions} />
+        <SessionInfoSection title="Finished" data={finishedSession} />
       </ScrollView>
     </PageLayout>
   );
@@ -135,10 +145,10 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   summaryCard: {
-    backgroundColor: "#FFD800", // brand yellow
+    backgroundColor: "#FFD800",
     borderRadius: 20,
     marginBottom: 16,
-    overflow: "hidden", // ensures check-in wraps properly
+    overflow: "hidden",
   },
   header: {
     alignItems: "center",

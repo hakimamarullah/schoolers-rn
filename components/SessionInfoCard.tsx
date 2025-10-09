@@ -1,22 +1,16 @@
+import { SessionInfo } from "@/types/classroom.type";
 import React, { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-type ClassCardProps = {
-  subject?: string;
-  room?: string;
-  teacher?: string;
-  datetime?: string;
-};
 
-const ScheduleInfoCard = ({
-  subject = "N/A",
-  room = "N/A",
-  teacher = "N/A",
-  datetime = "N/A",
-}: ClassCardProps) => (
+type SessionInfoCardProps = {
+  data?: SessionInfo
+}
+
+const SessionInfoCard = ({ data }: SessionInfoCardProps) => (
   <View style={styles.outerCard}>
     {/* Subject Title */}
-    <Text style={styles.subject}>{subject}</Text>
+    <Text style={styles.subject}>{data?.subjectName}</Text>
 
     {/* Inner Info Container */}
     <View style={styles.infoContainer}>
@@ -24,24 +18,36 @@ const ScheduleInfoCard = ({
       <View style={styles.leftInfo}>
         <View style={styles.infoBlock}>
           <Text style={styles.label}>Room</Text>
-          <Text style={styles.value}>{room}</Text>
+          <Text style={styles.value}>{data?.room}</Text>
         </View>
         <View style={styles.infoBlock}>
           <Text style={styles.label}>Datetime</Text>
-          <Text style={[styles.value, styles.datetime]}>{datetime}</Text>
+          <Text style={[styles.value, styles.datetime]}>{data?.datetime}</Text>
         </View>
+       
+          <View style={styles.infoBlock}>
+            <Text style={styles.label}>Attendance</Text>
+            <Text style={styles.value}>{`${data?.attendanceInfo?.attendedSessions}/${data?.attendanceInfo?.totalSessions}`}</Text>
+          </View>
+      
       </View>
 
       {/* Right Side: Teachers stacked */}
       <View style={styles.rightInfo}>
-        <Text style={styles.label}>Teachers</Text>
-        <Text style={styles.value}>{teacher}</Text>
+        <View style={styles.infoBlock}>
+            <Text style={styles.label}>Teacher</Text>
+            <Text style={styles.value}>{data?.teacherName}</Text>
+          </View>
+        <View style={styles.infoBlock}>
+            <Text style={styles.label}>Topic</Text>
+            <Text style={styles.value}>{data?.topic ?? "-"}</Text>
+          </View>
       </View>
     </View>
   </View>
 );
 
-export default memo(ScheduleInfoCard);
+export default memo(SessionInfoCard);
 
 const styles = StyleSheet.create({
   outerCard: {

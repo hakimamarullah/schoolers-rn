@@ -48,9 +48,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 18,
-    paddingBottom: 6,
-    borderBottomColor: "#ffd800",
-    borderBottomWidth: 1
+    paddingBottom: 6
   },
   menuGrid: {
     flexDirection: "row",
