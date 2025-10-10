@@ -4,10 +4,12 @@ import React from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { useSession } from "@/hooks/useSession";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function NotFoundScreen() {
-  const { session, isHostSet, isLoading, loginId } = useSession();
+  const { session, isHostSet, loginId } = useSession();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleRecovery = () => {
     if (!isHostSet) return router.replace("/");
@@ -29,10 +31,10 @@ export default function NotFoundScreen() {
             style={styles.icon}
           />
 
-          <Text style={styles.title}>This screen doesn't exist.</Text>
+          <Text style={styles.title}>{t("common.screenNotFound")}</Text>
 
           <TouchableOpacity style={styles.link} onPress={handleRecovery}>
-            <Text style={styles.linkText}>Bring me back!</Text>
+            <Text style={styles.linkText}>{t("common.bringMeBack")}</Text>
           </TouchableOpacity>
         </View>
       </PageLayout>

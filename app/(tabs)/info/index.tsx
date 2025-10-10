@@ -7,7 +7,7 @@ import { StyleSheet, FlatList } from 'react-native'
 export default function InfoScreen() {
   const router = useRouter()
 
-  // 20 mock notifications
+  
   const info: NotificationInfo[] = useMemo(
     () =>
       Array.from({ length: 20 }, (_, i) => ({
@@ -17,7 +17,7 @@ export default function InfoScreen() {
             ? 'Check new assignment for biology that you might have missed last week'
             : 'Important update from the school administration regarding upcoming exams and activities'
         }`,
-        hasRead: i % 3 === 0, // some read, some unread
+        hasRead: i % 3 === 0,
         content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. ${
           i % 2 === 0
             ? 'Quisque faucibus ex sapien. Lorem ipsum dolor sit amet consectetur adipiscing elit.'
@@ -43,10 +43,10 @@ export default function InfoScreen() {
         )}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews={true} // improves performance
-        initialNumToRender={10} // render first 10 items initially
-        maxToRenderPerBatch={5} // batch rendering
-        windowSize={5} // number of items rendered outside viewport
+        removeClippedSubviews={true}
+        initialNumToRender={10}
+        maxToRenderPerBatch={5}
+        windowSize={5}
       />
     </PageLayout>
   )

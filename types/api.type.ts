@@ -9,3 +9,18 @@ export interface FieldError {
   fieldName: string;
   message: string;
 }
+
+export interface ClockInRequest {
+  sessionId: number;
+  loginId: string;
+  latitude: string;
+  longitude: string;
+}
+
+export interface AttendanceResponse {
+  id: number;
+  clockInTime: string;
+  isLate: boolean;
+  latitude: string;
+  longitude: string;
+}

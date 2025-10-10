@@ -2,6 +2,7 @@ import { PageLayout } from "@/components/PageLayout";
 import SetupHostForm from "@/components/SetupHostForm";
 import { initializeApiClient } from "@/config/apiClient.config";
 import { useApp } from "@/hooks/useApp";
+import { useSafeTimeout } from "@/hooks/useSafeTimeout";
 import { useSession } from "@/hooks/useSession";
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
@@ -10,6 +11,7 @@ export default function SetupHostScreen() {
   const { setHost } = useSession();
   const app  = useApp();
 
+  const { setSafeTimeout } = useSafeTimeout();
 
   const handleSubmit = useCallback(
     async (host: string) => {
@@ -25,14 +27,12 @@ export default function SetupHostScreen() {
         app.showOverlay("Validating host...");
 
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4000);
+        setSafeTimeout(() => controller.abort(), 4000);
 
         const response = await fetch(`${host}/api/info`, {
           method: "GET",
           signal: controller.signal,
         });
-
-        clearTimeout(timeout);
 
         if (!response.ok) {
           throw new Error("Unreachable");

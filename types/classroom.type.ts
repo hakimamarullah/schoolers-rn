@@ -29,7 +29,6 @@ export interface AttendanceInfo {
 }
 export interface SessionInfo {
   sessionId: number;
-  attendanceSessionId: number;
   startTime: string;
   endTime: string;
   scheduleId: number;
@@ -38,6 +37,8 @@ export interface SessionInfo {
   teacherName: string;
   datetime: string;
   sessionDate: string;
+  displayDate: string;
+  displayTime: string;
   topic: string;
   status: string;
   attendanceInfo: AttendanceInfo;

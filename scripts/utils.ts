@@ -1,3 +1,4 @@
+import i18n from "@/i18n/i18n";
 import { ApiResponse } from "@/types/api.type";
 
 export const getGreetingText = (hour: number) => {
@@ -99,3 +100,17 @@ export const censorString = (
 
   return `${front}${masked}${back}`;
 };
+
+
+export const handleError = (error: any): any => {
+    if (error.response?.data) {
+      if (error.response?.data.code >= 500 && error.response.data.code <= 599) {
+        throw new Error(i18n.t("common.systemUnavailable"));
+      }
+      return error.response?.data;
+    }
+    if (error.message) {
+      throw new Error(i18n.t("common.systemUnavailable"));
+    }
+    throw new Error(i18n.t("common.networkError"));
+  }

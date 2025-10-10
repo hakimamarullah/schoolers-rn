@@ -1,5 +1,5 @@
 import { getApiClient, getSecureApiClient } from '@/config/apiClient.config';
-import { handleResponse, inferFileMeta } from '@/scripts/utils';
+import { handleError, handleResponse, inferFileMeta } from '@/scripts/utils';
 import { ApiResponse } from '@/types/api.type';
 import {
   AuthResponse,
@@ -18,6 +18,7 @@ import BiometricService from './biometric.service';
 import { default as DeviceService, default as deviceService } from './device.service';
 import sessionService from './session.service';
 import { default as StorageService, default as storageService } from './storage.service';
+import i18n from '@/i18n/i18n';
 
 
 class AuthService {
@@ -43,7 +44,7 @@ class AuthService {
 
       return response.data;
     } catch (error: any) {
-      return this.handleError(error);
+      return handleError(error);
     }
   }
 
@@ -85,7 +86,7 @@ class AuthService {
 
     return response.data;
     } catch(error: any) {
-      return this.handleError(error)
+      return handleError(error)
     }
     
   }
@@ -121,7 +122,7 @@ class AuthService {
 
       return response.data?.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw handleError(error);
     }
   }
 
@@ -159,7 +160,7 @@ class AuthService {
 
       return response.data?.data;
     } catch (error) {
-      return this.handleError(error);
+      return handleError(error);
     }
   }
 
@@ -221,7 +222,7 @@ class AuthService {
       }
       return response.data;
     } catch (error) {
-      return this.handleError(error);
+      return handleError(error);
     }
   }
 
@@ -284,25 +285,11 @@ class AuthService {
         await sessionService.signOut();
       }
     } catch(error: any) {
-      onError?.(error.response?.data?.message ?? error.message);
+      onError?.(error.response?.data?.message ?? i18n.t("common.systemUnavailable"));
       await sessionService.signOut();
     }
   }
 
-
-
-  /**
-   * Handle errors
-   */
-  private handleError(error: any): any {
-    if (error.response?.data) {
-      return error.response?.data;
-    }
-    if (error.message) {
-      throw new Error(error.message);
-    }
-    throw new Error('Network error. Please check your connection.');
-  }
 }
 
 export default new AuthService();

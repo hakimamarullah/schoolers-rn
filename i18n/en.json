@@ -5,7 +5,8 @@
     "Ongoing": "Ongoing",
     "Upcoming": "Upcoming",
     "Cancelled": "Cancelled",
-    "Finished": "Finished"
+    "Finished": "Finished",
+    "failedGetSessionInfo": "Oops can't get sessions info :("
   },
    "login": {
     "Please enter your password": "Masukkan password kamu dulu ya!",
@@ -73,7 +74,17 @@
     "datetime": "Datetime",
     "teacher": "Teacher",
     "topic": "Topic",
-    "no sessions available": "No sessions available"
+    "no sessions available": "No sessions available",
+    "subjectName": "Subject",
+    "dateLabel": "Date",
+    "timeLabel": "Time",
+    "No Ongoing Session": "No Ongoing Session",
+    "success": "Success",
+    "screenNotFound": "This screen doesn't exist.",
+    "bringMeBack": "Bring me back!",
+    "systemUnavailable": "System Unavailable",
+    "networkError": "Network error. Please check your connection.",
+    "noUserInfoFound": "User info not found"
   },
   "day" : {
     "mon": "Mon",
@@ -82,5 +93,17 @@
     "thu": "Thu",
     "fri": "Fri",
     "sat": "Sat"
+  },
+  "checkin": {
+    "clockInSuccess": "Your attendance has been recorded at address: {{address}} on {{datetime}}",
+    "location not available": "Location not available",
+    "Cannot clock in without location": "Cannot clock in without location",
+    "Clock in now?": "Clock in now?",
+    "Failed to get ongoing session info.": "Failed to get ongoing session info."
+  },
+  "changeClass": {
+    "Failed to save classroom. Please try again later": "Failed to save classroom. Please try again later",
+    "Classroom updated successfully. You will be signed out now.": "Classroom updated successfully. You will be signed out now.",
+     "Failed to get classroom info":  "Failed to get classroom info"
   }
 }

@@ -1,7 +1,7 @@
 import { getSecureApiClient } from "@/config/apiClient.config";
+import { handleError } from "@/scripts/utils";
 import { ApiResponse } from "@/types/api.type";
 import { ClassroomSchedulesInfo, GetClassroomSessionRequest, SessionInfo, SimpleClassroomInfo } from "@/types/classroom.type";
-import storageService from "./storage.service";
 import { format } from "date-fns";
 
 class ClassroomService {
@@ -38,19 +38,10 @@ class ClassroomService {
 
     return response.data?.data;
     } catch(error: any) {
-      return this.handleError(error);
+      return handleError(error);
     }
   }
 
-  private handleError(error: any): any {
-    if (error.response?.data) {
-      return error.response?.data;
-    }
-    if (error.message) {
-      throw new Error(error.message);
-    }
-    throw new Error('Network error. Please check your connection.');
-  }
 }
 
 export default new ClassroomService();

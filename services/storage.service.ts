@@ -25,7 +25,7 @@ export const STORAGE_KEYS = {
 
 class StorageService {
 
-  // Secure storage for sensitive data
+  
   private async setSecure(key: string, value: string): Promise<void> {
     try {
       await SecureStore.setItemAsync(key, value);
@@ -52,7 +52,7 @@ class StorageService {
     }
   }
 
-  // Regular storage
+  
   private async setRegular(key: string, value: string): Promise<void> {
     try {
       await AsyncStorage.setItem(key, value);
@@ -78,6 +78,7 @@ class StorageService {
   async saveData(key: string, value: any) : Promise<void> {
     await this.setRegular(key, value);
   }
+
   private async deleteRegular(key: string): Promise<void> {
     try {
       await AsyncStorage.removeItem(key);
@@ -89,6 +90,11 @@ class StorageService {
   async getLoginId(): Promise<LoginId | null> {
     const storedId = await this.getSecure(STORAGE_KEYS.LOGIN_ID);
     return storedId && JSON.parse(storedId);
+  }
+
+  async getUserInfo(): Promise<UserInfo | null> {
+    const userInfo = await this.getSecure("session");
+    return userInfo && JSON.parse(userInfo);
   }
 
   async getApiHost(): Promise<string | null> {
@@ -127,11 +133,6 @@ class StorageService {
   async clearAuthTokens(): Promise<void> {
     await this.deleteSecure(KEYS.ACCESS_TOKEN);
     await this.deleteSecure(KEYS.SESSION_ID);
-  }
-
-  // User info
-  async saveUserInfo(user: UserInfo): Promise<void> {
-    await this.setRegular(KEYS.USER_INFO, JSON.stringify(user));
   }
 
   async clearUserInfo(): Promise<void> {

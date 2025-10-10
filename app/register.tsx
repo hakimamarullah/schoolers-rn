@@ -72,7 +72,7 @@ export default function RegisterScreen() {
 
   const onRefresh = useCallback(async () => {
     try {
-      app.showModal("Info", "Reset form ?", performRefresh);
+      app.showModal("Info", "Reset form?", performRefresh);
     } finally {
       setRefreshing(false);
     }

@@ -8,6 +8,7 @@ import ProfilePicture from "@/components/ProfilePicture";
 import SessionInfoSection from "@/components/ScheduleSection";
 import { MAIN_MENU } from "@/constants/menuConfig";
 import { useApp } from "@/hooks/useApp";
+import { useSafeTimeout } from "@/hooks/useSafeTimeout";
 import { useSession } from "@/hooks/useSession";
 import homepageInfoService from "@/services/homepageInfo.service";
 import sessionService from "@/services/session.service";
@@ -27,7 +28,7 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add this
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { signOut, session } = useSession();
   const [ongoingSessions, setOngoingSessions] = useState<SessionInfo[]>([]);
   const [upcomingSessions, setUpcomingSessions] = useState<SessionInfo[]>([]);
@@ -36,14 +37,15 @@ export default function HomeScreen() {
   const [finishedSession, setFinishedSession] = useState<SessionInfo[]>([]);
   const app = useApp();
   const { t } = useTranslation();
+  const { setSafeTimeout } = useSafeTimeout();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setRefreshTrigger(prev => prev + 1); // Trigger data refetch
-    setTimeout(() => {
+    setRefreshTrigger(prev => prev + 1);
+    setSafeTimeout(() => {
       setRefreshing(false);
     }, 1500);
-  }, []);
+  }, [setSafeTimeout]);
 
   const mainMenu = useMemo(
     () =>
@@ -78,7 +80,7 @@ export default function HomeScreen() {
         console.log({ error: error.message });
         app.showModal(
           "Info",
-          "Oops can't get sessions info :(",
+          t("home.failedGetSessionInfo"),
           undefined,
           false
         );
@@ -86,7 +88,7 @@ export default function HomeScreen() {
     };
 
     fetchHomepageInfo();
-  }, [refreshTrigger]); // Changed dependency
+  }, [refreshTrigger]);
 
   return (
     <PageLayout

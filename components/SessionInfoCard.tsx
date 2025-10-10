@@ -78,13 +78,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: "#FFD800",
-    columnGap: 3, // Smaller gap
+    columnGap: 3,
   },
   leftInfo: {
-    flex: 0.48, // Reduced flex
+    flex: 0.48,
   },
   rightInfo: {
-    flex: 0.48, // Reduced flex
+    flex: 0.48,
     justifyContent: "flex-start",
   },
   infoBlock: {

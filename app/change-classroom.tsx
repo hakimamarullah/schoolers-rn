@@ -2,6 +2,7 @@ import ChangeClassroomForm from "@/components/ChangeClassroomForm";
 import { PageLayout } from "@/components/PageLayout";
 import { Option } from "@/components/SearchableDropdown";
 import { useApp } from "@/hooks/useApp";
+import { useSafeTimeout } from "@/hooks/useSafeTimeout";
 import { useSession } from "@/hooks/useSession";
 import classroomService from "@/services/classroom.service";
 import React, { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ export default function ChangeClassroomScreen() {
   const app = useApp();
   const { session, signOut } = useSession();
   const { t } = useTranslation();
+  const { setSafeTimeout } = useSafeTimeout();
 
   useEffect(() => {
     const loadClassroom = async () => {
@@ -23,7 +25,7 @@ export default function ChangeClassroomScreen() {
           setDefaultClassroom(String(session?.classroomId));
         }
       } catch (error: any) {
-        app.showModal("Error", "Failed to load classroom", undefined, false);
+        app.showModal("Error", t("changeClass.Failed to get classroom info"), undefined, false);
       } finally {
         app.hideOverlay();
       }
@@ -41,7 +43,7 @@ export default function ChangeClassroomScreen() {
         console.error(error);
         app.showModal(
           "Error",
-          "Failed to get classroom info",
+          t("changeClass.Failed to get classroom info"),
           undefined,
           false
         );
@@ -57,17 +59,17 @@ export default function ChangeClassroomScreen() {
     try {
       await classroomService.changeClassroom(Number(value));
       app.showModal(
-        "Success",
-        "Classroom updated successfully. You will be signed out now.",
+        "Info",
+       t( "changeClass.Classroom updated successfully. You will be signed out now."),
         undefined,
         false
       );
-      setTimeout( () => {
+      setSafeTimeout( () => {
         app.hideModal();
         signOut();
       }, 2000);
     } catch (error: any) {
-      app.showModal("Error", "Failed to save classroom. Please try again later", undefined, false);
+      app.showModal("Error", t("changeClass.Failed to save classroom. Please try again later"), undefined, false);
       console.log(error.message);
     }
   };

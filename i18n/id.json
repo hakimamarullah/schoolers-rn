@@ -5,7 +5,8 @@
     "Ongoing": "Sedang Berlangsung",
     "Upcoming": "Mendatang",
     "Cancelled": "Dibatalkan",
-    "Finished": "Berakhir"
+    "Finished": "Berakhir",
+    "failedGetSessionInfo": "Oops gagal memuat informasi sesi :("
   },
   "login": {
     "Please enter your password": "Masukkan password kamu dulu ya!",
@@ -73,7 +74,17 @@
     "datetime": "Waktu",
     "teacher": "Pengajar",
     "topic": "Topik",
-    "no sessions available": "Tidak ada sesi"
+    "no sessions available": "Tidak ada sesi",
+    "subjectName": "Pelajaran",
+    "dateLabel": "Tanggal",
+    "timeLabel": "Waktu",
+    "No Ongoing Session": "Tidak ada sesi berlangsung",
+    "success": "Sukses",
+    "screenNotFound": "Halaman tidak ditemukan.",
+    "bringMeBack": "Balik Sekarang!",
+    "systemUnavailable": "Sistem Tidak Tersedia",
+    "networkError": "Kesalahan jaringan. Mohon cek koneksimu ya!.",
+    "noUserInfoFound": "Data pengguna tidak ditemukan."
   },
   "day" : {
     "mon": "Sen",
@@ -82,5 +93,17 @@
     "thu": "Kam",
     "fri": "Jum",
     "sat": "Sab"
+  },
+  "checkin": {
+    "clockInSuccess": "Berhasil clock-in di alamat: {{address}} pada {{datetime}}",
+    "location not available": "Lokasi tidak tersedia",
+    "Cannot clock in without location": "Tidak bisa clock-in tanpa lokasi",
+    "Clock in now?": "Clock in sekarang?",
+    "Failed to get ongoing session info.": "Gagal memuat informasi sesi."
+  },
+  "changeClass" : {
+    "Failed to save classroom. Please try again later": "Gagal menyimpan kelas. Coba lagi nanti.",
+    "Classroom updated successfully. You will be signed out now.": "Berhasil mengganti kelas. Kamu akan logout sekarang.",
+     "Failed to get classroom info": "Gagal memuat informasi kelas."
   }
 }
