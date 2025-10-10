@@ -29,6 +29,9 @@ export interface AttendanceInfo {
 }
 export interface SessionInfo {
   sessionId: number;
+  attendanceSessionId: number;
+  startTime: string;
+  endTime: string;
   scheduleId: number;
   subjectName: string;
   room: string;
@@ -53,4 +56,10 @@ export interface HomepageInfo {
   upcomingSessions: SessionInfo[];
   cancelledSessions: SessionInfo[];
   finishedSessions: SessionInfo[];
+}
+
+export interface GetClassroomSessionRequest {
+  classroomId: number;
+  status: string;
+  sessionDate: string;
 }

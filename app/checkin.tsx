@@ -1,12 +1,17 @@
 import { PageLayout } from "@/components/PageLayout";
 import { useApp } from "@/hooks/useApp";
 import { format } from "date-fns";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import ClockInForm from "../components/ClockInForm";
+import { SessionInfo } from "@/types/classroom.type";
+import classroomService from "@/services/classroom.service";
+import { useSession } from "@/hooks/useSession";
 
 const ClockInScreen = () => {
   const app = useApp();
+  const { session } = useSession();
+  const [onGoingSession, setOnGoingSession] = useState<SessionInfo | null>(null);
  
 
 
@@ -35,6 +40,19 @@ const ClockInScreen = () => {
     
     app.showModal("Clock In", "Clock in now?", () => submitAttendance(location));
   };
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const classroomId = session?.classroomId;
+      if (classroomId) {
+         const response = await classroomService.getClassroomOnGoingSession(classroomId);
+         setOnGoingSession(response);
+         console.log({response})
+      }
+      
+    }
+    fetchSession();
+  }, [])
 
   return (
     <PageLayout title='Check In'>

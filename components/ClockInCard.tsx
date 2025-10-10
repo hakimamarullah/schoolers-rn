@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import ProfilePicture from "./ProfilePicture";
 import { format } from "date-fns";
 import { getGreetingText } from "@/scripts/utils";
+import { useTranslation } from "react-i18next";
 
 interface ClockInCardProps {
   fullName: string;
@@ -13,6 +14,7 @@ interface ClockInCardProps {
 
 const ClockInCard: React.FC<ClockInCardProps> = ({ fullName, classroom, grade, profilePicUri }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const { t } = useTranslation();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -26,7 +28,7 @@ const ClockInCard: React.FC<ClockInCardProps> = ({ fullName, classroom, grade, p
       <View style={styles.header}>
         <ProfilePicture uri={profilePicUri} size={60} />
         <View style={styles.headerText}>
-          <Text style={styles.greeting}>{getGreetingText(new Date().getHours())}</Text>
+          <Text style={styles.greeting}>{t(`greeting.${getGreetingText(new Date().getHours())}`)}</Text>
           <Text style={styles.name}>{fullName}</Text>
           <Text style={styles.classInfo}>
             {classroom} {grade ? `- Grade ${grade}` : ""}

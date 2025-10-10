@@ -36,7 +36,8 @@
     "Login": "Login",
     "Personal Data": "Personal Data",
     "Setup Host": "Setup Host",
-    "Change Classroom": "Change Classroom"
+    "Change Classroom": "Change Classroom",
+    "Check In": "Check In"
   },
   "profile": {
     "sections" : {
@@ -64,7 +65,7 @@
     "Save Changes": "Save Changes",
     "Classroom": "Classroom",
     "Select Classroom": "Select Classroom",
-    "cancel": "Batal",
+    "cancel": "Cancel",
     "no results found": "No result found",
     "search": "Search",
     "room": "Room",

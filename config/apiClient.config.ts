@@ -4,6 +4,7 @@ import sessionService from '@/services/session.service';
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import * as Location from 'expo-location';
 import StorageService from '../services/storage.service';
+import i18n from '@/i18n/i18n'; // Update path to your i18n config
 
 let apiClientInstance: AxiosInstance | null = null;
 let apiClientInstanceInsecure: AxiosInstance | null = null;
@@ -11,6 +12,15 @@ let apiClientInstanceInsecure: AxiosInstance | null = null;
 const clients: Record<string, AxiosInstance | null> = {
   secure: apiClientInstance,
   insecure: apiClientInstanceInsecure,
+};
+
+const LOCATION_STORAGE_KEY = 'cached_location';
+const LOCATION_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+type CachedLocation = {
+  lat: number;
+  lon: number;
+  timestamp: number;
 };
 
 /**
@@ -37,12 +47,14 @@ export const initializeApiClient = async (): Promise<void> => {
   setupInterceptor(apiClientInstance, true);
   setupInterceptor(apiClientInstanceInsecure, false);
 
-
-  setupLocationInterceptor(apiClientInstance);
-  setupLocationInterceptor(apiClientInstanceInsecure);
+  setupLocationAndLanguageInterceptor(apiClientInstance);
+  setupLocationAndLanguageInterceptor(apiClientInstanceInsecure);
 
   clients.secure = apiClientInstance;
   clients.insecure = apiClientInstanceInsecure;
+
+  // Prefetch location in background on initialization
+  prefetchLocation();
 
   console.log('API Client initialized with base URL:', baseURL);
 };
@@ -79,46 +91,126 @@ const setupInterceptor = (instance: AxiosInstance, isSecure: boolean) => {
   );
 };
 
-let cachedLocation: { lat: number; lon: number; timestamp: number } | null = null;
-const LOCATION_CACHE_DURATION = 3 * 60 * 1000; // 5 minutes
+/**
+ * Get cached location from storage
+ */
+const getCachedLocation = async (): Promise<CachedLocation | null> => {
+  try {
+    const cached = await StorageService.getData(LOCATION_STORAGE_KEY);
+    if (!cached) return null;
 
-const setupLocationInterceptor = (instance: AxiosInstance) => {
+    const location: CachedLocation = JSON.parse(cached);
+    const now = Date.now();
+
+    // Check if cache is still fresh
+    if (now - location.timestamp < LOCATION_CACHE_DURATION) {
+      return location;
+    }
+
+    return null;
+  } catch (error) {
+    console.warn('[Location] Error reading cached location:', error);
+    return null;
+  }
+};
+
+/**
+ * Save location to storage
+ */
+const saveCachedLocation = async (location: CachedLocation): Promise<void> => {
+  try {
+    await StorageService.saveData(LOCATION_STORAGE_KEY, JSON.stringify(location));
+  } catch (error) {
+    console.warn('[Location] Error saving location to cache:', error);
+  }
+};
+
+/**
+ * Prefetch location in background (non-blocking)
+ */
+const prefetchLocation = async (): Promise<void> => {
+  try {
+    const { status } = await Location.getForegroundPermissionsAsync();
+    if (status !== 'granted') return;
+
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Highest, // Faster than Highest
+    });
+
+    const cachedLocation: CachedLocation = {
+      lat: location.coords.latitude,
+      lon: location.coords.longitude,
+      timestamp: Date.now(),
+    };
+
+    await saveCachedLocation(cachedLocation);
+    console.log('[Location] Prefetched and cached');
+  } catch (error) {
+    console.warn('[Location] Prefetch failed:', error);
+  }
+};
+
+/**
+ * Setup interceptor for location and language headers
+ */
+const setupLocationAndLanguageInterceptor = (instance: AxiosInstance) => {
   instance.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       try {
-        const now = Date.now();
-        
-        // Use cached location if fresh enough
-        if (cachedLocation && (now - cachedLocation.timestamp) < LOCATION_CACHE_DURATION) {
-          const baseUA = (config.headers?.['User-Agent'] as string) ?? 
-            `SchoolersMobile/${CONFIG.APP_VERSION}`;
-          config.headers['User-Agent'] = `${baseUA};${cachedLocation.lat};${cachedLocation.lon}`;
-          return config;
+        // Add language header
+        const currentLanguage = i18n.language || 'en';
+        config.headers['Accept-Language'] = currentLanguage;
+
+        // Get cached location
+        let cachedLocation = await getCachedLocation();
+
+        // If no cache or expired, try to get new location (with timeout)
+        if (!cachedLocation) {
+          try {
+            const location = await Promise.race([
+              Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Balanced, // Faster than Highest
+              }),
+              new Promise<null>((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), 5000) // Reduced to 5s
+              ),
+            ]) as Location.LocationObject;
+
+            cachedLocation = {
+              lat: location.coords.latitude,
+              lon: location.coords.longitude,
+              timestamp: Date.now(),
+            };
+
+            // Save to storage for next time (non-blocking)
+            saveCachedLocation(cachedLocation);
+          } catch (err) {
+            console.warn('[Location] Could not retrieve fresh location:', err);
+          }
         }
 
-        // Fetch new location with timeout
-        const location = await Promise.race([
-          Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 30000))
-        ]) as Location.LocationObject;
-
-        cachedLocation = {
-          lat: location.coords.latitude,
-          lon: location.coords.longitude,
-          timestamp: now
-        };
-
-        const baseUA = (config.headers?.['User-Agent'] as string) ?? 
-          `SchoolersMobile/${CONFIG.APP_VERSION}`;
-        config.headers['User-Agent'] = `${baseUA};${cachedLocation.lat};${cachedLocation.lon}`;
-        
+        // Add location to User-Agent if available
+        if (cachedLocation) {
+          const baseUA =
+            (config.headers?.['User-Agent'] as string) ??
+            `SchoolersMobile/${CONFIG.APP_VERSION}`;
+          config.headers['User-Agent'] =
+            `${baseUA};${cachedLocation.lat};${cachedLocation.lon}`;
+        }
       } catch (err) {
-        console.warn('[Location] Could not retrieve location', err);
+        console.warn('[Interceptor] Error setting headers:', err);
       }
       return config;
     },
     (error) => Promise.reject(error)
   );
+};
+
+/**
+ * Manually refresh location (call this when user pulls to refresh, etc.)
+ */
+export const refreshLocation = async (): Promise<void> => {
+  await prefetchLocation();
 };
 
 /**

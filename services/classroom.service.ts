@@ -1,6 +1,8 @@
 import { getSecureApiClient } from "@/config/apiClient.config";
 import { ApiResponse } from "@/types/api.type";
-import { ClassroomSchedulesInfo, SimpleClassroomInfo } from "@/types/classroom.type";
+import { ClassroomSchedulesInfo, GetClassroomSessionRequest, SessionInfo, SimpleClassroomInfo } from "@/types/classroom.type";
+import storageService from "./storage.service";
+import { format } from "date-fns";
 
 class ClassroomService {
 
@@ -21,6 +23,33 @@ class ClassroomService {
   async changeClassroom(classroomId: number): Promise<void> {
     const api = getSecureApiClient();
     await api.put(`/students/change-classroom/${classroomId}`);
+  }
+
+  async getClassroomOnGoingSession(classroomId: number): Promise<SessionInfo> {
+    try {
+      const api = getSecureApiClient();
+
+    const request: GetClassroomSessionRequest = {
+      classroomId,
+      status: "ONGOING",
+      sessionDate: format(new Date(), "dd-MM-yyyy")
+    }
+    const response = await api.post<ApiResponse<SessionInfo>>("/classrooms/sessions", request);
+
+    return response.data?.data;
+    } catch(error: any) {
+      return this.handleError(error);
+    }
+  }
+
+  private handleError(error: any): any {
+    if (error.response?.data) {
+      return error.response?.data;
+    }
+    if (error.message) {
+      throw new Error(error.message);
+    }
+    throw new Error('Network error. Please check your connection.');
   }
 }
 

@@ -24,6 +24,7 @@ export const STORAGE_KEYS = {
 };
 
 class StorageService {
+
   // Secure storage for sensitive data
   private async setSecure(key: string, value: string): Promise<void> {
     try {
@@ -70,6 +71,13 @@ class StorageService {
     }
   }
 
+  async getData(key: string) : Promise<string | null> {
+    return await this.getRegular(key);
+  }
+
+  async saveData(key: string, value: any) : Promise<void> {
+    await this.setRegular(key, value);
+  }
   private async deleteRegular(key: string): Promise<void> {
     try {
       await AsyncStorage.removeItem(key);

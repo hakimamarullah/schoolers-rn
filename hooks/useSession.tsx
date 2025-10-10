@@ -1,3 +1,4 @@
+import { refreshLocation } from '@/config/apiClient.config';
 import authService from '@/services/auth.service';
 import sessionService from '@/services/session.service';
 import storageService from '@/services/storage.service';
@@ -93,6 +94,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
       (nextState: AppStateStatus) => {
         if (nextState === "active" || nextState === "background") {
           sessionService.setSignOutCallback(handleSignOut);
+          refreshLocation();
         }
         if (nextState === "inactive") {
           handleSignOut();
