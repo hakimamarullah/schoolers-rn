@@ -1,5 +1,6 @@
 import { getGreetingText } from "@/scripts/utils";
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { View, Text, StyleSheet } from "react-native";
 
 interface GreetingProps {
@@ -10,10 +11,11 @@ interface GreetingProps {
 const Greeting = ({ name = 'Kid' }: GreetingProps) => {
   const hour = new Date().getHours();
   const greetingText = getGreetingText(hour);
+  const { t } = useTranslation();
 
   return (
     <View>
-      <Text style={styles.greeting}>{greetingText}</Text>
+      <Text style={styles.greeting}>{t(`greeting.${greetingText}`)}</Text>
       <Text style={styles.greetingName}>{name}</Text>
     </View>
   );

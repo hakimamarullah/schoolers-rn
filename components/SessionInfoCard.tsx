@@ -1,5 +1,6 @@
 import { SessionInfo } from "@/types/classroom.type";
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 
@@ -7,7 +8,9 @@ type SessionInfoCardProps = {
   data?: SessionInfo
 }
 
-const SessionInfoCard = ({ data }: SessionInfoCardProps) => (
+const SessionInfoCard = ({ data }: SessionInfoCardProps) => {
+  const { t } = useTranslation();
+   return (
   <View style={styles.outerCard}>
     {/* Subject Title */}
     <Text style={styles.subject}>{data?.subjectName}</Text>
@@ -17,16 +20,16 @@ const SessionInfoCard = ({ data }: SessionInfoCardProps) => (
       {/* Left Side */}
       <View style={styles.leftInfo}>
         <View style={styles.infoBlock}>
-          <Text style={styles.label}>Room</Text>
+          <Text style={styles.label}>{t("common.room")}</Text>
           <Text style={styles.value}>{data?.room}</Text>
         </View>
         <View style={styles.infoBlock}>
-          <Text style={styles.label}>Datetime</Text>
+          <Text style={styles.label}>{t("common.datetime")}</Text>
           <Text style={[styles.value, styles.datetime]}>{data?.datetime}</Text>
         </View>
        
           <View style={styles.infoBlock}>
-            <Text style={styles.label}>Attendance</Text>
+            <Text style={styles.label}>{t("common.attendance")}</Text>
             <Text style={styles.value}>{`${data?.attendanceInfo?.attendedSessions}/${data?.attendanceInfo?.totalSessions}`}</Text>
           </View>
       
@@ -35,17 +38,18 @@ const SessionInfoCard = ({ data }: SessionInfoCardProps) => (
       {/* Right Side: Teachers stacked */}
       <View style={styles.rightInfo}>
         <View style={styles.infoBlock}>
-            <Text style={styles.label}>Teacher</Text>
+            <Text style={styles.label}>{t("common.teacher")}</Text>
             <Text style={styles.value}>{data?.teacherName}</Text>
           </View>
         <View style={styles.infoBlock}>
-            <Text style={styles.label}>Topic</Text>
+            <Text style={styles.label}>{t("common.topic")}</Text>
             <Text style={styles.value}>{data?.topic ?? "-"}</Text>
           </View>
       </View>
     </View>
   </View>
 );
+}
 
 export default memo(SessionInfoCard);
 
@@ -74,13 +78,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: "#FFD800",
+    columnGap: 3, // Smaller gap
   },
   leftInfo: {
-    flex: 1, // balanced to give adequate space for datetime
-    paddingRight: 4,
+    flex: 0.48, // Reduced flex
   },
   rightInfo: {
-    flex: 1, // increased to give more space for teachers
+    flex: 0.48, // Reduced flex
     justifyContent: "flex-start",
   },
   infoBlock: {

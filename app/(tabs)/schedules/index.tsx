@@ -8,6 +8,7 @@ import { useSession } from "@/hooks/useSession";
 import classroomService from "@/services/classroom.service";
 import { ClassroomSchedulesInfo } from "@/types/classroom.type";
 import { useApp } from "@/hooks/useApp";
+import { useTranslation } from "react-i18next";
 
 export default function SchedulesScreen() {
   const layout = useWindowDimensions();
@@ -17,15 +18,15 @@ export default function SchedulesScreen() {
   const [data, setData] = useState<ClassroomSchedulesInfo | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const { t } = useTranslation();
 
   const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
-  const dayShorts = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dayShorts = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(it => t(`day.${it.toLowerCase()}`))
 
   const fetchSchedules = useCallback(async () => {
     try {
       setLoading(true);
       const response = await classroomService.getClassroomSchedules(session?.classroomId ?? -1);
-
       if (response.code !== 200) {
         app.showModal("Error", response.message, undefined, false);
         return;

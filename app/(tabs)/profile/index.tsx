@@ -10,6 +10,7 @@ import storageService from "@/services/storage.service";
 
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 
 export default function ProfileScreen() {
@@ -17,9 +18,10 @@ export default function ProfileScreen() {
   const { signOut, session } = useSession();
   const app = useApp();
   const [enableBiometric, setEnableBiometric] = useState(false);
+  const { t } = useTranslation();
 
   const handleLogout = () => {
-    app.showModal("Logout", "Sign out now ?", () => signOut());
+    app.showModal(t("common.Logout"), t("common.Sign out now?"), () => signOut());
   };
 
   const handleRegisterBiometric = async () => {
@@ -65,10 +67,10 @@ export default function ProfileScreen() {
     try {
       if (status) {
         app.showModal(
-          "Biometric",
-          "Enable biometric authentication ?",
+          t("common.Biometric"),
+          t("common.Enable biometric authentication?"),
           handleRegisterBiometric,
-          false
+          true
         );
         return;
       }
@@ -77,7 +79,7 @@ export default function ProfileScreen() {
       console.log(error.message)
       return;
     }
-    app.showModal("Biometric", "Disable biometric ?", handleDisableBiometric);
+    app.showModal("Biometric", "Disable biometric?", handleDisableBiometric);
   };
   useEffect(() => {
     const getBiometricStatus = async () => {
@@ -100,11 +102,11 @@ export default function ProfileScreen() {
         <View style={styles.lowerContainer}>
           {/* Account Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Account</Text>
+            <Text style={styles.sectionTitle}>{t("profile.sections.Account")}</Text>
             <View>
               <ProfileMenu
                 iconName="person"
-                label="Personal Data"
+                label={t("profile.menuItem.Personal Data")}
                 onPress={() => router.push("/personal-data")}
               />
             </View>
@@ -112,16 +114,16 @@ export default function ProfileScreen() {
 
           {/* Personalization Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Personalization</Text>
+            <Text style={styles.sectionTitle}>{t("profile.sections.Personalization")}</Text>
             <View>
               <ProfileMenu
                 iconName="language"
-                label="Language"
+                label={t("profile.menuItem.Language")}
                 onPress={() => router.push("/change-language")}
               />
               <ProfileMenu
                 iconName="edit"
-                label="Change classroom"
+                label={t("profile.menuItem.Change Classroom")}
                 onPress={() => router.push("/change-classroom")}
                 showBorder={true}
               />
@@ -129,11 +131,11 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Security</Text>
+            <Text style={styles.sectionTitle}>{t("profile.sections.Security")}</Text>
             <View>
               <ProfileMenu
                 iconName="fingerprint"
-                label="Biometric"
+                label={t("profile.menuItem.Biometric")}
                 rightComponent={
                   <Switch
                     value={enableBiometric}
@@ -147,11 +149,11 @@ export default function ProfileScreen() {
 
           {/* Others Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Others</Text>
+            <Text style={styles.sectionTitle}>{t("profile.sections.Others")}</Text>
             <View>
               <ProfileMenu
                 iconName="logout"
-                label="Log out"
+                label={t("profile.menuItem.Log Out")}
                 onPress={handleLogout}
                 showBorder={true}
               />

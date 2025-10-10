@@ -3,9 +3,11 @@ import { SplashScreenController } from "@/components/SplashScreenController";
 import { AppProvider } from "@/hooks/useApp";
 import { SessionProvider, useSession } from "@/hooks/useSession";
 import { useSetupLocationPermission } from "@/hooks/useSetupLocationPermission";
+import i18n from "@/i18n/i18n";
+import storageService from "@/services/storage.service";
 import { SplashScreen, Stack } from "expo-router";
+import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
 
 export default function Root() {
   SplashScreen.preventAutoHideAsync();
@@ -26,6 +28,18 @@ function RootNavigator() {
   const { session, isHostSet, isLoading, loginId } = useSession();
 
   useSetupLocationPermission();
+  useEffect(() => {
+     const setLanguage = async () => {
+       try { 
+        const savedLanguage = await storageService.getLanguage();
+        i18n.changeLanguage(savedLanguage ?? "en");
+       } catch(error: any){
+
+       }
+     }
+
+     setLanguage();
+  }, [])
 
   if (isLoading) return null;
 

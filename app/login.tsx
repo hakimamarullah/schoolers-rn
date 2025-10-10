@@ -6,16 +6,18 @@ import { handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
 import biometricService from "@/services/biometric.service";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 export default function LoginScreen() {
   const app = useApp();
   const { signIn, loginId } = useSession();
+  const { t } = useTranslation();
 
   const handlePasswordLogin = async (password: string) => {
     try {
       if (!password.trim()) {
-        app.showModal("Error", "Please enter your password");
+        app.showModal("Error", t("login.Please enter your password"));
         return;
       }
 
@@ -25,10 +27,10 @@ export default function LoginScreen() {
         password
       );
       if (response.code === 401) {
-        app.showModal("Failed Login", response.message, undefined, false);
+        app.showModal(t('login.Failed Login'), response.message, undefined, false);
         return;
       } else if (response.code === 429) {
-        app.showModal("Failed Login", response.message, undefined, false);
+        app.showModal("login.Failed Login", response.message, undefined, false);
         return;
       }
 
@@ -43,7 +45,7 @@ export default function LoginScreen() {
     } catch (error: any) {
       app.showModal(
         "Error",
-        "Login failed. Please try again later",
+        t("login.Login failed. Please try again later"),
         undefined,
         false
       );

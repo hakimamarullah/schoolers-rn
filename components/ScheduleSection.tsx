@@ -3,25 +3,29 @@ import React, { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import SessionInfoCard from "./SessionInfoCard";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 type SectionProps = {
   title: string;
   data: SessionInfo[];
 };
 
-const SessionInfoSection = ({ title, data }: SectionProps) => (
+const SessionInfoSection = ({ title, data }: SectionProps) => {
+  const { t } = useTranslation();
+  return (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>{title}</Text>
-    {data.length > 0 ? (
+    {data?.length > 0 ? (
       data.map((item, idx) => <SessionInfoCard key={idx} data={item} />)
     ) : (
       <View style={styles.emptyState}>
         <Ionicons name="calendar-outline" size={64} color="#CBD5E1" />
-        <Text style={styles.emptyText}>No sessions available</Text>
+        <Text style={styles.emptyText}>{t("common.no sessions available")}</Text>
       </View>
     )}
   </View>
 );
+}
 
 export default memo(SessionInfoSection);
 

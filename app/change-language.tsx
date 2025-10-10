@@ -1,11 +1,12 @@
-import { StyleSheet, View } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import { PageLayout } from '@/components/PageLayout';
 import LanguageOptionsList from '@/components/LanguageOptionsList';
-import * as SecureStore from 'expo-secure-store';
-import { LANGUAGE_KEY } from '@/constants/common';
+import { PageLayout } from '@/components/PageLayout';
 import { useApp } from '@/hooks/useApp';
+import i18n from '@/i18n/i18n';
+import storageService from '@/services/storage.service';
+import * as Localization from "expo-localization";
 import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 
 
@@ -23,9 +24,12 @@ export default function ChangeLanguageScreen() {
     const loadLanguage = async () => {
     try {
       app.showOverlay("Load Language...")
-      const savedLanguage = await SecureStore.getItemAsync(LANGUAGE_KEY);
+      const savedLanguage = await storageService.getLanguage();
       if (savedLanguage) {
         setDefaultLanguage(savedLanguage);
+      } else {
+        const language = Localization.getLocales()[0].languageCode ?? "en";
+        setDefaultLanguage(language)
       }
     } catch (error: any) {
       app.showModal("Error", 'Failed to load default language', undefined, false);
@@ -40,7 +44,8 @@ export default function ChangeLanguageScreen() {
 
   const handleLanguageSelect = async (lang: string) => {
     try {
-      await SecureStore.setItemAsync(LANGUAGE_KEY, lang);
+      await storageService.setLanguage(lang);
+      await i18n.changeLanguage(lang);
       router.back();
     } catch (error) {
       app.showModal("Error", "Failed to change language", undefined, false);

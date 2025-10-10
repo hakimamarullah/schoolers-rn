@@ -99,6 +99,10 @@ class StorageService {
     return await this.getRegular(STORAGE_KEYS.LANGUAGE);
   }
 
+  async setLanguage(lang: string) : Promise<void> {
+    await this.setRegular(STORAGE_KEYS.LANGUAGE, lang);
+  }
+
   // Auth tokens
   async saveSessionId(sessionId: string): Promise<void> {
     await this.setSecure(KEYS.SESSION_ID, sessionId);

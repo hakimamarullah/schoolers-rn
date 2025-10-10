@@ -1,9 +1,11 @@
 import TabBarIcon from "@/components/TabBarIcon";
 import { useSession } from "@/hooks/useSession";
 import { Tabs } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 export default function TabsLayout() {
   const { session, isHostSet } = useSession();
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -31,7 +33,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            title: "Home",
+            title: t("tabItem.Home"),
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
                 name={focused ? "home" : "home-outline"}
@@ -44,7 +46,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="schedules"
           options={{
-            title: "Schedules",
+            title: t("tabItem.Schedules"),
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
                 name={focused ? "calendar" : "calendar-outline"}
@@ -57,7 +59,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="assignments"
           options={{
-            title: "Assignments",
+            title: t("tabItem.Assignments"),
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
                 name={focused ? "book" : "book-outline"}
@@ -70,7 +72,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="info"
           options={{
-            title: "Info",
+            title: t("tabItem.Info"),
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
                 name={focused ? "notifications-sharp" : "notifications-outline"}
@@ -83,7 +85,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profile",
+            title: t("tabItem.Profile"),
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
                 name={focused ? "person" : "person-outline"}

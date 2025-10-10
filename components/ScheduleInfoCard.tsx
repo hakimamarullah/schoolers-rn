@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 type ClassCardProps = {
@@ -13,7 +14,9 @@ const ScheduleInfoCard = ({
   room = "N/A",
   teacher = "N/A",
   datetime = "N/A",
-}: ClassCardProps) => (
+}: ClassCardProps) => {
+  const { t } = useTranslation();
+  return (
   <View style={styles.outerCard}>
     {/* Subject Title */}
     <Text style={styles.subject}>{subject}</Text>
@@ -23,23 +26,24 @@ const ScheduleInfoCard = ({
       {/* Left Side */}
       <View style={styles.leftInfo}>
         <View style={styles.infoBlock}>
-          <Text style={styles.label}>Room</Text>
+          <Text style={styles.label}>{t("common.room")}</Text>
           <Text style={styles.value}>{room}</Text>
         </View>
         <View style={styles.infoBlock}>
-          <Text style={styles.label}>Datetime</Text>
+          <Text style={styles.label}>{t("common.datetime")}</Text>
           <Text style={[styles.value, styles.datetime]}>{datetime}</Text>
         </View>
       </View>
 
       {/* Right Side: Teachers stacked */}
       <View style={styles.rightInfo}>
-        <Text style={styles.label}>Teachers</Text>
+        <Text style={styles.label}>{t("common.teacher")}</Text>
         <Text style={styles.value}>{teacher}</Text>
       </View>
     </View>
   </View>
 );
+}
 
 export default memo(ScheduleInfoCard);
 

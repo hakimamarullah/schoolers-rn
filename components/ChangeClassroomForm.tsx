@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import SearchableDropdown, { Option } from "./SearchableDropdown";
 import SubmitButton from "./SubmitButton";
+import { useTranslation } from "react-i18next";
 
 interface ChangeClassroomFormProps {
   options: Option[];
@@ -16,6 +17,7 @@ const ChangeClassroomForm: React.FC<ChangeClassroomFormProps> = ({
 }) => {
   const [selectedClassroom, setSelectedClassroom] = useState("");
   const [initialClassroom, setInitialClassroom] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (defaultValue) {
@@ -37,15 +39,15 @@ const ChangeClassroomForm: React.FC<ChangeClassroomFormProps> = ({
   return (
     <View style={styles.container}>
       <SearchableDropdown
-        label="Classroom"
-        placeholder="Select classroom"
+        label={t("common.Classroom")}
+        placeholder={t("common.Select Classroom")}
         options={options}
         selectedValue={selectedClassroom}
         onSelect={handleClassroomChange}
       />
 
       <SubmitButton
-        label="Save Changes"
+        label={t("common.Save Changes")}
         onPress={handleSubmit}
         disabled={!isFormValid}
         style={styles.submitButton}

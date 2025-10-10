@@ -1,0 +1,85 @@
+{
+  "home": {
+    "Finished Class": "Kelas Selesai",
+    "Main Menu": "Menu Utama",
+    "Ongoing": "Sedang Berlangsung",
+    "Upcoming": "Mendatang",
+    "Cancelled": "Dibatalkan",
+    "Finished": "Berakhir"
+  },
+  "login": {
+    "Please enter your password": "Masukkan password kamu dulu ya!",
+    "Failed Login": "Gagal login",
+    "Login failed. Please try again later": "Gagal masuk. Tunggu atau coba lagi nanti ya!"
+  },
+  "loginForm": {
+    "Password": "Kata Sandi",
+    "Enter password": "Masukkan kata sandi",
+    "Login": "Masuk"
+  },
+  "greeting": {
+    "Good Morning": "Selamat Pagi",
+    "Good Evening": "Selamat Malam",
+    "Good Afternoon": "Selamat Siang",
+    "Good Night": "Selamat Malam"
+  },
+  "tabItem": {
+    "Home": "Beranda",
+    "Schedules": "Jadwal",
+    "Assignments": "Tugas",
+    "Info": "Info",
+    "Profile": "Profil",
+    "Schoolers": "Schoolers",
+    "Information": "Informasi",
+    "Language": "Bahasa",
+    "Assignment Details": "Detail Tugas",
+    "Login": "Masuk",
+    "Personal Data": "Data Pribadi",
+    "Setup Host": "Setup Host",
+    "Change Classroom": "Ganti Kelas"
+  },
+  "profile": {
+    "sections" : {
+       "Account": "Akun",
+       "Personalization": "Personalisasi",
+       "Security": "Keamanan",
+       "Others": "Lainnya"
+    },
+    "menuItem" : {
+      "Personal Data": "Data Pribadi",
+      "Language": "Bahasa",
+      "Change Classroom": "Ganti Kelas",
+      "Biometric": "Biometrik",
+      "Log Out": "Keluar"
+    }
+  },
+  "common" : {
+    "Logout": "Keluar",
+    "Sign out now?": "Keluar sekarang?",
+    "No Schedule": "Tidak Ada Jadwal",
+    "There are no subjects scheduled for this day": "Tidak ada jadwal pelajaran untuk hari ini",
+    "Biometric": "Biometrik",
+    "Enable biometric authentication?": "Aktifkan autentikasi biometrik?",
+    "Save": "Simpan",
+    "Save Changes": "Simpan Perubahan",
+    "Classroom": "Kelas",
+    "Select Classroom": "Pilih Kelas",
+    "Cancel": "Batal",
+    "no results found": "Tidak ada hasil ditemukan",
+    "search": "Cari",
+    "room": "Ruangan",
+    "attendance": "Kehadiran",
+    "datetime": "Waktu",
+    "teacher": "Pengajar",
+    "topic": "Topik",
+    "no sessions available": "Tidak ada sesi"
+  },
+  "day" : {
+    "mon": "Sen",
+    "tue": "Sel",
+    "wed": "Rab",
+    "thu": "Kam",
+    "fri": "Jum",
+    "sat": "Sab"
+  }
+}

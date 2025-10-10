@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, View, Text } from "react-native";
 import ScheduleInfoCard from "./ScheduleInfoCard";
 import ScheduleInfoCardSkeleton from "./ScheduleInfoCardSkeleton";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 interface Schedule {
   id: number;
@@ -20,7 +21,7 @@ export function ScheduleList({
   schedules,
   isLoading = false,
 }: ScheduleListProps) {
-  // Show skeleton while loading
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <ScrollView
@@ -43,9 +44,9 @@ export function ScheduleList({
         showsVerticalScrollIndicator={false}
       >
         <Ionicons name="calendar-outline" size={64} color="#CCC" />
-        <Text style={styles.emptyText}>No Schedule</Text>
+        <Text style={styles.emptyText}>{t("common.No Schedule")}</Text>
         <Text style={styles.emptySubtext}>
-          There are no subjects scheduled for this day
+          {t("common.There are no subjects scheduled for this day")}
         </Text>
       </ScrollView>
     );

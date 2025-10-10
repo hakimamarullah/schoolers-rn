@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import PasswordInput from "./PasswordInput";
+import { useTranslation } from "react-i18next";
 
 interface LoginFormProps {
   onSubmit: (password: string) => void;
@@ -19,6 +20,7 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const { loginId } = useSession();
   const app = useApp();
+  const { t } = useTranslation();
 
   const handleBiometricPress = async () => {
     const { isEnabled } = await biometricService.getBiometricInfo();
@@ -38,8 +40,9 @@ export default function LoginForm({
 
       {/* Password field */}
       <PasswordInput
-        label="Password"
+        label={t("loginForm.Password")}
         value={password}
+        placeholder={t("loginForm.Enter password")}
         onChangeText={setPassword}
       />
 
@@ -49,7 +52,7 @@ export default function LoginForm({
           style={styles.loginButton}
           onPress={() => onSubmit(password)}
         >
-          <Text style={styles.loginText}>Login</Text>
+          <Text style={styles.loginText}>{t("loginForm.Login")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

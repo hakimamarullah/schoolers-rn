@@ -15,6 +15,7 @@ import { AttendanceStats, SessionInfo } from "@/types/classroom.type";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   RefreshControl,
   ScrollView,
@@ -34,6 +35,7 @@ export default function HomeScreen() {
   const [sessionStats, setSessionStats] = useState<AttendanceStats | undefined>(undefined);
   const [finishedSession, setFinishedSession] = useState<SessionInfo[]>([]);
   const app = useApp();
+  const { t } = useTranslation();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -122,18 +124,19 @@ export default function HomeScreen() {
             <View style={styles.bottomInfo}>
               <DateTimeDisplay />
               <FinishedClassInfo 
+                label={t("home.Finished Class")}
                 finished={sessionStats?.finishedClasses ?? 0} 
                 total={sessionStats?.totalClasses ?? 0} 
               />
             </View>
           </View>
         </LinearGradient>
-        <MenuSection title="Main Menu" data={mainMenu} />
+        <MenuSection title={t("home.Main Menu")} data={mainMenu} />
 
-        <SessionInfoSection title="Ongoing" data={ongoingSessions} />
-        <SessionInfoSection title="Upcoming" data={upcomingSessions} />
-        <SessionInfoSection title="Cancelled" data={cancelledSessions} />
-        <SessionInfoSection title="Finished" data={finishedSession} />
+        <SessionInfoSection title={t("home.Ongoing")} data={ongoingSessions} />
+        <SessionInfoSection title={t("home.Upcoming")} data={upcomingSessions} />
+        <SessionInfoSection title={t("home.Cancelled")} data={cancelledSessions} />
+        <SessionInfoSection title={t("home.Finished")} data={finishedSession} />
       </ScrollView>
     </PageLayout>
   );

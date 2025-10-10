@@ -5,6 +5,7 @@ import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
 import classroomService from "@/services/classroom.service";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 export default function ChangeClassroomScreen() {
@@ -12,6 +13,7 @@ export default function ChangeClassroomScreen() {
   const [classroomOptions, setClassroomOptions] = useState<Option[]>([]);
   const app = useApp();
   const { session, signOut } = useSession();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadClassroom = async () => {

@@ -3,13 +3,14 @@ import { View, Text, StyleSheet } from "react-native";
 
 interface FinishedClassInfoProps {
   finished?: number;
+  label?: string;
   total?: number;
   style?: any;
 }
 
-const FinishedClassInfo = ({ finished = 0, total = 0, style }: FinishedClassInfoProps) => (
+const FinishedClassInfo = ({ finished = 0, total = 0, label = "Finished Class", style }: FinishedClassInfoProps) => (
   <View style={[styles.container, style]}>
-    <Text style={styles.finishedLabel}>Finished Class</Text>
+    <Text style={styles.finishedLabel}>{label}</Text>
     <Text style={styles.finishedCount}>{finished}/{total}</Text>
   </View>
 );

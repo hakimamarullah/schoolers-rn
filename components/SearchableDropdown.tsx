@@ -13,6 +13,7 @@ import {
   Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export interface Option {
   label: string;
@@ -47,6 +48,7 @@ export default function SearchableDropdown({
 
   const selectedLabel =
     options.find((opt) => opt.value === selected)?.label || "";
+  const { t } = useTranslation();
 
   const filtered = options.filter((opt) =>
     opt.label.toLowerCase().includes(search.toLowerCase())
@@ -98,7 +100,7 @@ export default function SearchableDropdown({
 
                 <TextInput
                   style={styles.searchInput}
-                  placeholder="Search..."
+                  placeholder={`${t("common.search")}...`}
                   value={search}
                   onChangeText={setSearch}
                 />
@@ -115,7 +117,7 @@ export default function SearchableDropdown({
                     </TouchableOpacity>
                   )}
                   ListEmptyComponent={
-                    <Text style={styles.emptyText}>No results found</Text>
+                    <Text style={styles.emptyText}>{t("common.no results found")}</Text>
                   }
                 />
 
@@ -123,7 +125,7 @@ export default function SearchableDropdown({
                   style={styles.cancelButton}
                   onPress={() => setVisible(false)}
                 >
-                  <Text style={styles.cancelText}>Cancel</Text>
+                  <Text style={styles.cancelText}>{t("common.cancel")}</Text>
                 </TouchableOpacity>
               </View>
             </KeyboardAvoidingView>

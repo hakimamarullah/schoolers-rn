@@ -1,0 +1,85 @@
+{
+  "home": {
+    "Finished Class": "Finished Class",
+    "Main Menu": "Main Menu",
+    "Ongoing": "Ongoing",
+    "Upcoming": "Upcoming",
+    "Cancelled": "Cancelled",
+    "Finished": "Finished"
+  },
+   "login": {
+    "Please enter your password": "Masukkan password kamu dulu ya!",
+    "Failed Login": "Failed Login",
+    "Login failed. Please try again later": "Login failed. Please try again later"
+  },
+  "loginForm": {
+    "Password": "Password",
+    "Enter password": "Enter password",
+    "Login": "Login"
+  },
+  "greeting" : {
+    "Good Morning": "Good Morning",
+    "Good Evening": "Good Evening",
+    "Good Afternoon": "Good Afternoon",
+    "Good Night": "Good Night"
+  },
+  "tabItem": {
+    "Home": "Home",
+    "Schedules": "Schedules",
+    "Assignments": "Assignments",
+    "Info": "Info",
+    "Information": "Information",
+    "Profile": "Profile",
+    "Schoolers": "Schoolers",
+    "Language": "Language",
+    "Assignment Details": "Assigments Details",
+    "Login": "Login",
+    "Personal Data": "Personal Data",
+    "Setup Host": "Setup Host",
+    "Change Classroom": "Change Classroom"
+  },
+  "profile": {
+    "sections" : {
+       "Account": "Account",
+       "Personalization": "Personalization",
+       "Security": "Security",
+       "Others": "Others"
+    },
+    "menuItem" : {
+      "Personal Data": "Personal Data",
+      "Language": "Language",
+      "Change Classroom": "Change Classroom",
+      "Biometric": "Biometric",
+      "Log Out": "Log Out"
+    }
+  },
+  "common" : {
+    "Logout": "Logout",
+    "Sign out now?": "Sign out now?",
+    "No Schedule": "No Schedule",
+    "There are no subjects scheduled for this day": "There are no subjects scheduled for this day",
+    "Biometric": "Biometric",
+    "Enable biometric authentication?": "Enable biometric authentication?",
+    "Save": "Save",
+    "Save Changes": "Save Changes",
+    "Classroom": "Classroom",
+    "Select Classroom": "Select Classroom",
+    "cancel": "Batal",
+    "no results found": "No result found",
+    "search": "Search",
+    "room": "Room",
+    "attendance": "Attendance",
+    "datetime": "Datetime",
+    "teacher": "Teacher",
+    "topic": "Topic",
+    "no sessions available": "No sessions available"
+  },
+  "day" : {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  }
+}

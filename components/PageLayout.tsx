@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   StyleSheet,
   Text,
@@ -40,6 +41,7 @@ export function PageLayout({
   const isTabRoot = parent?.startsWith("(");
 
   const canGoBack = !isTabRoot && router.canGoBack();
+  const { t } = useTranslation();
 
   const rights = Array.isArray(headerRight)
     ? headerRight
@@ -85,7 +87,7 @@ export function PageLayout({
                 <Ionicons name="chevron-back" size={24} color="#000" />
               </TouchableOpacity>
             )}
-            {title && <Text style={styles.headerTitle}>{title}</Text>}
+            {title && <Text style={styles.headerTitle}>{t(`tabItem.${title}`)}</Text>}
           </View>
 
           <View style={styles.headerRight}>
