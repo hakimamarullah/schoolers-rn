@@ -23,7 +23,7 @@ const CurrentLocationMap: React.FC<CurrentLocationMapProps> = ({ onLocationUpdat
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted" || !isMounted) return;
 
-    const loc = await Location.getCurrentPositionAsync({});
+    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
     const coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
 
     const reverse = await Location.reverseGeocodeAsync(coords);
