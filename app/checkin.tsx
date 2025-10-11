@@ -16,7 +16,7 @@ import { handleResponse } from "@/scripts/utils";
 const ClockInScreen = () => {
   const app = useApp();
   const { session } = useSession();
-  const [onGoingSession, setOnGoingSession] = useState<SessionInfo>();
+  const [onGoingSession, setOnGoingSession] = useState<SessionInfo | undefined>(undefined);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
@@ -74,7 +74,7 @@ const ClockInScreen = () => {
     address?: string;
     sessionId: number;
   }) => {
-    if (!data) {
+    if (!data || (!data?.latitude || !data?.longitude)) {
       app.showModal(
         t("checkin.Location not available"),
         t("checkin.Cannot clock in without location"),
@@ -96,14 +96,18 @@ const ClockInScreen = () => {
           const response = await classroomService.getClassroomOnGoingSession(
             session.classroomId
           );
-          setOnGoingSession(response);
-        } else {
-          setOnGoingSession(undefined);
-        }
+          const result = handleResponse(response);
+          if (result.serverError) {
+            throw new Error(t("common.systemUnavailable"))
+          } else if (!result.ok) {
+            throw new Error(result.message);
+          }
+          setOnGoingSession(response.data);
+        } 
       } catch (error: any) {
         app.showModal(
           "Info",
-          t("checkin.Failed to get ongoing session info."),
+          error.message ?? t("checkin.Failed to get ongoing session info."),
           undefined,
           false
         );

@@ -38,7 +38,8 @@
     "Personal Data": "Data Pribadi",
     "Setup Host": "Setup Host",
     "Change Classroom": "Ganti Kelas",
-    "Check In": "Check In"
+    "Check In": "Check In",
+    "Oops": "Oops"
   },
   "profile": {
     "sections" : {
@@ -84,7 +85,13 @@
     "bringMeBack": "Balik Sekarang!",
     "systemUnavailable": "Sistem Tidak Tersedia",
     "networkError": "Kesalahan jaringan. Mohon cek koneksimu ya!.",
-    "noUserInfoFound": "Data pengguna tidak ditemukan."
+    "noUserInfoFound": "Data pengguna tidak ditemukan.",
+    "Pull down to try again": "Usap layar ke bawah untuk memuat ulang",
+    "No assignments yet": "Belum ada tugas",
+    "Check back later for new assignments": "Cek kembali nanti",
+    "confirmOpenUrl": "Buka tautan berikut?\n{{uri}}",
+    "confirmDowloadFile": "Unduh file ini?\n{{file}}",
+    "confirmMarkAsDone": "Yakin sudah selesai?"
   },
   "day" : {
     "mon": "Sen",

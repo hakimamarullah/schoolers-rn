@@ -24,6 +24,7 @@ export default function AssignmentCard({
   onPress,
 }: AssignmentCardProps) {
   const [flashAnim] = useState(() => new Animated.Value(0));
+  
 
   const handlePressIn = () => {
     Animated.timing(flashAnim, {
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 8,
     borderRadius: 12,
-    overflow: "hidden", // ensures flash is rounded
+    overflow: "hidden", 
   },
   flashOverlay: {
     ...StyleSheet.absoluteFillObject,

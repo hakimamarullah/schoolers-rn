@@ -25,7 +25,7 @@ class ClassroomService {
     await api.put(`/students/change-classroom/${classroomId}`);
   }
 
-  async getClassroomOnGoingSession(classroomId: number): Promise<SessionInfo> {
+  async getClassroomOnGoingSession(classroomId: number): Promise<ApiResponse<SessionInfo>> {
     try {
       const api = getSecureApiClient();
 
@@ -36,7 +36,7 @@ class ClassroomService {
     }
     const response = await api.post<ApiResponse<SessionInfo>>("/classrooms/sessions", request);
 
-    return response.data?.data;
+    return response.data;
     } catch(error: any) {
       return handleError(error);
     }

@@ -11,6 +11,7 @@ export const getGreetingText = (hour: number) => {
 
 export interface HandledResponse<T> {
   ok: boolean;
+  serverError: boolean;
   data?: T;
   message?: string;
   fieldErrors?: Record<string, string>;
@@ -24,12 +25,14 @@ export interface HandledResponse<T> {
 export const handleResponse = <T>(response: ApiResponse<T>): HandledResponse<T> => {
   const { code, message, data } = response;
 
-  // ✅ Success codes (you can adjust based on your API contract)
+
   const isSuccess = code >= 200 && code < 300;
+  const isServerError = code >= 500 && code < 600;
 
   if (isSuccess) {
     return {
       ok: true,
+      serverError: isServerError,
       code,
       data,
       message,
@@ -47,6 +50,7 @@ export const handleResponse = <T>(response: ApiResponse<T>): HandledResponse<T> 
     code,
     message: message || "An unexpected error occurred",
     fieldErrors,
+    serverError: isServerError,
     data
   };
 };

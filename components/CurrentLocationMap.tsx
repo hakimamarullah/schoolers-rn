@@ -15,44 +15,67 @@ interface CurrentLocationMapProps {
 
 const CurrentLocationMap: React.FC<CurrentLocationMapProps> = ({ onLocationUpdate }) => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number; address?: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const mapRef = useRef<MapView>(null);
 
- useEffect(() => {
-  let isMounted = true;
-  (async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted" || !isMounted) return;
+  useEffect(() => {
+    let isMounted = true;
+    
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+        
+        if (!isMounted) return;
 
-    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-    const coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
+      
+        const loc = await Location.getCurrentPositionAsync({ 
+          accuracy: Location.Accuracy.Highest
+        });
+        
+        const coords = { 
+          latitude: loc.coords.latitude, 
+          longitude: loc.coords.longitude 
+        };
 
-    const reverse = await Location.reverseGeocodeAsync(coords);
-    const addressObj = reverse[0];
-    const address = addressObj
-      ? `${addressObj.name ?? ""} ${addressObj.street ?? ""}, ${addressObj.subregion ?? ""}, ${addressObj.region ?? ""}`
-      : undefined;
+        
+        if (isMounted) {
+          setLocation(coords);
+          setIsLoading(false);
+          onLocationUpdate?.(coords);
+        }
 
-    if (isMounted) {
-      const fullLocation = { ...coords, address };
-      setLocation(fullLocation);
-      onLocationUpdate?.(fullLocation);
+      
+        Location.reverseGeocodeAsync(coords).then(reverse => {
+          if (!isMounted) return;
+          
+          const addressObj = reverse[0];
+          const address = addressObj
+            ? `${addressObj.name ?? ""} ${addressObj.street ?? ""}, ${addressObj.subregion ?? ""}, ${addressObj.region ?? ""}`.trim()
+            : undefined;
 
-      if (mapRef.current) {
-        mapRef.current.animateToRegion({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          latitudeDelta: 0.0015,
-          longitudeDelta: 0.0015,
-        }, 1000);
+          const fullLocation = { ...coords, address };
+          setLocation(fullLocation);
+          onLocationUpdate?.(fullLocation);
+        }).catch(err => {
+          console.warn("Reverse geocoding failed:", err);
+        });
+
+      } catch (error) {
+        console.error("Location fetch error:", error);
+        if (isMounted) setIsLoading(false);
       }
-    }
-  })();
+    })();
 
-  return () => { isMounted = false; }; 
-}, []);
+    return () => { isMounted = false; }; 
+  }, []);
 
-
-  if (!location) return <Text style={styles.loadingText}>Fetching location...</Text>;
+  if (isLoading || !location) {
+    return <Text style={styles.loadingText}>Fetching location...</Text>;
+  }
 
   return (
     <View style={styles.mapWrapper}>
@@ -68,17 +91,26 @@ const CurrentLocationMap: React.FC<CurrentLocationMapProps> = ({ onLocationUpdat
           longitudeDelta: 0.002,
         }}
         showsUserLocation
+        showsMyLocationButton={true}
+        rotateEnabled={false}
+        pitchEnabled={true}
       >
-        <Marker coordinate={location} title="You are here" description={location.address} />
+        <Marker 
+          coordinate={location} 
+          title="You are here" 
+          description={location.address}
+        />
       </MapView>
-      {location.address && <Text style={styles.addressText}>{location.address}</Text>}
+      {location.address && (
+        <Text style={styles.addressText}>{location.address}</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   mapWrapper: {
-    alignItems: "center", // centers map horizontally
+    alignItems: "center",
     marginBottom: 16,
   },
   map: {
@@ -96,6 +128,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     marginTop: 4,
+    paddingHorizontal: 16,
   },
 });
 

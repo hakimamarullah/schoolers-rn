@@ -38,7 +38,8 @@
     "Personal Data": "Personal Data",
     "Setup Host": "Setup Host",
     "Change Classroom": "Change Classroom",
-    "Check In": "Check In"
+    "Check In": "Check In",
+    "Oops": "Oops"
   },
   "profile": {
     "sections" : {
@@ -84,7 +85,13 @@
     "bringMeBack": "Bring me back!",
     "systemUnavailable": "System Unavailable",
     "networkError": "Network error. Please check your connection.",
-    "noUserInfoFound": "User info not found"
+    "noUserInfoFound": "User info not found",
+    "Pull down to try again": "Pull down to try again",
+    "No assignments yet": "No assignments yet",
+    "Check back later for new assignments": "Check back later for new assignments",
+    "confirmOpenUrl": "Open this?\n{{uri}}",
+    "confirmDowloadFile": "Download or open this file?\n{{file}}",
+    "confirmMarkAsDone": "Ready to mark as done?"
   },
   "day" : {
     "mon": "Mon",
