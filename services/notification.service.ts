@@ -1,8 +1,7 @@
 // services/notificationService.ts
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
-import messaging from '@react-native-firebase/messaging';
-
+import messaging from '@react-native-firebase/messaging'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Platform } from 'react-native'
 
@@ -19,6 +18,7 @@ export interface StoredNotification {
 }
 
 const NOTIFICATIONS_STORAGE_KEY = '@notifications_storage'
+const FCM_TOKEN_STORAGE_KEY = '@fcm_token'
 
 // Configure how notifications are handled when the app is in the foreground
 Notifications.setNotificationHandler({
@@ -31,11 +31,10 @@ Notifications.setNotificationHandler({
 })
 
 /**
- * Register for push notifications and get the Expo Push Token
+ * Register for push notifications and get the FCM Token
  */
-
 export async function registerForPushNotificationsAsync(): Promise<string | undefined> {
-  let token: string | undefined;
+  let token: string | undefined
 
   // Set up notification channel for Android
   if (Platform.OS === 'android') {
@@ -45,54 +44,178 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
       sound: 'default',
-    });
+    })
   }
 
   // Check if running on physical device
   if (!Device.isDevice) {
-    alert('Must use physical device for Push Notifications');
-    return undefined;
+    console.log('Must use physical device for Push Notifications')
+    return undefined
   }
 
-  // Request permissions
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
+  // Request permissions from Expo Notifications
+  const { status: existingStatus } = await Notifications.getPermissionsAsync()
+  let finalStatus = existingStatus
 
   if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
+    const { status } = await Notifications.requestPermissionsAsync()
+    finalStatus = status
   }
 
   if (finalStatus !== 'granted') {
-    alert('Failed to get push token for push notification!');
-    return undefined;
+    console.log('Failed to get push notification permission!')
+    return undefined
   }
 
-  // Request Firebase Messaging permission (Android 13+)
-  if (Platform.OS === 'android') {
-    const authStatus = await messaging().requestPermission();
+  // Request Firebase Messaging permission
+  try {
+    const authStatus = await messaging().requestPermission()
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL
 
     if (!enabled) {
-      console.log('Firebase messaging permission not granted');
+      console.log('Firebase messaging permission not granted')
+      return undefined
     }
+  } catch (error) {
+    console.error('Error requesting Firebase permission:', error)
+    return undefined
   }
 
   // Get FCM token
   try {
-    token = await messaging().getToken();
-    console.log('FCM Token:', token);
+    token = await messaging().getToken()
+    console.log('FCM Token:', token)
+    
+    // Store token locally
+    await AsyncStorage.setItem(FCM_TOKEN_STORAGE_KEY, token)
+    
+    // TODO: Send token to your backend
+    await sendTokenToServer(token)
+    
   } catch (error) {
-    console.error('Error getting push token:', error);
+    console.error('Error getting FCM token:', error)
   }
 
-  return token;
+  return token
+}
+
+/**
+ * Setup token refresh listener
+ */
+export function setupTokenRefreshListener() {
+  return messaging().onTokenRefresh(async (newToken) => {
+    console.log('FCM Token refreshed:', newToken)
+    
+    // Store new token
+    await AsyncStorage.setItem(FCM_TOKEN_STORAGE_KEY, newToken)
+    
+    // Send to backend
+    await sendTokenToServer(newToken)
+  })
+}
+
+/**
+ * Get stored FCM token
+ */
+export async function getStoredFCMToken(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(FCM_TOKEN_STORAGE_KEY)
+  } catch (error) {
+    console.error('Error getting stored FCM token:', error)
+    return null
+  }
+}
+
+/**
+ * Send FCM token to your backend
+ */
+async function sendTokenToServer(fcmToken: string): Promise<void> {
+  try {
+    // TODO: Replace with your actual backend endpoint
+    const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8080'
+    
+    // TODO: Get userId from your auth system
+    const userId = 'USER_ID' // Replace with actual user ID
+    
+    const response = await fetch(`${BACKEND_URL}/api/fcm/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Authorization': `Bearer ${yourAuthToken}`, // Add your auth token
+      },
+      body: JSON.stringify({
+        userId: userId,
+        fcmToken: fcmToken,
+        platform: Platform.OS,
+        deviceInfo: {
+          model: Device.modelName,
+          os: Platform.OS,
+          osVersion: Platform.Version,
+        }
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to register FCM token')
+    }
+
+    console.log('FCM token registered successfully')
+  } catch (error) {
+    console.error('Error sending token to server:', error)
+    // Don't throw - fail silently and retry later
+  }
+}
+
+/**
+ * Setup Firebase background message handler
+ * This should be called outside of any component
+ * NOTE: This runs when app is QUIT (completely closed)
+ */
+export function setupBackgroundMessageHandler() {
+  messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+    console.log('📦 Message handled in background (app quit):', remoteMessage)
+    
+    // Save to storage even when app is killed
+    await saveFCMMessageToStorage(remoteMessage)
+    
+    // FCM will automatically show the notification
+  })
+}
+
+/**
+ * Setup Firebase foreground message handler
+ * This handles messages when app is in foreground
+ */
+export function setupForegroundMessageHandler(
+  onMessageReceived: (remoteMessage: any) => void
+) {
+  return messaging().onMessage(async (remoteMessage) => {
+    console.log('📨 FCM message received in foreground:', remoteMessage)
+    
+    // Call custom handler (e.g., to save to storage or update UI)
+    onMessageReceived(remoteMessage)
+    
+    // ✅ ONLY show notification if it's a DATA-ONLY message
+    // If remoteMessage.notification exists, FCM already showed it
+    if (!remoteMessage.notification && remoteMessage.data) {
+      // This is a data-only message, show it manually
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: remoteMessage.data.title as string || 'Notification',
+          body: remoteMessage.data.body as string || '',
+          data: remoteMessage.data || {},
+        },
+        trigger: null, // Show immediately
+      })
+    }
+  })
 }
 
 /**
  * Save notification to local storage
+ * This can be called from expo-notifications listener
  */
 export async function saveNotificationToStorage(
   notification: Notifications.Notification
@@ -115,6 +238,37 @@ export async function saveNotificationToStorage(
     await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updated))
   } catch (error) {
     console.error('Error saving notification to storage:', error)
+  }
+}
+
+/**
+ * Save FCM message to storage
+ * Call this from the FCM foreground handler
+ */
+export async function saveFCMMessageToStorage(
+  remoteMessage: any
+): Promise<void> {
+  try {
+    const notification = remoteMessage.notification || {}
+    const data = remoteMessage.data || {}
+    
+    const storedNotif: StoredNotification = {
+      id: remoteMessage.messageId || Date.now().toString(),
+      title: notification.title || data.title || 'Notification',
+      body: notification.body || data.body || '',
+      data: data,
+      receivedAt: new Date().toISOString(),
+      hasRead: false,
+    }
+
+    // Get existing notifications
+    const existing = await getStoredNotifications()
+    const updated = [storedNotif, ...existing]
+
+    // Save to storage
+    await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updated))
+  } catch (error) {
+    console.error('Error saving FCM message to storage:', error)
   }
 }
 
@@ -196,4 +350,45 @@ export async function getUnreadCount(): Promise<number> {
     console.error('Error getting unread count:', error)
     return 0
   }
+}
+
+/**
+ * Handle notification opened when app was in background/killed
+ * Call this on app startup to check if app was opened from a notification
+ */
+export async function handleInitialNotification(): Promise<any | null> {
+  try {
+    const remoteMessage = await messaging().getInitialNotification()
+    
+    if (remoteMessage) {
+      console.log('📬 App opened from notification (background/killed):', remoteMessage)
+      
+      // Save to storage if not already saved
+      await saveFCMMessageToStorage(remoteMessage)
+      
+      return remoteMessage
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Error handling initial notification:', error)
+    return null
+  }
+}
+
+/**
+ * Setup listener for notifications opened when app was in background
+ */
+export function setupNotificationOpenedListener(
+  onNotificationOpened: (remoteMessage: any) => void
+) {
+  return messaging().onNotificationOpenedApp((remoteMessage) => {
+    console.log('📬 App opened from notification (background):', remoteMessage)
+    
+    // Save to storage
+    saveFCMMessageToStorage(remoteMessage)
+    
+    // Call custom handler (e.g., navigate to screen)
+    onNotificationOpened(remoteMessage)
+  })
 }

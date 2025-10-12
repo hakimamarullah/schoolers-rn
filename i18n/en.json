@@ -13,6 +13,10 @@
     "Failed Login": "Failed Login",
     "Login failed. Please try again later": "Login failed. Please try again later"
   },
+  "biometric": {
+     "signInFailed": "Sign in with Biometric failed. Please try again.",
+     "authFailed": "Biometric authentication was cancelled or failed"
+  },
   "loginForm": {
     "Password": "Password",
     "Enter password": "Enter password",
@@ -39,7 +43,8 @@
     "Setup Host": "Setup Host",
     "Change Classroom": "Change Classroom",
     "Check In": "Check In",
-    "Oops": "Oops"
+    "Oops": "Oops",
+    "Notification": "Notification"
   },
   "profile": {
     "sections" : {

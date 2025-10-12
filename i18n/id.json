@@ -39,7 +39,12 @@
     "Setup Host": "Setup Host",
     "Change Classroom": "Ganti Kelas",
     "Check In": "Check In",
-    "Oops": "Oops"
+    "Oops": "Oops",
+    "Notification": "Notifikasi"
+  },
+  "biometric": {
+     "signInFailed": "Gagal masuk menggunakan biometrik. Coba lagi ya!",
+     "authFailed": "Autentikasi biometrik gagal. Gunakan password saja! Hadeh!"
   },
   "profile": {
     "sections" : {

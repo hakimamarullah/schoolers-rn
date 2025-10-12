@@ -8,7 +8,6 @@ import ProfilePicture from "@/components/ProfilePicture";
 import SessionInfoSection from "@/components/ScheduleSection";
 import { MAIN_MENU } from "@/constants/menuConfig";
 import { useApp } from "@/hooks/useApp";
-import { useNotifications } from "@/hooks/UseNotification";
 import { useSafeTimeout } from "@/hooks/useSafeTimeout";
 import { useSession } from "@/hooks/useSession";
 import homepageInfoService from "@/services/homepageInfo.service";
@@ -39,7 +38,6 @@ export default function HomeScreen() {
   const app = useApp();
   const { t } = useTranslation();
   const { setSafeTimeout } = useSafeTimeout();
-  const { devicePushToken } = useNotifications();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -90,7 +88,6 @@ export default function HomeScreen() {
     };
 
     fetchHomepageInfo();
-    console.log({devicePushToken});
   }, [refreshTrigger]);
 
   return (

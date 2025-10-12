@@ -1,11 +1,18 @@
 import TabBarIcon from "@/components/TabBarIcon";
+import { useNotifications } from "@/hooks/UseNotification";
 import { useSession } from "@/hooks/useSession";
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { View, Text, StyleSheet } from "react-native";
 
 export default function TabsLayout() {
   const { session, isHostSet } = useSession();
+  const { notifications } = useNotifications();
   const { t } = useTranslation();
+  
+  
+  const unreadCount = notifications.filter(notif => !notif.hasRead).length;
+
   return (
     <Tabs
       screenOptions={{
@@ -74,10 +81,19 @@ export default function TabsLayout() {
           options={{
             title: t("tabItem.Info"),
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon
-                name={focused ? "notifications-sharp" : "notifications-outline"}
-                focused={focused}
-              />
+              <View style={styles.iconContainer}>
+                <TabBarIcon
+                  name={focused ? "notifications-sharp" : "notifications-outline"}
+                  focused={focused}
+                />
+                {unreadCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
             ),
           }}
         />
@@ -98,3 +114,32 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    position: 'relative',
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: '#FF3B30',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    borderWidth: 2,
+    borderColor: '#FFB800',
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+});

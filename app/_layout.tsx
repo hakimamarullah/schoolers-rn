@@ -10,7 +10,10 @@ import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "@/config/firebaseConfig"
+import { setupBackgroundMessageHandler } from "@/services/notification.service";
 
+
+setupBackgroundMessageHandler();
 export default function Root() {
   SplashScreen.preventAutoHideAsync();
   return (

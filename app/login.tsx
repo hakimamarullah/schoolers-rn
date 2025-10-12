@@ -73,7 +73,7 @@ export default function LoginScreen() {
         throw new Error("Error login using biometric. no access token on response.");
       }
     } catch (error: any) {
-      app.showModal("Error", "Sign in with Biometric failed. Please try again.", undefined, false);
+      app.showModal("Error", t("biometric.signInFailed"), undefined, false);
       console.log(error.message);
     } finally {
       app.hideOverlay();
