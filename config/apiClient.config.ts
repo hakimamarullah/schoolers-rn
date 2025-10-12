@@ -5,6 +5,7 @@ import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'ax
 import * as Location from 'expo-location';
 import StorageService from '../services/storage.service';
 import i18n from '@/i18n/i18n'; // Update path to your i18n config
+import { handleError } from '@/scripts/utils';
 
 let apiClientInstance: AxiosInstance | null = null;
 let apiClientInstanceInsecure: AxiosInstance | null = null;
@@ -75,7 +76,7 @@ const setupInterceptor = (instance: AxiosInstance, isSecure: boolean) => {
     },
     (error: AxiosError) => {
       console.error('[Request Error]', error);
-      return Promise.reject(error);
+      return Promise.reject(errorHandler(error));
     }
   );
 
@@ -86,7 +87,7 @@ const setupInterceptor = (instance: AxiosInstance, isSecure: boolean) => {
         await StorageService.clearAll();
         await sessionService.signOut();
       }
-      return Promise.reject(error);
+      return Promise.reject(errorHandler(error));
     }
   );
 };
@@ -202,7 +203,7 @@ const setupLocationAndLanguageInterceptor = (instance: AxiosInstance) => {
       }
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(errorHandler(error))
   );
 };
 
@@ -233,4 +234,32 @@ export const isApiClientInitialized = (): boolean =>
 export const destroyApiClient = (): void => {
   apiClientInstance = null;
   apiClientInstanceInsecure = null;
+};
+
+const errorHandler = (error: any): any => {
+  // If server responded
+  if (error.response) {
+    const status = error.response.status;
+    const serverMessage = error.response.data?.message;
+
+    if (status >= 500 && status <= 599) {
+      error.message = i18n.t('common.systemUnavailable');
+    } else if (serverMessage) {
+      error.message = serverMessage;
+    } else {
+      error.message = i18n.t('common.systemUnavailable');
+    }
+
+    return error; // ✅ keep full error object with response
+  }
+
+  // No response = network / timeout / server down
+  if (error.request) {
+    error.message = i18n.t('common.systemUnavailable');
+    return error;
+  }
+
+  // Unexpected error (client-side / config)
+  error.message = i18n.t('common.networkError');
+  return error;
 };

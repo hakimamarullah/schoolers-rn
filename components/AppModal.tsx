@@ -1,3 +1,5 @@
+import { useSafeTimeout } from "@/hooks/useSafeTimeout";
+import { MaterialIcons } from "@expo/vector-icons";
 import React, {
   forwardRef,
   memo,
@@ -13,7 +15,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 
 export type AppModalRef = {
   show: (
@@ -21,63 +22,80 @@ export type AppModalRef = {
     message: string,
     onConfirm?: () => void,
     closable?: boolean
-  ) => void;
-  hide: () => void;
+  ) => Promise<void>;
+  hide: () => Promise<void>;
 };
 
 const AppModal = forwardRef<AppModalRef, {}>((_, ref) => {
   const [visible, setVisible] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [onConfirm, setOnConfirm] = useState<(() => void) | undefined>();
+  const onConfirmRef = useRef<(() => void) | undefined>(undefined);
   const [dismissable, setDismissable] = useState(true);
   const opacity = useRef(new Animated.Value(0)).current;
+  const { setSafeTimeout } = useSafeTimeout();
 
   const fadeIn = () =>
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
-
-  const fadeOut = (onEnd?: () => void) =>
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start(() => onEnd && onEnd());
-
-  const handleClose = () => {
-    fadeOut(() => {
-      setVisible(false);
-      setTitle("");
-      setMessage("");
-      setOnConfirm(undefined);
-      setDismissable(true);
+    new Promise<void>((resolve) => {
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(() => resolve());
     });
+
+  const fadeOut = () =>
+    new Promise<void>((resolve) => {
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(() => resolve());
+    });
+
+  const handleClose = async () => {
+    await fadeOut();
+    setVisible(false);
+    setTitle("");
+    setMessage("");
+    onConfirmRef.current = undefined;
+    setDismissable(true);
   };
 
-  const handleConfirm = () => {
-    if (onConfirm) {
-      onConfirm();
+  const handleConfirm = async () => {
+    const callback = onConfirmRef.current;
+    onConfirmRef.current = undefined; // Clear it immediately to prevent double execution
+    await handleClose(); // ensure modal fully hides first
+    if (callback) {
+      try {
+        callback();
+      } catch (error) {
+        console.error("Error in modal confirm callback:", error);
+      }
     }
-    handleClose();
   };
 
   useImperativeHandle(
     ref,
     () => ({
-      show: (t, m, callback, closable) => {
+      show: async (t, m, callback, closable) => {
+        if (visible) {
+          await handleClose();
+          await new Promise((r) => setSafeTimeout(r, 100));
+        }
+
         setTitle(t);
         setMessage(m);
-        setOnConfirm(() => callback);
-        setVisible(true);
+        onConfirmRef.current = callback;
         setDismissable(closable ?? true);
+        setVisible(true);
+
+        // Wait a tick so the Modal mounts before fade-in
         requestAnimationFrame(() => fadeIn());
       },
       hide: handleClose,
     }),
-    [opacity]
+    [visible]
   );
 
   return (
@@ -86,12 +104,14 @@ const AppModal = forwardRef<AppModalRef, {}>((_, ref) => {
       transparent
       animationType="none"
       statusBarTranslucent
-      onRequestClose={handleClose}
+      onRequestClose={dismissable ? handleClose : undefined}
     >
       <Animated.View style={[styles.overlay, { opacity }]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={dismissable ? handleClose : undefined}
+        />
         <View style={styles.contentBox}>
-          {/* Close Button */}
           {dismissable && (
             <Pressable style={styles.closeButton} onPress={handleClose}>
               <MaterialIcons name="close" size={24} color="#666" />

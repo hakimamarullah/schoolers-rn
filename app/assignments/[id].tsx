@@ -21,7 +21,7 @@ export default function AssignmentDetails() {
   const [assignment, setAssignment] = useState<AssignmentResponse | null>(null);
   const app = useApp();
   const router = useRouter();
-  const { downloadFile } = useFileDownloader();
+  const { download } = useFileDownloader();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -40,14 +40,13 @@ export default function AssignmentDetails() {
   const openUri = (uri: string, onError?: (error: any) => void) => {
     Linking.openURL(uri).catch((err) => onError?.(err));
   };
-  const handleFilePress = async (url: string) => {
-    try {
-      // await downloadFile(url); Disable for now
 
+  const handleFilePress = async (uri: string) => {
+    try {
       app.showModal(
         "Info",
-        t("common.confirmDowloadFile", { file: url }),
-        () => openUri(url),
+        t("common.confirmDowloadFile", { file: uri }),
+        async () => await download(uri, undefined, () => openUri(uri)),
         true
       );
     } catch (error: any) {}
@@ -69,9 +68,20 @@ export default function AssignmentDetails() {
     (r) => r.resourceType === ResourceType.URL
   );
 
+  const submitMarkAsDone = async () => {
+    try {
+      const response = await assignmentService.updateAssignmentStatus(
+        Number(id),
+        "SUBMITTED"
+      );
+      app.showModal("Info", response, undefined, false);
+    } catch (error: any) {
+      app.showModal("Info", error.message, undefined, false);
+    }
+  };
   const handleMarkAsDone = () => {
-    app.showModal("Info", t("common.confirmMarkAsDone"), () => console.log("Marked"));
-  }
+    app.showModal("Info", t("common.confirmMarkAsDone"), submitMarkAsDone);
+  };
 
   return (
     <PageLayout title="Assignment Details">
@@ -79,30 +89,36 @@ export default function AssignmentDetails() {
         style={styles.container}
         contentContainerStyle={styles.content}
       >
-        {/* Icon */}
-        <View style={styles.iconContainer}>
-          <MaterialIcons name="description" size={48} color="#9CA3AF" />
-        </View>
+        <View style={styles.headerContainer}>
+          {/* Icon */}
+          <View style={styles.iconContainer}>
+            <MaterialIcons name="description" size={30} color="#A67C00" />
+          </View>
 
-        {/* Subject Name */}
-        <Text style={styles.subjectName}>{assignment?.subjectName}</Text>
+          {/* Subject Name */}
+          <View style={styles.subjectNameContainer}>
+            <Text style={styles.subjectName}>{assignment?.subjectName}</Text>
+          </View>
+        </View>
 
         {/* Due Date */}
         <View style={styles.section}>
-          <Text style={styles.label}>Due Date</Text>
+          <Text style={styles.label}>{t("assignmentDetails.duedate")}</Text>
           <Text style={styles.value}>{assignment?.dueDate}</Text>
         </View>
 
         {/* Title */}
         <View style={styles.section}>
-          <Text style={styles.label}>Title</Text>
+          <Text style={styles.label}>{t("assignmentDetails.title")}</Text>
           <Text style={styles.value}>{assignment?.title}</Text>
         </View>
 
         {/* Description */}
         {assignment?.description && (
           <View style={styles.section}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>
+              {t("assignmentDetails.description")}
+            </Text>
             <Text style={styles.value}>{assignment.description}</Text>
           </View>
         )}
@@ -110,7 +126,7 @@ export default function AssignmentDetails() {
         {/* Files */}
         {fileResources && fileResources.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.label}>Files</Text>
+            <Text style={styles.label}>{t("assignmentDetails.files")}</Text>
             {fileResources?.map((file) => (
               <Pressable
                 key={file.id}
@@ -131,7 +147,7 @@ export default function AssignmentDetails() {
         {/* URLs */}
         {urlResources && urlResources.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.label}>URL</Text>
+            <Text style={styles.label}>{t("assignmentDetails.url")}</Text>
             {urlResources.map((url) => (
               <Pressable
                 key={url.id}
@@ -147,7 +163,7 @@ export default function AssignmentDetails() {
         {/* Remaining Time */}
         {assignment?.remainingTimeBadgeText && (
           <View style={styles.section}>
-            <Text style={styles.label}>Remaining time</Text>
+            <Text style={styles.label}>Status</Text>
             <Text style={styles.value}>
               {assignment.remainingTimeBadgeText}
             </Text>
@@ -157,7 +173,9 @@ export default function AssignmentDetails() {
         {/* Mark as Done Button */}
         {!assignment?.isSubmitted && (
           <Pressable onPress={handleMarkAsDone} style={styles.button}>
-            <Text style={styles.buttonText}>Mark as done</Text>
+            <Text style={styles.buttonText}>
+              {t("assignmentDetails.markAsDone")}
+            </Text>
           </Pressable>
         )}
 
@@ -165,7 +183,9 @@ export default function AssignmentDetails() {
         {assignment?.isSubmitted && (
           <View style={styles.submittedBadge}>
             <MaterialIcons name="check-circle" size={20} color="#15803D" />
-            <Text style={styles.submittedText}>Submitted</Text>
+            <Text style={styles.submittedText}>
+              {t("assignmentDetails.submitted")}
+            </Text>
           </View>
         )}
       </ScrollView>
@@ -179,22 +199,44 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   content: {
-    padding: 20,
     paddingBottom: 40,
   },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
+  },
   iconContainer: {
+    backgroundColor: "#FFE78A",
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
     alignItems: "center",
-    marginBottom: 16,
+    justifyContent: "center",
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  subjectNameContainer: {
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
   },
   subjectName: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "500",
     color: "#111827",
-    textAlign: "center",
-    marginBottom: 24,
+    flexWrap: "wrap",
   },
   section: {
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   label: {
     fontSize: 12,
@@ -205,6 +247,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#111827",
     lineHeight: 24,
+    textAlign: "justify",
   },
   fileItem: {
     flexDirection: "row",
@@ -231,6 +274,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     marginTop: 20,
+    marginHorizontal: 10,
   },
   buttonText: {
     fontSize: 16,
@@ -246,6 +290,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 24,
     marginTop: 20,
+    marginHorizontal: 10,
   },
   submittedText: {
     fontSize: 16,

@@ -49,6 +49,13 @@ class AssignmentService {
       resources: mappedResources
     }
   }
+
+  async updateAssignmentStatus(assignmentId: number, submissionStatus: string): Promise<string> {
+    const api = getSecureApiClient();
+    const response = await api.put<ApiResponse<void>>(`/students/assignments/${assignmentId}/status/${submissionStatus}`);
+    return response?.data?.message;
+    
+  }
 }
 
 export default new AssignmentService();

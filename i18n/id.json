@@ -91,7 +91,13 @@
     "Check back later for new assignments": "Cek kembali nanti",
     "confirmOpenUrl": "Buka tautan berikut?\n{{uri}}",
     "confirmDowloadFile": "Unduh file ini?\n{{file}}",
-    "confirmMarkAsDone": "Yakin sudah selesai?"
+    "confirmMarkAsDone": "Yakin sudah selesai?",
+    "cannotSaveImageWithoutPermission": "Tidak bisa menyimpan gambar tanpa izin akses media",
+    "fullname": "Nama Lengkap",
+    "nisn": "NISN",
+    "gender": "Jenis Kelamin",
+    "grade": "Tingkat",
+    "email": "Email"
   },
   "day" : {
     "mon": "Sen",
@@ -112,5 +118,37 @@
     "Failed to save classroom. Please try again later": "Gagal menyimpan kelas. Coba lagi nanti.",
     "Classroom updated successfully. You will be signed out now.": "Berhasil mengganti kelas. Kamu akan logout sekarang.",
      "Failed to get classroom info": "Gagal memuat informasi kelas."
+  },
+  "assignmentDetails": {
+    "duedate": "Batas Pengumpulan",
+    "title": "Judul",
+    "description": "Deskripsi",
+    "files": "Berkas",
+    "url": "Pranala",
+    "markAsDone": "Tandai Selesai",
+    "submitted": "Selesai"
+  },
+  "personalDataSum": {
+    "saveAsImage": "Simpan sebagai Gambar",
+    "Personal data card saved to gallery!": "Kartu Data Pribadi berhasil disimpan ke galeri",
+    "Failed to save image": "Gagal menyimpan gambar!"
+  },
+  "fileDownloader": {
+    "downloading": "Mengunduh file...",
+    "downloadFailed": "Unduhan gagal.",
+    "downloadCancelled": "Unduhan gagal atau dibatalkan.",
+    "sharingNotAvailable": "Berbagi tidak tersedia di perangkat ini.",
+    "saveFile": "Simpan file",
+    "saveOrShareFile": "Simpan atau bagikan file",
+    "successAndroid": "File berhasil diunduh! Silakan simpan ke lokasi pilihan Anda.",
+    "successIOS": "File disimpan ke folder Dokumen!\nAnda dapat mengaksesnya di aplikasi Files.",
+    "userCancelled": "Unduhan dibatalkan oleh pengguna.",
+    "fileSavedSharingCancelled": "File disimpan, tetapi berbagi dibatalkan.",
+    "errorTitle": "Kesalahan",
+    "successTitle": "Berhasil",
+    "infoTitle": "Info",
+    "fileDownloadFailed": "Unduhan file gagal.",
+    "cacheCleanedUp": "File cache dibersihkan",
+    "couldNotDeleteCache": "Tidak dapat menghapus file cache"
   }
 }

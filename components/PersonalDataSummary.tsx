@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { captureRef } from "react-native-view-shot";
 import ProfilePicture from "./ProfilePicture";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -19,6 +20,7 @@ const PersonalDataSummary: React.FC = () => {
   const cardRef = useRef<View>(null);
   const app = useApp();
   const { session } = useSession();
+  const { t } = useTranslation();
 
   const handleSaveImage = async () => {
     try {
@@ -26,8 +28,8 @@ const PersonalDataSummary: React.FC = () => {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
         app.showModal(
-          "Permission Denied",
-          "Cannot save image without permission",
+          "Info",
+          t("common.cannotSaveImageWithoutPermission"),
           undefined,
           false
         );
@@ -44,14 +46,14 @@ const PersonalDataSummary: React.FC = () => {
       await MediaLibrary.saveToLibraryAsync(uri);
     
       app.showModal(
-        "Success",
-        "Personal data card saved to gallery!",
+        t("common.success"),
+        t("personalDataSum.Personal data card saved to gallery!"),
         undefined,
         false
       );
     } catch (error) {
       console.error("Error saving image:", error);
-      app.showModal("Error", "Failed to save image", undefined, false);
+      app.showModal("Error", t("personalDataSum.Failed to save image"), undefined, false);
     }
   };
 
@@ -78,10 +80,10 @@ const PersonalDataSummary: React.FC = () => {
           <View style={styles.cardContent}>
             <View style={styles.detailsGrid}>
               <View style={styles.detailColumn}>
-                <Text style={styles.detailLabel}>Full Name</Text>
+                <Text style={styles.detailLabel}>{t("common.fullname")}</Text>
                 <Text style={styles.detailValue}>{session?.fullName}</Text>
 
-                <Text style={[styles.detailLabel, styles.marginTop]}>NISN</Text>
+                <Text style={[styles.detailLabel, styles.marginTop]}>{t("common.nisn")}</Text>
                 <Text style={styles.detailValue}>{session?.loginId}</Text>
 
                 <Text style={[styles.detailLabel, styles.marginTop]}>
@@ -91,16 +93,16 @@ const PersonalDataSummary: React.FC = () => {
               </View>
 
               <View style={styles.detailColumn}>
-                <Text style={[styles.detailLabel]}>Classroom</Text>
+                <Text style={[styles.detailLabel]}>{t("common.Classroom")}</Text>
                 <Text style={styles.detailValue}>{session?.className}</Text>
 
                 <Text style={[styles.detailLabel, styles.marginTop]}>
-                  Grade
+                  {t("common.grade")}
                 </Text>
                 <Text style={styles.detailValue}>{session?.grade ?? "-"}</Text>
 
                 <Text style={[styles.detailLabel, styles.marginTop]}>
-                  Email
+                  {t("common.email")}
                 </Text>
                 <Text style={styles.detailValue}>{session?.email}</Text>
               </View>
@@ -115,7 +117,7 @@ const PersonalDataSummary: React.FC = () => {
           activeOpacity={0.7}
         >
           <MaterialIcons name="file-download" size={20} color="#000" />
-          <Text style={styles.saveButtonText}>Save as Image</Text>
+          <Text style={styles.saveButtonText}>{t("personalDataSum.saveAsImage")}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

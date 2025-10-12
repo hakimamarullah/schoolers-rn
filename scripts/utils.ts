@@ -117,4 +117,4 @@ export const handleError = (error: any): any => {
       throw new Error(i18n.t("common.systemUnavailable"));
     }
     throw new Error(i18n.t("common.networkError"));
-  }
+}

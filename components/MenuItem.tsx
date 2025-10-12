@@ -18,7 +18,7 @@ export default function MenuItem({
   title, 
   onPress, 
   iconColor = "#FFB800",
-  bgColor = "#FFF6DC",
+  bgColor = "#FFECC2",
   showBadge = false,
   badgeText = "NEW",
   style 
@@ -75,8 +75,10 @@ const styles = StyleSheet.create({
   iconWrapper: {
     width: 48,
     height: 48,
-    borderRadius: 16,
+    borderRadius: 14,
     position: "absolute",
+    borderColor: "#ffd800",
+    borderWidth: 0.2,
     transform: [{ rotate: '45deg' }],
   },
   iconAbsolute: {
@@ -105,11 +107,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   title: {
-    fontSize: 10,
-    fontWeight: "400",
+    fontSize: 11,
+    fontWeight: "500",
     color: "#333",
     textAlign: "center",
     lineHeight: 12,
+    marginTop: 2,
     maxWidth: 60,
   },
 });

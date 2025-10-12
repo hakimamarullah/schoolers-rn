@@ -7,7 +7,7 @@ import { useEffect, useRef, useCallback } from 'react';
 export const useSafeTimeout = () => {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const setSafeTimeout = useCallback((callback: () => void, delay: number) => {
+  const setSafeTimeout = useCallback((callback: (v?: unknown) => void, delay: number) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }

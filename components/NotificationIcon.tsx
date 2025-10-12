@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    position: "relative", // needed for badge positioning
+    position: "relative", 
   },
   badge: {
     position: "absolute",
@@ -34,6 +34,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#FF9D00",
     borderWidth: 1,
-    borderColor: "#FFF9E0", // border matches container
+    borderColor: "#FFF9E0",
   },
 });

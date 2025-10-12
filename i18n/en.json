@@ -91,7 +91,14 @@
     "Check back later for new assignments": "Check back later for new assignments",
     "confirmOpenUrl": "Open this?\n{{uri}}",
     "confirmDowloadFile": "Download or open this file?\n{{file}}",
-    "confirmMarkAsDone": "Ready to mark as done?"
+    "confirmMarkAsDone": "Ready to mark as done?",
+    "cannotSaveImageWithoutPermission": "Cannot save image without permission",
+    "fullname": "Full Name",
+    "nisn": "NISN",
+    "gender": "Gender",
+    "grade": "Grade",
+    "email": "Email"
+    
   },
   "day" : {
     "mon": "Mon",
@@ -111,6 +118,38 @@
   "changeClass": {
     "Failed to save classroom. Please try again later": "Failed to save classroom. Please try again later",
     "Classroom updated successfully. You will be signed out now.": "Classroom updated successfully. You will be signed out now.",
-     "Failed to get classroom info":  "Failed to get classroom info"
+    "Failed to get classroom info":  "Failed to get classroom info"
+  },
+  "assignmentDetails": {
+    "duedate": "Due Date",
+    "title": "Title",
+    "description": "Description",
+    "files": "Files",
+    "url": "URL",
+    "markAsDone": "Mark As Done",
+    "submitted": "Submitted"
+  },
+  "personalDataSum": {
+    "saveAsImage": "Save as Image",
+    "Personal data card saved to gallery!": "Personal data card saved to gallery!",
+    "Failed to save image": "Failed to save image"
+  },
+  "fileDownloader": {
+    "downloading": "Downloading file...",
+    "downloadFailed": "Download failed.",
+    "downloadCancelled": "Download failed or was cancelled.",
+    "sharingNotAvailable": "Sharing is not available on this device.",
+    "saveFile": "Save file",
+    "saveOrShareFile": "Save or share file",
+    "successAndroid": "File downloaded! Please save it to your preferred location.",
+    "successIOS": "File saved to Documents folder!\nYou can access it in the Files app.",
+    "userCancelled": "Download cancelled by user.",
+    "fileSavedSharingCancelled": "File saved, but sharing was cancelled.",
+    "errorTitle": "Error",
+    "successTitle": "Success",
+    "infoTitle": "Info",
+    "fileDownloadFailed": "File download failed.",
+    "cacheCleanedUp": "Cache file cleaned up",
+    "couldNotDeleteCache": "Could not delete cache file"
   }
 }
