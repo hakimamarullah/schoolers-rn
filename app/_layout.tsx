@@ -9,6 +9,7 @@ import storageService from "@/services/storage.service";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import "@/config/firebaseConfig"
 
 export default function Root() {
   SplashScreen.preventAutoHideAsync();

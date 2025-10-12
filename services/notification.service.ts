@@ -1,7 +1,8 @@
 // services/notificationService.ts
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
-import Constants from 'expo-constants'
+import messaging from '@react-native-firebase/messaging';
+
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Platform } from 'react-native'
 
@@ -32,8 +33,9 @@ Notifications.setNotificationHandler({
 /**
  * Register for push notifications and get the Expo Push Token
  */
+
 export async function registerForPushNotificationsAsync(): Promise<string | undefined> {
-  let token: string | undefined
+  let token: string | undefined;
 
   // Set up notification channel for Android
   if (Platform.OS === 'android') {
@@ -43,46 +45,50 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
       sound: 'default',
-    })
+    });
   }
 
   // Check if running on physical device
   if (!Device.isDevice) {
-    alert('Must use physical device for Push Notifications')
-    return undefined
+    alert('Must use physical device for Push Notifications');
+    return undefined;
   }
 
   // Request permissions
-  const { status: existingStatus } = await Notifications.getPermissionsAsync()
-  let finalStatus = existingStatus
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
 
   if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync()
-    finalStatus = status
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
   }
 
   if (finalStatus !== 'granted') {
-    alert('Failed to get push token for push notification!')
-    return undefined
+    alert('Failed to get push token for push notification!');
+    return undefined;
   }
 
-  // Get the Expo Push Token
-  try {
-    const projectId =
-      Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId
+  // Request Firebase Messaging permission (Android 13+)
+  if (Platform.OS === 'android') {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-    if (!projectId) {
-      throw new Error('Project ID not found')
+    if (!enabled) {
+      console.log('Firebase messaging permission not granted');
     }
-
-    const pushTokenData = await Notifications.getDevicePushTokenAsync();
-    token = pushTokenData.data
-    console.log('Expo Push Token:', token)
-  } catch (error) {
-    console.error('Error getting push token:', error)
   }
 
-  return token
+  // Get FCM token
+  try {
+    token = await messaging().getToken();
+    console.log('FCM Token:', token);
+  } catch (error) {
+    console.error('Error getting push token:', error);
+  }
+
+  return token;
 }
 
 /**
