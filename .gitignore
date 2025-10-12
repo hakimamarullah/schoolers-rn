@@ -43,3 +43,6 @@ app-example
 /android
 
 .env
+
+schoolers-firebase-credentials.json
+

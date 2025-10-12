@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324071781335",
+    "project_id": "schoolers-4e844",
+    "storage_bucket": "schoolers-4e844.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324071781335:android:e40a3f75974c7f4eec5192",
+        "android_client_info": {
+          "package_name": "com.Schoolers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJ2XCJ1307kjY8VUXtMkFh5rMr5gO9tQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

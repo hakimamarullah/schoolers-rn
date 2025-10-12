@@ -1,6 +1,7 @@
 // app/_layout.tsx
 import { SplashScreenController } from "@/components/SplashScreenController";
 import { AppProvider } from "@/hooks/useApp";
+import { NotificationProvider } from "@/hooks/UseNotification";
 import { SessionProvider, useSession } from "@/hooks/useSession";
 import { useSetupLocationPermission } from "@/hooks/useSetupLocationPermission";
 import i18n from "@/i18n/i18n";
@@ -15,31 +16,30 @@ export default function Root() {
     <SafeAreaProvider>
       <SessionProvider>
         <AppProvider>
-          <SplashScreenController />
-          <RootNavigator />
+          <NotificationProvider>
+            <SplashScreenController />
+            <RootNavigator />
+          </NotificationProvider>
         </AppProvider>
       </SessionProvider>
     </SafeAreaProvider>
   );
 }
 
-
 function RootNavigator() {
   const { session, isHostSet, isLoading, loginId } = useSession();
 
   useSetupLocationPermission();
   useEffect(() => {
-     const setLanguage = async () => {
-       try { 
+    const setLanguage = async () => {
+      try {
         const savedLanguage = await storageService.getLanguage();
         i18n.changeLanguage(savedLanguage ?? "en");
-       } catch(error: any){
+      } catch (error: any) {}
+    };
 
-       }
-     }
-
-     setLanguage();
-  }, [])
+    setLanguage();
+  }, []);
 
   if (isLoading) return null;
 
@@ -58,11 +58,11 @@ function RootNavigator() {
 
       {/* ✅ 2. Host is set but not logged in → show login */}
       <Stack.Protected guard={isHostSet && !session && !!loginId}>
-        <Stack.Screen name="login"/>
+        <Stack.Screen name="login" />
       </Stack.Protected>
 
       <Stack.Protected guard={isHostSet && !loginId && !session}>
-        <Stack.Screen name="register" options={{ navigationBarHidden: true }}/>
+        <Stack.Screen name="register" options={{ navigationBarHidden: true }} />
       </Stack.Protected>
 
       {/* ✅ 3. Host set & logged in → main app */}

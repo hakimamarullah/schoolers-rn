@@ -9,9 +9,13 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "entitlements": {
+        "aps-environment": "development"
+      }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -48,11 +52,13 @@
     },
     "plugins": [
       "expo-router",
+      "expo-notifications",
+      "@react-native-firebase/app",
       [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash_backdrop.png",
-          "resizeMode": "contain",
+          "resizeMode": "cover",
           "backgroundColor": "#ffd800",
           "dark": {
             "backgroundColor": "#ffd800"
