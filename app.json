@@ -4,12 +4,16 @@
     "slug": "Schoolers",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "schoolers",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "icon": {
+        "dark": "./assets/icons/ios-dark.png",
+        "light": "./assets/icons/ios-light.png",
+        "tinted": "./assets/icons/ios-tinted.png"
+      },
       "entitlements": {
         "aps-environment": "development"
       }
@@ -17,10 +21,9 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FFB800",
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "monochromeImage": "./assets/icons/adaptive-icon.png"
       },
       "softwareKeyboardLayoutMode": "pan",
       "edgeToEdgeEnabled": true,
@@ -57,11 +60,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash_backdrop.png",
-          "resizeMode": "cover",
+          "image": "./assets/icons/splash-icon-light.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
           "backgroundColor": "#ffd800",
           "dark": {
-            "backgroundColor": "#ffd800"
+            "backgroundColor": "#ffd800",
+            "image": "./assets/icons/splash-icon-light.png"
           }
         }
       ],
