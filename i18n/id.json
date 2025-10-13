@@ -102,7 +102,10 @@
     "nisn": "NISN",
     "gender": "Jenis Kelamin",
     "grade": "Tingkat",
-    "email": "Email"
+    "email": "Email",
+    "failedToLoadInformation": "Gagal memuat informasi",
+    "No notifications yet": "Belum ada informasi",
+    "You'll see your notifications here when you receive them": "Kamu dapat melihat informasi di sini jika ada"
   },
   "day" : {
     "mon": "Sen",

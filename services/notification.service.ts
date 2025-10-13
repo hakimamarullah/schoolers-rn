@@ -1,9 +1,13 @@
 // services/notificationService.ts
+import { getSecureApiClient } from '@/config/apiClient.config'
+import { ApiResponse } from '@/types/api.type'
+import { AppNotificationRequest } from '@/types/notification.type'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { AuthorizationStatus, getInitialNotification, getMessaging, getToken, onMessage, onNotificationOpenedApp, onTokenRefresh, requestPermission, setBackgroundMessageHandler } from '@react-native-firebase/messaging'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
-import messaging from '@react-native-firebase/messaging'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Platform } from 'react-native'
+import deviceService from './device.service'
 
 export interface StoredNotification {
   id: string
@@ -69,10 +73,10 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
 
   // Request Firebase Messaging permission
   try {
-    const authStatus = await messaging().requestPermission()
+    const authStatus = await requestPermission(getMessaging())
     const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL
+      authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL
 
     if (!enabled) {
       console.log('Firebase messaging permission not granted')
@@ -85,13 +89,10 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
 
   // Get FCM token
   try {
-    token = await messaging().getToken()
+    token = await getToken(getMessaging());
     console.log('FCM Token:', token)
     
-    // Store token locally
     await AsyncStorage.setItem(FCM_TOKEN_STORAGE_KEY, token)
-    
-    // TODO: Send token to your backend
     await sendTokenToServer(token)
     
   } catch (error) {
@@ -105,17 +106,39 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
  * Setup token refresh listener
  */
 export function setupTokenRefreshListener() {
-  return messaging().onTokenRefresh(async (newToken) => {
+  return onTokenRefresh(getMessaging(), async (newToken) => {
     console.log('FCM Token refreshed:', newToken)
     
-    // Store new token
+    const oldToken = await AsyncStorage.getItem(FCM_TOKEN_STORAGE_KEY);
     await AsyncStorage.setItem(FCM_TOKEN_STORAGE_KEY, newToken)
     
     // Send to backend
-    await sendTokenToServer(newToken)
+    await refreshFcmToken(newToken, oldToken)
   })
 }
 
+
+async function refreshFcmToken(newToken: string, oldToken?: string | null): Promise<void> {
+  try {
+    const api = getSecureApiClient();
+     const { deviceId, deviceName } = await deviceService.getDeviceInfo();
+    const request: AppNotificationRequest = {
+        deviceId,
+        deviceName,
+        token: newToken,
+        osType: Platform.OS.toUpperCase()
+
+    }
+
+    await api.put("/notifications/tokens/refresh", request, {
+      params: {
+        oldToken
+      }
+    })
+  } catch(error: any) {
+    console.error("Error refresh FCM token", error);
+  }
+}
 /**
  * Get stored FCM token
  */
@@ -133,38 +156,24 @@ export async function getStoredFCMToken(): Promise<string | null> {
  */
 async function sendTokenToServer(fcmToken: string): Promise<void> {
   try {
-    // TODO: Replace with your actual backend endpoint
-    const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8080'
     
-    // TODO: Get userId from your auth system
-    const userId = 'USER_ID' // Replace with actual user ID
-    
-    const response = await fetch(`${BACKEND_URL}/api/fcm/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${yourAuthToken}`, // Add your auth token
-      },
-      body: JSON.stringify({
-        userId: userId,
-        fcmToken: fcmToken,
-        platform: Platform.OS,
-        deviceInfo: {
-          model: Device.modelName,
-          os: Platform.OS,
-          osVersion: Platform.Version,
-        }
-      }),
-    })
+    const api = getSecureApiClient();
 
-    if (!response.ok) {
-      throw new Error('Failed to register FCM token')
+    const { deviceId, deviceName } = await deviceService.getDeviceInfo();
+    const request: AppNotificationRequest = {
+        deviceId,
+        deviceName,
+        token: fcmToken,
+        osType: Platform.OS.toUpperCase()
+
     }
-
+    
+    
+     await api.post<ApiResponse<any>>("/notifications/tokens/register", request);
+   
     console.log('FCM token registered successfully')
   } catch (error) {
     console.error('Error sending token to server:', error)
-    // Don't throw - fail silently and retry later
   }
 }
 
@@ -174,7 +183,7 @@ async function sendTokenToServer(fcmToken: string): Promise<void> {
  * NOTE: This runs when app is QUIT (completely closed)
  */
 export function setupBackgroundMessageHandler() {
-  messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+  setBackgroundMessageHandler(getMessaging(), async (remoteMessage) => {
     console.log('📦 Message handled in background (app quit):', remoteMessage)
     
     // Save to storage even when app is killed
@@ -191,7 +200,7 @@ export function setupBackgroundMessageHandler() {
 export function setupForegroundMessageHandler(
   onMessageReceived: (remoteMessage: any) => void
 ) {
-  return messaging().onMessage(async (remoteMessage) => {
+  return onMessage(getMessaging(), async (remoteMessage) => {
     console.log('📨 FCM message received in foreground:', remoteMessage)
     
     // Call custom handler (e.g., to save to storage or update UI)
@@ -358,7 +367,7 @@ export async function getUnreadCount(): Promise<number> {
  */
 export async function handleInitialNotification(): Promise<any | null> {
   try {
-    const remoteMessage = await messaging().getInitialNotification()
+    const remoteMessage = await getInitialNotification(getMessaging());
     
     if (remoteMessage) {
       console.log('📬 App opened from notification (background/killed):', remoteMessage)
@@ -382,7 +391,7 @@ export async function handleInitialNotification(): Promise<any | null> {
 export function setupNotificationOpenedListener(
   onNotificationOpened: (remoteMessage: any) => void
 ) {
-  return messaging().onNotificationOpenedApp((remoteMessage) => {
+  return onNotificationOpenedApp(getMessaging(), (remoteMessage) => {
     console.log('📬 App opened from notification (background):', remoteMessage)
     
     // Save to storage
@@ -392,3 +401,5 @@ export function setupNotificationOpenedListener(
     onNotificationOpened(remoteMessage)
   })
 }
+
+

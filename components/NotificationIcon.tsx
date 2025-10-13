@@ -4,12 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface NotificationIconProp {
   hasRead?: boolean;
+  size?: number;
 }
 
-export default function NotificationIcon({ hasRead }: NotificationIconProp) {
+export default function NotificationIcon({ hasRead, size = 23}: NotificationIconProp) {
   return (
     <View style={styles.container}>
-      <Ionicons name="notifications" size={23} color={"#A67C00"} />
+      <Ionicons name="notifications" size={size} color={"#A67C00"} />
       {!hasRead && <View style={styles.badge} />}
     </View>
   )

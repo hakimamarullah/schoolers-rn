@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import NotificationIcon from "./NotificationIcon";
 
 export interface NotificationInfo {
@@ -15,7 +15,7 @@ interface NotificationCardProps {
   onPress?: (it: NotificationInfo | undefined) => void;
 }
 
-export default function NotificationCard({
+export default function InformationCard({
   data,
   onPress,
 }: NotificationCardProps) {
@@ -37,7 +37,7 @@ export default function NotificationCard({
             {title}
           </Text>
         </Pressable>
-        <Text style={styles.content} numberOfLines={2} ellipsizeMode="tail">
+        <Text style={styles.content} numberOfLines={3} ellipsizeMode="tail">
           {content}
         </Text>
       </View>

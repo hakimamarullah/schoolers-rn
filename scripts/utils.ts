@@ -118,3 +118,18 @@ export const handleError = (error: any): any => {
     }
     throw new Error(i18n.t("common.networkError"));
 }
+
+
+export const removeTime = (datetime: string): string => {
+  if (!datetime) return "";
+
+
+  const parts = datetime.split(" ");
+
+
+  if (parts.length > 1 && parts[parts.length - 1].includes(":")) {
+    parts.splice(parts.length - 1, 1);
+  }
+
+  return parts.join(" ");
+};

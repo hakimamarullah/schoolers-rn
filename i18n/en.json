@@ -102,7 +102,10 @@
     "nisn": "NISN",
     "gender": "Gender",
     "grade": "Grade",
-    "email": "Email"
+    "email": "Email",
+    "failedToLoadInformation": "Failed to load information",
+    "No notifications yet": "No information yet",
+    "You'll see your notifications here when you receive them": "You'll see informations here when you receive them"
     
   },
   "day" : {

@@ -55,7 +55,15 @@
     },
     "plugins": [
       "expo-router",
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/sounds/cabin_chime.wav"
+          ],
+          "enableBackgroundRemoteNotifications": true
+        }
+      ],
       "@react-native-firebase/app",
       [
         "expo-splash-screen",
