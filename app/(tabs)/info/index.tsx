@@ -1,6 +1,6 @@
 // app/info/index.tsx
 import InformationCardSkeleton from '@/components/InformationCardSkeleton'
-import InformationCard, { NotificationInfo } from '@/components/NotificationCard'
+import InformationCard, { NotificationInfo } from '@/components/InformationCard'
 import { PageLayout } from '@/components/PageLayout'
 import { removeTime } from '@/scripts/utils'
 import informationService from '@/services/information.service'
@@ -95,8 +95,14 @@ export default function InfoScreen() {
   }, [hasMore, page, informations.length])
 
   const handleInfoPress = async (item: NotificationInfo) => {
-    router.push(`/info/${item.id}` as RelativePathString)
-  }
+  setInformations((prev) =>
+    prev.map((info) =>
+      info.id === item.id ? { ...info, hasRead: true } : info
+    )
+  );
+  router.push(`/info/${item.id}` as RelativePathString);
+};
+
 
   const transformedInformations = informations.map(transformToNotificationInfo)
 
@@ -149,7 +155,6 @@ export default function InfoScreen() {
 
     return null
   }
-
   return (
     <PageLayout title="Information">
       <View style={styles.container}>

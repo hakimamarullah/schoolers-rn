@@ -1,7 +1,7 @@
 // app/_layout.tsx
 import { SplashScreenController } from "@/components/SplashScreenController";
 import { AppProvider } from "@/hooks/useApp";
-import { NotificationProvider } from "@/hooks/UseNotification";
+import { NotificationProvider, useNotifications } from "@/hooks/UseNotification";
 import { SessionProvider, useSession } from "@/hooks/useSession";
 import { useSetupLocationPermission } from "@/hooks/useSetupLocationPermission";
 import i18n from "@/i18n/i18n";
@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "@/config/firebaseConfig"
 import { setupBackgroundMessageHandler } from "@/services/notification.service";
+
 
 
 setupBackgroundMessageHandler();
@@ -33,7 +34,7 @@ export default function Root() {
 function RootNavigator() {
   const { session, isHostSet, isLoading, loginId } = useSession();
 
-  useSetupLocationPermission();
+  useNotifications();
   useEffect(() => {
     const setLanguage = async () => {
       try {

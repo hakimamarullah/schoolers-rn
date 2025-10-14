@@ -3,7 +3,12 @@ import { getSecureApiClient } from '@/config/apiClient.config'
 import { ApiResponse } from '@/types/api.type'
 import { AppNotificationRequest } from '@/types/notification.type'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AuthorizationStatus, getInitialNotification, getMessaging, getToken, onMessage, onNotificationOpenedApp, onTokenRefresh, requestPermission, setBackgroundMessageHandler } from '@react-native-firebase/messaging'
+import {
+  AuthorizationStatus, getInitialNotification, getMessaging, getToken,
+  onMessage, onNotificationOpenedApp,
+  onTokenRefresh, requestPermission,
+  setBackgroundMessageHandler
+} from '@react-native-firebase/messaging'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { Platform } from 'react-native'
@@ -21,7 +26,7 @@ export interface StoredNotification {
   hasRead: boolean
 }
 
-const NOTIFICATIONS_STORAGE_KEY = '@notifications_storage'
+
 const FCM_TOKEN_STORAGE_KEY = '@fcm_token'
 
 // Configure how notifications are handled when the app is in the foreground
@@ -46,8 +51,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-      sound: 'default',
+      lightColor: '#FF231F7C'
     })
   }
 
@@ -90,9 +94,12 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
   // Get FCM token
   try {
     token = await getToken(getMessaging());
-    console.log('FCM Token:', token)
     
+    const oldToken = await AsyncStorage.getItem(FCM_TOKEN_STORAGE_KEY);
     await AsyncStorage.setItem(FCM_TOKEN_STORAGE_KEY, token)
+    if (oldToken === token) {
+      return token;
+    }
     await sendTokenToServer(token)
     
   } catch (error) {
@@ -111,8 +118,6 @@ export function setupTokenRefreshListener() {
     
     const oldToken = await AsyncStorage.getItem(FCM_TOKEN_STORAGE_KEY);
     await AsyncStorage.setItem(FCM_TOKEN_STORAGE_KEY, newToken)
-    
-    // Send to backend
     await refreshFcmToken(newToken, oldToken)
   })
 }
@@ -139,17 +144,7 @@ async function refreshFcmToken(newToken: string, oldToken?: string | null): Prom
     console.error("Error refresh FCM token", error);
   }
 }
-/**
- * Get stored FCM token
- */
-export async function getStoredFCMToken(): Promise<string | null> {
-  try {
-    return await AsyncStorage.getItem(FCM_TOKEN_STORAGE_KEY)
-  } catch (error) {
-    console.error('Error getting stored FCM token:', error)
-    return null
-  }
-}
+
 
 /**
  * Send FCM token to your backend
@@ -185,11 +180,6 @@ async function sendTokenToServer(fcmToken: string): Promise<void> {
 export function setupBackgroundMessageHandler() {
   setBackgroundMessageHandler(getMessaging(), async (remoteMessage) => {
     console.log('📦 Message handled in background (app quit):', remoteMessage)
-    
-    // Save to storage even when app is killed
-    await saveFCMMessageToStorage(remoteMessage)
-    
-    // FCM will automatically show the notification
   })
 }
 
@@ -222,144 +212,7 @@ export function setupForegroundMessageHandler(
   })
 }
 
-/**
- * Save notification to local storage
- * This can be called from expo-notifications listener
- */
-export async function saveNotificationToStorage(
-  notification: Notifications.Notification
-): Promise<void> {
-  try {
-    const storedNotif: StoredNotification = {
-      id: notification.request.identifier,
-      title: notification.request.content.title || 'Notification',
-      body: notification.request.content.body || '',
-      data: (notification.request.content.data as any) || {},
-      receivedAt: new Date(notification.date).toISOString(),
-      hasRead: false,
-    }
 
-    // Get existing notifications
-    const existing = await getStoredNotifications()
-    const updated = [storedNotif, ...existing]
-
-    // Save to storage
-    await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updated))
-  } catch (error) {
-    console.error('Error saving notification to storage:', error)
-  }
-}
-
-/**
- * Save FCM message to storage
- * Call this from the FCM foreground handler
- */
-export async function saveFCMMessageToStorage(
-  remoteMessage: any
-): Promise<void> {
-  try {
-    const notification = remoteMessage.notification || {}
-    const data = remoteMessage.data || {}
-    
-    const storedNotif: StoredNotification = {
-      id: remoteMessage.messageId || Date.now().toString(),
-      title: notification.title || data.title || 'Notification',
-      body: notification.body || data.body || '',
-      data: data,
-      receivedAt: new Date().toISOString(),
-      hasRead: false,
-    }
-
-    // Get existing notifications
-    const existing = await getStoredNotifications()
-    const updated = [storedNotif, ...existing]
-
-    // Save to storage
-    await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updated))
-  } catch (error) {
-    console.error('Error saving FCM message to storage:', error)
-  }
-}
-
-/**
- * Get all stored notifications
- */
-export async function getStoredNotifications(): Promise<StoredNotification[]> {
-  try {
-    const stored = await AsyncStorage.getItem(NOTIFICATIONS_STORAGE_KEY)
-    return stored ? JSON.parse(stored) : []
-  } catch (error) {
-    console.error('Error getting stored notifications:', error)
-    return []
-  }
-}
-
-/**
- * Mark notification as read
- */
-export async function markNotificationAsRead(notificationId: string): Promise<void> {
-  try {
-    const notifications = await getStoredNotifications()
-    const updated = notifications.map(notif =>
-      notif.id === notificationId ? { ...notif, hasRead: true } : notif
-    )
-    await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updated))
-  } catch (error) {
-    console.error('Error marking notification as read:', error)
-  }
-}
-
-/**
- * Get notification by ID
- */
-export async function getNotificationById(
-  notificationId: string
-): Promise<StoredNotification | null> {
-  try {
-    const notifications = await getStoredNotifications()
-    return notifications.find(notif => notif.id === notificationId) || null
-  } catch (error) {
-    console.error('Error getting notification by ID:', error)
-    return null
-  }
-}
-
-/**
- * Clear all notifications
- */
-export async function clearAllNotifications(): Promise<void> {
-  try {
-    await AsyncStorage.removeItem(NOTIFICATIONS_STORAGE_KEY)
-  } catch (error) {
-    console.error('Error clearing notifications:', error)
-  }
-}
-
-/**
- * Delete specific notification
- */
-export async function deleteNotification(notificationId: string): Promise<void> {
-  try {
-    const notifications = await getStoredNotifications()
-    const filtered = notifications.filter(notif => notif.id !== notificationId)
-    await AsyncStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(filtered))
-  } catch (error) {
-    console.error('Error deleting notification:', error)
-  }
-}
-
-/**
- * Get unread notification count
- */
-export async function getUnreadCount(): Promise<number> {
-  try {
-    const notifications = await getStoredNotifications()
-    return notifications.filter(notif => !notif.hasRead).length
-  } catch (error) {
-    console.error('Error getting unread count:', error)
-    return 0
-  }
-}
 
 /**
  * Handle notification opened when app was in background/killed
@@ -371,9 +224,6 @@ export async function handleInitialNotification(): Promise<any | null> {
     
     if (remoteMessage) {
       console.log('📬 App opened from notification (background/killed):', remoteMessage)
-      
-      // Save to storage if not already saved
-      await saveFCMMessageToStorage(remoteMessage)
       
       return remoteMessage
     }
@@ -393,9 +243,6 @@ export function setupNotificationOpenedListener(
 ) {
   return onNotificationOpenedApp(getMessaging(), (remoteMessage) => {
     console.log('📬 App opened from notification (background):', remoteMessage)
-    
-    // Save to storage
-    saveFCMMessageToStorage(remoteMessage)
     
     // Call custom handler (e.g., navigate to screen)
     onNotificationOpened(remoteMessage)

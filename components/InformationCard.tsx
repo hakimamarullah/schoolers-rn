@@ -15,10 +15,7 @@ interface NotificationCardProps {
   onPress?: (it: NotificationInfo | undefined) => void;
 }
 
-export default function InformationCard({
-  data,
-  onPress,
-}: NotificationCardProps) {
+function InformationCardComponent({ data, onPress }: NotificationCardProps) {
   const { title = "", hasRead = false, date = "", content = "" } = data || {};
 
   return (
@@ -37,7 +34,7 @@ export default function InformationCard({
             {title}
           </Text>
         </Pressable>
-        <Text style={styles.content} numberOfLines={3} ellipsizeMode="tail">
+        <Text style={styles.content} numberOfLines={2} ellipsizeMode="tail">
           {content}
         </Text>
       </View>
@@ -45,6 +42,25 @@ export default function InformationCard({
     </View>
   );
 }
+
+
+const InformationCard = React.memo(
+  InformationCardComponent,
+  (prevProps, nextProps) => {
+    const prev = prevProps.data;
+    const next = nextProps.data;
+   
+    return (
+      prev?.id === next?.id &&
+      prev?.title === next?.title &&
+      prev?.hasRead === next?.hasRead &&
+      prev?.date === next?.date &&
+      prev?.content === next?.content
+    );
+  }
+);
+
+export default InformationCard;
 
 const styles = StyleSheet.create({
   container: {
@@ -67,11 +83,11 @@ const styles = StyleSheet.create({
   },
   titleUnread: {
     fontWeight: "bold",
-    color: "#000", // darker for unread
+    color: "#000",
   },
   titleRead: {
     fontWeight: "normal",
-    color: "#000", // lighter for read
+    color: "#000",
   },
   content: {
     fontSize: 13,

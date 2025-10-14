@@ -4,6 +4,12 @@ export interface InformationSimpleResponse {
   body: string;
   bannerUri: string;
   createdAt: string;
-  authorName: string;
+  author: Author;
   hasRead: boolean;
+}
+
+export interface Author {
+  id: number;
+  name: string;
+  email: string;
 }

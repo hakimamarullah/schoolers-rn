@@ -6,11 +6,13 @@ import { InformationSimpleResponse } from '@/types/information.type'
 import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View, Text, ScrollView, ActivityIndicator, Image } from 'react-native'
+import { useNotifications } from '@/hooks/UseNotification'
 
 export default function NotificationDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [info, setInfo] = useState<InformationSimpleResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const { refreshUnreadCount } = useNotifications();
 
   useEffect(() => {
     const fetchNotificationDetail = async () => {
@@ -19,6 +21,7 @@ export default function NotificationDetailScreen() {
         const response = await informationService.getInformationById(Number(id))
         setInfo(response)
         await informationService.markAsRead(Number(id));
+        await refreshUnreadCount();
       } catch (error) {
         console.error('Error fetching notification:', error)
       } finally {
@@ -50,7 +53,7 @@ export default function NotificationDetailScreen() {
       </PageLayout>
     )
   }
-  console.log({uri: info.bannerUri})
+ 
   return (
     <PageLayout title="Information">
       <ScrollView
@@ -90,10 +93,10 @@ export default function NotificationDetailScreen() {
           </View>
 
           {/* Author Information */}
-          {info.authorName && (
+          {info.author?.name && (
             <View style={styles.authorContainer}>
               <Text style={styles.authorLabel}>Posted by:</Text>
-              <Text style={styles.authorName}>{info.authorName}</Text>
+              <Text style={styles.authorName}>{info.author.name}</Text>
             </View>
           )}
         </View>

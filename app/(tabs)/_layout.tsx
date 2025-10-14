@@ -7,11 +7,9 @@ import { View, Text, StyleSheet } from "react-native";
 
 export default function TabsLayout() {
   const { session, isHostSet } = useSession();
-  const { notifications } = useNotifications();
+  const { unreadCount } = useNotifications();
   const { t } = useTranslation();
   
-  
-  const unreadCount = notifications.filter(notif => !notif.hasRead).length;
 
   return (
     <Tabs

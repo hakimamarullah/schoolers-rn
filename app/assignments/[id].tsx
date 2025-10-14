@@ -1,6 +1,7 @@
 import { PageLayout } from "@/components/PageLayout";
 import { useApp } from "@/hooks/useApp";
 import { useFileDownloader } from "@/hooks/useFileDownloader";
+import { useSafeTimeout } from "@/hooks/useSafeTimeout";
 import assignmentService from "@/services/assignment.service";
 import { AssignmentResponse, ResourceType } from "@/types/assignments.type";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -8,6 +9,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Linking,
   Pressable,
   ScrollView,
@@ -19,18 +21,23 @@ import {
 export default function AssignmentDetails() {
   const { id } = useLocalSearchParams();
   const [assignment, setAssignment] = useState<AssignmentResponse | null>(null);
+  const [isLoading, setLoading] = useState<boolean>(false);
   const app = useApp();
   const router = useRouter();
   const { download } = useFileDownloader();
   const { t } = useTranslation();
 
+
   useEffect(() => {
     const fetchAssignment = async () => {
       try {
+        setLoading(true);
         const data = await assignmentService.getAssignmentDetails(Number(id));
         setAssignment(data);
       } catch (error: any) {
         app.showModal("Info", error.message, () => router.back(), false);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -83,6 +90,15 @@ export default function AssignmentDetails() {
     app.showModal("Info", t("common.confirmMarkAsDone"), submitMarkAsDone);
   };
 
+  if (isLoading) {
+    return (
+      <PageLayout title="Information">
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#6366f1" />
+        </View>
+      </PageLayout>
+    );
+  }
   return (
     <PageLayout title="Assignment Details">
       <ScrollView
@@ -92,7 +108,7 @@ export default function AssignmentDetails() {
         <View style={styles.headerContainer}>
           {/* Icon */}
           <View style={styles.iconContainer}>
-            <MaterialIcons name="description" size={30} color="#A67C00" />
+            <MaterialIcons name="description" size={25} color="#A67C00" />
           </View>
 
           {/* Subject Name */}
@@ -213,10 +229,15 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   iconContainer: {
     backgroundColor: "#FFE78A",
-    width: 45,
-    height: 45,
+    width: 40,
+    height: 40,
     borderRadius: 22.5,
     alignItems: "center",
     justifyContent: "center",

@@ -35,7 +35,7 @@ class InformationService {
     }
   }
 
-  async countUnread(): Promise<number> {
+  async getUnreadCount(): Promise<number> {
     try {
       const api = getSecureApiClient();
       const response = await api.get<ApiResponse<number>>("/informations/count-unread");

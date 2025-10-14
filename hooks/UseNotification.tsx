@@ -1,166 +1,195 @@
-// providers/NotificationProvider.tsx
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
-import * as Notifications from 'expo-notifications'
-import { useRouter } from 'expo-router'
-import { 
-  StoredNotification, 
-  getStoredNotifications, 
-  markNotificationAsRead, 
-  registerForPushNotificationsAsync, 
-  saveFCMMessageToStorage,
-  setupTokenRefreshListener,
-  setupForegroundMessageHandler,
+import { useSession } from "@/hooks/useSession";
+import informationService from "@/services/information.service";
+import {
   handleInitialNotification,
-  setupNotificationOpenedListener
-} from '@/services/notification.service'
-import { useSafeTimeout } from './useSafeTimeout'
+  registerForPushNotificationsAsync,
+  setupForegroundMessageHandler,
+  setupNotificationOpenedListener,
+  setupTokenRefreshListener
+} from "@/services/notification.service";
+import * as Notifications from "expo-notifications";
+import { RelativePathString, useRootNavigationState, useRouter, useSegments } from "expo-router";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import { AppState, AppStateStatus } from "react-native";
 
 interface NotificationContextType {
-  devicePushToken: string | undefined
-  notifications: StoredNotification[]
-  refreshNotifications: () => Promise<void>
-  markAsRead: (id: string) => Promise<void>
+  devicePushToken?: string;
+  unreadCount: number;
+  refreshUnreadCount: () => Promise<void>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined)
+const NotificationContext = createContext<NotificationContextType | undefined>(
+  undefined
+);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
-  const [devicePushToken, setDevicePushToken] = useState<string | undefined>()
-  const [notifications, setNotifications] = useState<StoredNotification[]>([])
-  const router = useRouter()
-  const { setSafeTimeout } = useSafeTimeout()
+  const [devicePushToken, setDevicePushToken] = useState<string>();
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const router = useRouter();
+  const { session } = useSession();
+  const rootNavigationState = useRootNavigationState();
+  const segments = useSegments();
 
-  const responseListener = useRef<ReturnType<typeof Notifications.addNotificationResponseReceivedListener> | null>(null)
-  const tokenRefreshUnsubscribe = useRef<(() => void) | null>(null)
-  const foregroundMessageUnsubscribe = useRef<(() => void) | null>(null)
-  const notificationOpenedUnsubscribe = useRef<(() => void) | null>(null)
+  const tokenRefreshUnsubscribe = useRef<(() => void) | null>(null);
+  const foregroundMessageUnsubscribe = useRef<(() => void) | null>(null);
+  const notificationOpenedUnsubscribe = useRef<(() => void) | null>(null);
+  const notificationResponseSubscription = useRef<Notifications.Subscription | null>(null);
+  const pendingNavigation = useRef<string | null>(null);
 
-  // Load stored notifications
-  const refreshNotifications = async () => {
-    const stored = await getStoredNotifications()
-    setNotifications(stored)
-  }
+  // Check if router is ready
+  const isRouterReady = rootNavigationState?.key != null;
 
-  // Mark notification as read
-  const markAsRead = async (id: string) => {
-    await markNotificationAsRead(id)
-    await refreshNotifications()
-  }
-
-  // Navigate to target screen from notification data
-  const navigateToTarget = (data: any) => {
-    if (data?.targetScreen) {
-      const targetScreen = data.targetScreen as string
-      setSafeTimeout(() => {
-        router.push(targetScreen as any)
-      }, 100)
+  /** Fetch unread count from backend */
+  const refreshUnreadCount = async () => {
+    if (!session) return;
+    try {
+      const count = await informationService.getUnreadCount();
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
     }
-  }
+  };
 
+  const navigateToTarget = (url: string) => {
+    if (!url) return;
+
+    if (isRouterReady) {
+      try {
+        router.push(url as RelativePathString);
+        pendingNavigation.current = null;
+      } catch (error) {
+        console.error("Navigation error:", error);
+      }
+    } else {
+      // Store for later when router is ready
+      pendingNavigation.current = url;
+    }
+  };
+
+  // Execute pending navigation when router becomes ready
   useEffect(() => {
-    // Register for push notifications and get FCM token
+    if (isRouterReady && pendingNavigation.current) {
+      const url = pendingNavigation.current;
+      pendingNavigation.current = null;
+      
+      // Small delay to ensure everything is settled
+      setTimeout(() => {
+        try {
+          router.push(url as RelativePathString);
+        } catch (error) {
+          console.error("Pending navigation error:", error);
+        }
+      }, 100);
+    }
+  }, [isRouterReady, router]);
+
+  // Initial load and app state changes
+  useEffect(() => {
+    if (!session) return;
+
+    // Fetch on initial load
+    refreshUnreadCount();
+
+    // Refresh when app comes to foreground
+    const subscription = AppState.addEventListener(
+      "change",
+      (nextAppState: AppStateStatus) => {
+        if (nextAppState === "active") {
+          refreshUnreadCount();
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [session]);
+
+  // Setup push notifications
+  useEffect(() => {
+    if (!session) return;
+
     registerForPushNotificationsAsync()
       .then((token) => {
-        if (token) {
-          setDevicePushToken(token)
-          console.log('✅ FCM Token registered:', token)
-        }
+        if (token) setDevicePushToken(token);
       })
-      .catch((error) => console.error('❌ Error registering for push notifications:', error))
+      .catch((err) => console.error("Push registration error:", err));
 
-    // Load initial notifications
-    refreshNotifications()
-
-    // Check if app was opened from a notification (when app was killed)
-    handleInitialNotification().then((remoteMessage) => {
-      if (remoteMessage) {
-        console.log('🚀 App launched from notification:', remoteMessage)
-        refreshNotifications()
-        navigateToTarget(remoteMessage.data)
+    // Handle initial notification
+    const handleInitial = async () => {
+      const remoteMessage = await handleInitialNotification();
+      if (remoteMessage?.data?.target) {
+        console.log("🚀 App launched via notification:", remoteMessage);
+        navigateToTarget(remoteMessage.data.target);
+        refreshUnreadCount();
       }
-    })
+    };
+    handleInitial();
 
-    // Setup FCM token refresh listener
-    tokenRefreshUnsubscribe.current = setupTokenRefreshListener()
-
-    // Setup Firebase foreground message handler
-    // This receives FCM messages when app is in FOREGROUND
-    foregroundMessageUnsubscribe.current = setupForegroundMessageHandler(
-      async (remoteMessage) => {
-        console.log('📨 FCM message (foreground):', remoteMessage)
-        
-        // Save FCM message to storage
-        await saveFCMMessageToStorage(remoteMessage)
-        await refreshNotifications()
-      }
-    )
-
-    // Setup listener for when app opens from notification (background state)
-    notificationOpenedUnsubscribe.current = setupNotificationOpenedListener(
-      async (remoteMessage) => {
-        console.log('📬 Notification opened (background):', remoteMessage)
-        
-        // Refresh notifications to show the new one
-        await refreshNotifications()
-        
-        // Navigate to target screen
-        navigateToTarget(remoteMessage.data)
-      }
-    )
-
-    // Listener for when user taps on notification (local or foreground)
-    // This handles taps when app is already in FOREGROUND
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(
-      async (response) => {
-        console.log('👆 Notification tapped (foreground):', response)
-
-        const notificationId = response.notification.request.identifier
-        const data = response.notification.request.content.data
-
-        // Mark as read
-        await markNotificationAsRead(notificationId)
-        await refreshNotifications()
-
-        // Navigate to target screen
-        navigateToTarget(data)
-      }
-    )
-
-    // Cleanup
-    return () => {
-      if (responseListener.current) {
-        responseListener.current.remove()
-      }
-      if (tokenRefreshUnsubscribe.current) {
-        tokenRefreshUnsubscribe.current()
-      }
-      if (foregroundMessageUnsubscribe.current) {
-        foregroundMessageUnsubscribe.current()
-      }
-      if (notificationOpenedUnsubscribe.current) {
-        notificationOpenedUnsubscribe.current()
+    function redirect(notification: Notifications.Notification) {
+      const url = notification.request.content.data?.target;
+      if (typeof url === 'string') {
+        navigateToTarget(url);
       }
     }
-  }, [router])
+
+    // Check for last notification response
+    const checkLastNotification = async () => {
+      try {
+        const response = Notifications.getLastNotificationResponse();
+        if (response?.notification) {
+          redirect(response.notification);
+        }
+      } catch (error) {
+        console.error("Error checking last notification:", error);
+      }
+    };
+    checkLastNotification();
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      redirect(response.notification);
+      refreshUnreadCount();
+    });
+    
+    notificationResponseSubscription.current = subscription;
+
+    tokenRefreshUnsubscribe.current = setupTokenRefreshListener();
+    foregroundMessageUnsubscribe.current = setupForegroundMessageHandler(async () => {
+      await refreshUnreadCount();
+    });
+    notificationOpenedUnsubscribe.current = setupNotificationOpenedListener(
+      async (remoteMessage) => {
+        await refreshUnreadCount();
+        if (remoteMessage?.data?.target) {
+          navigateToTarget(remoteMessage.data.target);
+        }
+      }
+    );
+
+    return () => {
+      notificationResponseSubscription.current?.remove();
+      tokenRefreshUnsubscribe.current?.();
+      foregroundMessageUnsubscribe.current?.();
+      notificationOpenedUnsubscribe.current?.();
+    };
+  }, [session, isRouterReady]);
 
   return (
     <NotificationContext.Provider
       value={{
         devicePushToken,
-        notifications,
-        refreshNotifications,
-        markAsRead,
+        unreadCount,
+        refreshUnreadCount,
       }}
     >
       {children}
     </NotificationContext.Provider>
-  )
+  );
 }
 
 export function useNotifications() {
-  const context = useContext(NotificationContext)
-  if (context === undefined) {
-    throw new Error('useNotifications must be used within a NotificationProvider')
-  }
-  return context
+  const context = useContext(NotificationContext);
+  if (!context)
+    throw new Error("useNotifications must be used within NotificationProvider");
+  return context;
 }
