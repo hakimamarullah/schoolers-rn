@@ -105,7 +105,10 @@
     "email": "Email",
     "failedToLoadInformation": "Gagal memuat informasi",
     "No notifications yet": "Belum ada informasi",
-    "You'll see your notifications here when you receive them": "Kamu dapat melihat informasi di sini jika ada"
+    "You'll see your notifications here when you receive them": "Kamu dapat melihat informasi di sini jika ada",
+    "informationNotFound": "Informasi tidak ditemukan",
+    "postedBy": "Diposting oleh:"
+
   },
   "day" : {
     "mon": "Sen",

@@ -7,12 +7,14 @@ import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View, Text, ScrollView, ActivityIndicator, Image } from 'react-native'
 import { useNotifications } from '@/hooks/UseNotification'
+import { useTranslation } from 'react-i18next'
 
 export default function NotificationDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [info, setInfo] = useState<InformationSimpleResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const { refreshUnreadCount } = useNotifications();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchNotificationDetail = async () => {
@@ -48,7 +50,7 @@ export default function NotificationDetailScreen() {
     return (
       <PageLayout title="Information">
         <View style={styles.centerContainer}>
-          <Text style={styles.errorText}>Information not found</Text>
+          <Text style={styles.errorText}>{t("common.informationNotFound")}</Text>
         </View>
       </PageLayout>
     )
@@ -95,7 +97,7 @@ export default function NotificationDetailScreen() {
           {/* Author Information */}
           {info.author?.name && (
             <View style={styles.authorContainer}>
-              <Text style={styles.authorLabel}>Posted by:</Text>
+              <Text style={styles.authorLabel}>{t("common.postedBy")}</Text>
               <Text style={styles.authorName}>{info.author.name}</Text>
             </View>
           )}

@@ -11,6 +11,7 @@ import * as Notifications from "expo-notifications";
 import { RelativePathString, useRootNavigationState, useRouter, useSegments } from "expo-router";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AppState, AppStateStatus } from "react-native";
+import { useSafeTimeout } from "./useSafeTimeout";
 
 interface NotificationContextType {
   devicePushToken?: string;
@@ -35,7 +36,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const notificationOpenedUnsubscribe = useRef<(() => void) | null>(null);
   const notificationResponseSubscription = useRef<Notifications.Subscription | null>(null);
   const pendingNavigation = useRef<string | null>(null);
-
+  const { setSafeTimeout } = useSafeTimeout();
   // Check if router is ready
   const isRouterReady = rootNavigationState?.key != null;
 
@@ -61,19 +62,18 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         console.error("Navigation error:", error);
       }
     } else {
-      // Store for later when router is ready
+     
       pendingNavigation.current = url;
     }
   };
 
-  // Execute pending navigation when router becomes ready
   useEffect(() => {
     if (isRouterReady && pendingNavigation.current) {
       const url = pendingNavigation.current;
       pendingNavigation.current = null;
       
-      // Small delay to ensure everything is settled
-      setTimeout(() => {
+  
+      setSafeTimeout(() => {
         try {
           router.push(url as RelativePathString);
         } catch (error) {
