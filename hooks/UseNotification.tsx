@@ -4,14 +4,12 @@ import {
   handleInitialNotification,
   registerForPushNotificationsAsync,
   setupForegroundMessageHandler,
-  setupNotificationOpenedListener,
   setupTokenRefreshListener
 } from "@/services/notification.service";
 import * as Notifications from "expo-notifications";
-import { RelativePathString, useRootNavigationState, useRouter, useSegments } from "expo-router";
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import { RelativePathString, useRootNavigationState, useRouter } from "expo-router";
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { AppState, AppStateStatus } from "react-native";
-import { useSafeTimeout } from "./useSafeTimeout";
 
 interface NotificationContextType {
   devicePushToken?: string;
@@ -19,160 +17,153 @@ interface NotificationContextType {
   refreshUnreadCount: () => Promise<void>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined
-);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [devicePushToken, setDevicePushToken] = useState<string>();
   const [unreadCount, setUnreadCount] = useState<number>(0);
-  const router = useRouter();
-  const { session } = useSession();
-  const rootNavigationState = useRootNavigationState();
-  const segments = useSegments();
 
+  const { session } = useSession();
+  const router = useRouter();
+  const rootNavigationState = useRootNavigationState();
+
+  // refs
+  const isMounted = useRef(true);
+  const isNavigating = useRef(false);
+  const pendingNavigation = useRef<string | null>(null);
+  const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // notification listener refs
   const tokenRefreshUnsubscribe = useRef<(() => void) | null>(null);
   const foregroundMessageUnsubscribe = useRef<(() => void) | null>(null);
-  const notificationOpenedUnsubscribe = useRef<(() => void) | null>(null);
   const notificationResponseSubscription = useRef<Notifications.Subscription | null>(null);
-  const pendingNavigation = useRef<string | null>(null);
-  const { setSafeTimeout } = useSafeTimeout();
-  // Check if router is ready
-  const isRouterReady = rootNavigationState?.key != null;
 
-  /** Fetch unread count from backend */
-  const refreshUnreadCount = async () => {
-    if (!session) return;
+  // derived
+  const isRouterReady = !!rootNavigationState?.key;
+
+  /** Safely fetch unread count */
+  const refreshUnreadCount = useCallback(async () => {
+    if (!session || !isMounted.current) return;
     try {
       const count = await informationService.getUnreadCount();
-      setUnreadCount(count);
-    } catch (error) {
-      console.error("Error fetching unread count:", error);
+      if (isMounted.current) setUnreadCount(count);
+    } catch (err) {
+      console.error("Error fetching unread count:", err);
     }
-  };
-
-  const navigateToTarget = (url: string) => {
-    if (!url) return;
-
-    if (isRouterReady) {
-      try {
-        router.push(url as RelativePathString);
-        pendingNavigation.current = null;
-      } catch (error) {
-        console.error("Navigation error:", error);
-      }
-    } else {
-     
-      pendingNavigation.current = url;
-    }
-  };
-
-  useEffect(() => {
-    if (isRouterReady && pendingNavigation.current) {
-      const url = pendingNavigation.current;
-      pendingNavigation.current = null;
-      
-  
-      setSafeTimeout(() => {
-        try {
-          router.push(url as RelativePathString);
-        } catch (error) {
-          console.error("Pending navigation error:", error);
-        }
-      }, 100);
-    }
-  }, [isRouterReady, router]);
-
-  // Initial load and app state changes
-  useEffect(() => {
-    if (!session) return;
-
-    // Fetch on initial load
-    refreshUnreadCount();
-
-    // Refresh when app comes to foreground
-    const subscription = AppState.addEventListener(
-      "change",
-      (nextAppState: AppStateStatus) => {
-        if (nextAppState === "active") {
-          refreshUnreadCount();
-        }
-      }
-    );
-
-    return () => {
-      subscription.remove();
-    };
   }, [session]);
 
-  // Setup push notifications
+  /** Safe navigation guard */
+  const navigateToTarget = useCallback(
+    (url: string) => {
+      if (!url || !isMounted.current) return;
+      if (!isRouterReady || isNavigating.current) return;
+
+      // prevent repeated navigation to same target
+      if (pendingNavigation.current === url) return;
+      pendingNavigation.current = url;
+
+      try {
+        isNavigating.current = true;
+        console.log("🔗 Navigating to:", url);
+        router.push(url as RelativePathString);
+      } catch (err) {
+        console.error("Navigation error:", err);
+      } finally {
+        if (navigationTimer.current) clearTimeout(navigationTimer.current);
+        navigationTimer.current = setTimeout(() => {
+          isNavigating.current = false;
+          pendingNavigation.current = null;
+        }, 800);
+      }
+    },
+    [isRouterReady, router]
+  );
+
+  /** Refresh unread count when app becomes active */
   useEffect(() => {
     if (!session) return;
+    refreshUnreadCount();
 
+    const subscription = AppState.addEventListener("change", (nextAppState: AppStateStatus) => {
+      if (nextAppState === "active" && isMounted.current) refreshUnreadCount();
+    });
+
+    return () => subscription.remove();
+  }, [session, refreshUnreadCount]);
+
+  /** Setup push notification logic */
+  useEffect(() => {
+    if (!session || !isRouterReady) return;
+    let isSubscribed = true;
+
+    // register push token
     registerForPushNotificationsAsync()
       .then((token) => {
-        if (token) setDevicePushToken(token);
+        if (token && isSubscribed && isMounted.current) setDevicePushToken(token);
       })
       .catch((err) => console.error("Push registration error:", err));
 
-    // Handle initial notification
+    /** Handle initial notification only once */
     const handleInitial = async () => {
-      const remoteMessage = await handleInitialNotification();
-      if (remoteMessage?.data?.target) {
-        console.log("🚀 App launched via notification:", remoteMessage);
-        navigateToTarget(remoteMessage.data.target);
-        refreshUnreadCount();
+      try {
+        const remoteMessage = await handleInitialNotification();
+        if (remoteMessage?.data?.target && isSubscribed && isMounted.current) {
+          navigateToTarget(remoteMessage.data.target);
+          refreshUnreadCount();
+          console.log("SHIIT")
+        }
+      } catch (err) {
+        console.error("Error handling initial notification:", err);
       }
     };
     handleInitial();
 
-    function redirect(notification: Notifications.Notification) {
-      const url = notification.request.content.data?.target;
-      if (typeof url === 'string') {
-        navigateToTarget(url);
-      }
-    }
-
-    // Check for last notification response
-    const checkLastNotification = async () => {
-      try {
-        const response = Notifications.getLastNotificationResponse();
-        if (response?.notification) {
-          redirect(response.notification);
+    /** Handle last tapped notification */
+    const response = Notifications.getLastNotificationResponse();
+    if (response) {
+      const url = response?.notification?.request?.content?.data?.target;
+        if (typeof url === "string" && isSubscribed && isMounted.current) {
+          console.log("CALLLLED FUCK")
+          navigateToTarget(url);
         }
-      } catch (error) {
-        console.error("Error checking last notification:", error);
-      }
-    };
-    checkLastNotification();
+    }
+      
 
-    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-      redirect(response.notification);
-      refreshUnreadCount();
-    });
-    
-    notificationResponseSubscription.current = subscription;
-
-    tokenRefreshUnsubscribe.current = setupTokenRefreshListener();
+    /** Foreground listener */
     foregroundMessageUnsubscribe.current = setupForegroundMessageHandler(async () => {
-      await refreshUnreadCount();
+      if (isSubscribed && isMounted.current) await refreshUnreadCount();
     });
-    notificationOpenedUnsubscribe.current = setupNotificationOpenedListener(
-      async (remoteMessage) => {
-        await refreshUnreadCount();
-        if (remoteMessage?.data?.target) {
-          navigateToTarget(remoteMessage.data.target);
+
+    /** When notification is tapped */
+    notificationResponseSubscription.current = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const url = response.notification.request.content.data?.target;
+        if (typeof url === "string" && isSubscribed && isMounted.current) {
+          navigateToTarget(url);
+          refreshUnreadCount();
+          console.log("DAMN FUCK")
         }
       }
     );
 
+    /** Token refresh */
+    tokenRefreshUnsubscribe.current = setupTokenRefreshListener();
+
     return () => {
+      isSubscribed = false;
       notificationResponseSubscription.current?.remove();
       tokenRefreshUnsubscribe.current?.();
       foregroundMessageUnsubscribe.current?.();
-      notificationOpenedUnsubscribe.current?.();
     };
-  }, [session, isRouterReady]);
+  }, [session, isRouterReady, navigateToTarget, refreshUnreadCount]);
+
+  /** Cleanup on unmount */
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      if (navigationTimer.current) clearTimeout(navigationTimer.current);
+    };
+  }, []);
 
   return (
     <NotificationContext.Provider
@@ -188,8 +179,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 }
 
 export function useNotifications() {
-  const context = useContext(NotificationContext);
-  if (!context)
-    throw new Error("useNotifications must be used within NotificationProvider");
-  return context;
+  const ctx = useContext(NotificationContext);
+  if (!ctx) throw new Error("useNotifications must be used within NotificationProvider");
+  return ctx;
 }
