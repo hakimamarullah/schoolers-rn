@@ -4,11 +4,22 @@ import {
   handleInitialNotification,
   registerForPushNotificationsAsync,
   setupForegroundMessageHandler,
-  setupTokenRefreshListener
+  setupTokenRefreshListener,
 } from "@/services/notification.service";
 import * as Notifications from "expo-notifications";
-import { RelativePathString, useRootNavigationState, useRouter } from "expo-router";
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
+import {
+  RelativePathString,
+  useRootNavigationState,
+  useRouter,
+} from "expo-router";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AppState, AppStateStatus } from "react-native";
 
 interface NotificationContextType {
@@ -17,9 +28,15 @@ interface NotificationContextType {
   refreshUnreadCount: () => Promise<void>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+const NotificationContext = createContext<NotificationContextType | undefined>(
+  undefined
+);
 
-export function NotificationProvider({ children }: { children: React.ReactNode }) {
+export function NotificationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [devicePushToken, setDevicePushToken] = useState<string>();
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
@@ -36,7 +53,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   // notification listener refs
   const tokenRefreshUnsubscribe = useRef<(() => void) | null>(null);
   const foregroundMessageUnsubscribe = useRef<(() => void) | null>(null);
-  const notificationResponseSubscription = useRef<Notifications.Subscription | null>(null);
+  const notificationResponseSubscription =
+    useRef<Notifications.Subscription | null>(null);
 
   // derived
   const isRouterReady = !!rootNavigationState?.key;
@@ -84,9 +102,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     if (!session) return;
     refreshUnreadCount();
 
-    const subscription = AppState.addEventListener("change", (nextAppState: AppStateStatus) => {
-      if (nextAppState === "active" && isMounted.current) refreshUnreadCount();
-    });
+    const subscription = AppState.addEventListener(
+      "change",
+      (nextAppState: AppStateStatus) => {
+        if (nextAppState === "active" && isMounted.current)
+          refreshUnreadCount();
+      }
+    );
 
     return () => subscription.remove();
   }, [session, refreshUnreadCount]);
@@ -99,7 +121,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     // register push token
     registerForPushNotificationsAsync()
       .then((token) => {
-        if (token && isSubscribed && isMounted.current) setDevicePushToken(token);
+        if (token && isSubscribed && isMounted.current)
+          setDevicePushToken(token);
       })
       .catch((err) => console.error("Push registration error:", err));
 
@@ -110,7 +133,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         if (remoteMessage?.data?.target && isSubscribed && isMounted.current) {
           navigateToTarget(remoteMessage.data.target);
           refreshUnreadCount();
-          console.log("SHIIT")
+          console.log("SHIIT");
         }
       } catch (err) {
         console.error("Error handling initial notification:", err);
@@ -122,29 +145,29 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const response = Notifications.getLastNotificationResponse();
     if (response) {
       const url = response?.notification?.request?.content?.data?.target;
-        if (typeof url === "string" && isSubscribed && isMounted.current) {
-          console.log("CALLLLED FUCK")
-          navigateToTarget(url);
-        }
+      if (typeof url === "string" && isSubscribed && isMounted.current) {
+        Notifications.clearLastNotificationResponse();
+        navigateToTarget(url);
+      }
     }
-      
 
     /** Foreground listener */
-    foregroundMessageUnsubscribe.current = setupForegroundMessageHandler(async () => {
-      if (isSubscribed && isMounted.current) await refreshUnreadCount();
-    });
+    foregroundMessageUnsubscribe.current = setupForegroundMessageHandler(
+      async () => {
+        if (isSubscribed && isMounted.current) await refreshUnreadCount();
+      }
+    );
 
     /** When notification is tapped */
-    notificationResponseSubscription.current = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
+    notificationResponseSubscription.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
         const url = response.notification.request.content.data?.target;
         if (typeof url === "string" && isSubscribed && isMounted.current) {
           navigateToTarget(url);
           refreshUnreadCount();
-          console.log("DAMN FUCK")
+          console.log("DAMN FUCK");
         }
-      }
-    );
+      });
 
     /** Token refresh */
     tokenRefreshUnsubscribe.current = setupTokenRefreshListener();
@@ -180,6 +203,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
 export function useNotifications() {
   const ctx = useContext(NotificationContext);
-  if (!ctx) throw new Error("useNotifications must be used within NotificationProvider");
+  if (!ctx)
+    throw new Error(
+      "useNotifications must be used within NotificationProvider"
+    );
   return ctx;
 }

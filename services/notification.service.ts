@@ -39,6 +39,7 @@ Notifications.setNotificationHandler({
   }),
 })
 
+
 /**
  * Register for push notifications and get the FCM Token
  */
@@ -198,12 +199,12 @@ export function setupForegroundMessageHandler(
     
     // ✅ ONLY show notification if it's a DATA-ONLY message
     // If remoteMessage.notification exists, FCM already showed it
-    if (!remoteMessage.notification && remoteMessage.data) {
+    if (remoteMessage.data) {
       // This is a data-only message, show it manually
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: remoteMessage.data.title as string || 'Notification',
-          body: remoteMessage.data.body as string || '',
+          title: remoteMessage.notification?.title as string || 'Notification',
+          body: remoteMessage.notification?.body as string || '',
           data: remoteMessage.data || {},
         },
         trigger: null, // Show immediately
