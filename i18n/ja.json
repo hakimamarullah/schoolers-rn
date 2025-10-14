@@ -1,0 +1,165 @@
+{
+  "home": {
+    "Finished Class": "終了した授業",
+    "Main Menu": "メインメニュー",
+    "Ongoing": "進行中",
+    "Upcoming": "予定",
+    "Cancelled": "キャンセル済み",
+    "Finished": "完了",
+    "failedGetSessionInfo": "セッション情報を取得できませんでした :("
+  },
+  "login": {
+    "Please enter your password": "パスワードを入力してください！",
+    "Failed Login": "ログイン失敗",
+    "Login failed. Please try again later": "ログインに失敗しました。後でもう一度お試しください。"
+  },
+  "biometric": {
+    "signInFailed": "生体認証でのサインインに失敗しました。もう一度お試しください。",
+    "authFailed": "生体認証がキャンセルまたは失敗しました",
+    "disabled": "生体認証ログインは無効になっています"
+  },
+  "loginForm": {
+    "Password": "パスワード",
+    "Enter password": "パスワードを入力",
+    "Login": "ログイン"
+  },
+  "greeting": {
+    "Good Morning": "おはようございます",
+    "Good Evening": "こんばんは",
+    "Good Afternoon": "こんにちは",
+    "Good Night": "おやすみなさい"
+  },
+  "tabItem": {
+    "Home": "ホーム",
+    "Schedules": "スケジュール",
+    "Assignments": "課題",
+    "Info": "情報",
+    "Information": "お知らせ",
+    "Profile": "プロフィール",
+    "Schoolers": "Schoolers",
+    "Language": "言語",
+    "Assignment Details": "課題の詳細",
+    "Login": "ログイン",
+    "Personal Data": "個人情報",
+    "Setup Host": "ホスト設定",
+    "Change Classroom": "クラス変更",
+    "Check In": "出席",
+    "Oops": "おっと",
+    "Notification": "通知"
+  },
+  "profile": {
+    "sections": {
+      "Account": "アカウント",
+      "Personalization": "カスタマイズ",
+      "Security": "セキュリティ",
+      "Others": "その他"
+    },
+    "menuItem": {
+      "Personal Data": "個人情報",
+      "Language": "言語",
+      "Change Classroom": "クラス変更",
+      "Biometric": "生体認証",
+      "Log Out": "ログアウト"
+    }
+  },
+  "common": {
+    "Logout": "ログアウト",
+    "Sign out now?": "今すぐログアウトしますか？",
+    "No Schedule": "スケジュールなし",
+    "There are no subjects scheduled for this day": "本日は授業の予定がありません",
+    "Biometric": "生体認証",
+    "Enable biometric authentication?": "生体認証を有効にしますか？",
+    "Save": "保存",
+    "Save Changes": "変更を保存",
+    "Classroom": "クラス",
+    "Select Classroom": "クラスを選択",
+    "cancel": "キャンセル",
+    "no results found": "結果が見つかりません",
+    "search": "検索",
+    "room": "教室",
+    "attendance": "出席",
+    "datetime": "日時",
+    "teacher": "先生",
+    "topic": "テーマ",
+    "no sessions available": "利用可能な授業はありません",
+    "subjectName": "科目",
+    "dateLabel": "日付",
+    "timeLabel": "時間",
+    "No Ongoing Session": "進行中の授業はありません",
+    "success": "成功",
+    "screenNotFound": "この画面は存在しません。",
+    "bringMeBack": "戻る",
+    "systemUnavailable": "システムが利用できません",
+    "networkError": "ネットワークエラーです。接続を確認してください。",
+    "noUserInfoFound": "ユーザー情報が見つかりません",
+    "Pull down to try again": "下にスワイプして再試行",
+    "No assignments yet": "課題はまだありません",
+    "Check back later for new assignments": "新しい課題は後で確認してください",
+    "confirmOpenUrl": "このリンクを開きますか？\n{{uri}}",
+    "confirmDowloadFile": "このファイルをダウンロードまたは開きますか？\n{{file}}",
+    "confirmMarkAsDone": "完了としてマークしますか？",
+    "cannotSaveImageWithoutPermission": "権限がないため、画像を保存できません",
+    "fullname": "氏名",
+    "nisn": "学籍番号",
+    "gender": "性別",
+    "grade": "学年",
+    "email": "メールアドレス",
+    "failedToLoadInformation": "情報の読み込みに失敗しました",
+    "No notifications yet": "まだ通知がありません",
+    "You'll see your notifications here when you receive them": "通知を受け取るとここに表示されます",
+    "informationNotFound": "情報が見つかりません",
+    "postedBy": "投稿者："
+  },
+  "day": {
+    "mon": "月",
+    "tue": "火",
+    "wed": "水",
+    "thu": "木",
+    "fri": "金",
+    "sat": "土"
+  },
+  "checkin": {
+    "clockInSuccess": "出席が記録されました：{{address}}（{{datetime}}）",
+    "location not available": "位置情報が利用できません",
+    "Cannot clock in without location": "位置情報なしでは出席できません",
+    "Clock in now?": "今すぐ出席しますか？",
+    "Failed to get ongoing session info.": "進行中の授業情報を取得できませんでした。"
+  },
+  "changeClass": {
+    "Failed to save classroom. Please try again later": "クラスの保存に失敗しました。後でもう一度お試しください。",
+    "Classroom updated successfully. You will be signed out now.": "クラスが更新されました。ログアウトします。",
+    "Failed to get classroom info": "クラス情報の取得に失敗しました"
+  },
+  "assignmentDetails": {
+    "duedate": "提出期限",
+    "title": "タイトル",
+    "description": "説明",
+    "files": "ファイル",
+    "url": "URL",
+    "markAsDone": "完了にする",
+    "submitted": "提出済み"
+  },
+  "personalDataSum": {
+    "saveAsImage": "画像として保存",
+    "Personal data card saved to gallery!": "個人情報カードをギャラリーに保存しました！",
+    "Failed to save image": "画像の保存に失敗しました"
+  },
+  "fileDownloader": {
+    "downloading": "ファイルをダウンロード中...",
+    "downloadFailed": "ダウンロードに失敗しました。",
+    "downloadCancelled": "ダウンロードがキャンセルまたは失敗しました。",
+    "sharingNotAvailable": "このデバイスでは共有機能が利用できません。",
+    "saveFile": "ファイルを保存",
+    "saveOrShareFile": "保存または共有",
+    "successAndroid": "ファイルをダウンロードしました！お好きな場所に保存してください。",
+    "successIOS": "ファイルは「Documents」フォルダに保存されました！ファイルアプリで開けます。",
+    "userCancelled": "ユーザーがダウンロードをキャンセルしました。",
+    "fileSavedSharingCancelled": "ファイルは保存されましたが、共有がキャンセルされました。",
+    "errorTitle": "エラー",
+    "successTitle": "成功",
+    "infoTitle": "情報",
+    "fileDownloadFailed": "ファイルのダウンロードに失敗しました。",
+    "cacheCleanedUp": "キャッシュファイルを削除しました",
+    "couldNotDeleteCache": "キャッシュファイルを削除できませんでした"
+  }
+}

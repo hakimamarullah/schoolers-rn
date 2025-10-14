@@ -5,7 +5,6 @@ import { useSession } from "@/hooks/useSession";
 import { handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
 import biometricService from "@/services/biometric.service";
-import storageService from "@/services/storage.service";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
@@ -17,9 +16,6 @@ export default function LoginScreen() {
 
   const handlePasswordLogin = async (password: string) => {
     try {
-      // REMOVE THIS
-      const host = await storageService.getApiHost();
-      app.showModal("Info", `Your host ${host}`, undefined, true);
       if (!password.trim()) {
         app.showModal("Error", t("login.Please enter your password"));
         return;
@@ -60,7 +56,7 @@ export default function LoginScreen() {
 
   const handleBiometricLogin = async () => {
     try {
-      // Biometric verified by OS - now authenticate with backend
+    
       const authenticated = await biometricService.authenticate();
       if (!authenticated) {
         throw new Error('Biometric authentication was cancelled or failed');

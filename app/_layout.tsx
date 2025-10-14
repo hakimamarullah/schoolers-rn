@@ -33,7 +33,8 @@ export default function Root() {
 
 function RootNavigator() {
   const { session, isHostSet, isLoading, loginId } = useSession();
-
+  
+  useSetupLocationPermission();
   useNotifications();
   useEffect(() => {
     const setLanguage = async () => {

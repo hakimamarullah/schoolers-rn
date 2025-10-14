@@ -3,6 +3,8 @@ import { default as i18n } from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./en.json";
 import id from "./id.json";
+import zh from "./zh.json";
+import ja from "./ja.json";
 
 const deviceLanguage = getLocales()[0]?.languageCode || 'en';
 
@@ -12,6 +14,8 @@ const deviceLanguage = getLocales()[0]?.languageCode || 'en';
     resources: {
       en: { translation: en },
       id: { translation: id },
+      zh: { translation: zh},
+      ja: { translation: ja}
     },
     lng: deviceLanguage,
     fallbackLng: 'en',

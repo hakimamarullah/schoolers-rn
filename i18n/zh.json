@@ -1,0 +1,165 @@
+{
+  "home": {
+    "Finished Class": "已完成课程",
+    "Main Menu": "主菜单",
+    "Ongoing": "进行中",
+    "Upcoming": "即将开始",
+    "Cancelled": "已取消",
+    "Finished": "已完成",
+    "failedGetSessionInfo": "糟糕，无法获取课程信息 :("
+  },
+  "login": {
+    "Please enter your password": "请先输入你的密码！",
+    "Failed Login": "登录失败",
+    "Login failed. Please try again later": "登录失败，请稍后再试"
+  },
+  "biometric": {
+    "signInFailed": "使用生物识别登录失败，请重试。",
+    "authFailed": "生物识别验证被取消或失败",
+    "disabled": "生物识别登录已禁用"
+  },
+  "loginForm": {
+    "Password": "密码",
+    "Enter password": "输入密码",
+    "Login": "登录"
+  },
+  "greeting": {
+    "Good Morning": "早上好",
+    "Good Evening": "晚上好",
+    "Good Afternoon": "下午好",
+    "Good Night": "晚安"
+  },
+  "tabItem": {
+    "Home": "主页",
+    "Schedules": "课程表",
+    "Assignments": "作业",
+    "Info": "信息",
+    "Information": "通知",
+    "Profile": "个人资料",
+    "Schoolers": "Schoolers",
+    "Language": "语言",
+    "Assignment Details": "作业详情",
+    "Login": "登录",
+    "Personal Data": "个人资料",
+    "Setup Host": "设置主机",
+    "Change Classroom": "更换班级",
+    "Check In": "签到",
+    "Oops": "糟糕",
+    "Notification": "通知"
+  },
+  "profile": {
+    "sections": {
+      "Account": "账户",
+      "Personalization": "个性化",
+      "Security": "安全",
+      "Others": "其他"
+    },
+    "menuItem": {
+      "Personal Data": "个人资料",
+      "Language": "语言",
+      "Change Classroom": "更换班级",
+      "Biometric": "生物识别",
+      "Log Out": "退出登录"
+    }
+  },
+  "common": {
+    "Logout": "退出登录",
+    "Sign out now?": "确定要退出吗？",
+    "No Schedule": "暂无课程",
+    "There are no subjects scheduled for this day": "今天没有安排课程",
+    "Biometric": "生物识别",
+    "Enable biometric authentication?": "是否启用生物识别登录？",
+    "Save": "保存",
+    "Save Changes": "保存更改",
+    "Classroom": "班级",
+    "Select Classroom": "选择班级",
+    "cancel": "取消",
+    "no results found": "未找到结果",
+    "search": "搜索",
+    "room": "教室",
+    "attendance": "出勤",
+    "datetime": "日期时间",
+    "teacher": "教师",
+    "topic": "主题",
+    "no sessions available": "暂无课程",
+    "subjectName": "科目",
+    "dateLabel": "日期",
+    "timeLabel": "时间",
+    "No Ongoing Session": "暂无进行中的课程",
+    "success": "成功",
+    "screenNotFound": "找不到该页面。",
+    "bringMeBack": "带我回去！",
+    "systemUnavailable": "系统不可用",
+    "networkError": "网络错误，请检查您的连接。",
+    "noUserInfoFound": "未找到用户信息",
+    "Pull down to try again": "下拉刷新重试",
+    "No assignments yet": "暂无作业",
+    "Check back later for new assignments": "稍后回来查看新作业吧！",
+    "confirmOpenUrl": "打开此链接？\n{{uri}}",
+    "confirmDowloadFile": "下载或打开此文件？\n{{file}}",
+    "confirmMarkAsDone": "确定要标记为已完成吗？",
+    "cannotSaveImageWithoutPermission": "没有权限无法保存图片",
+    "fullname": "姓名",
+    "nisn": "学号",
+    "gender": "性别",
+    "grade": "年级",
+    "email": "邮箱",
+    "failedToLoadInformation": "加载信息失败",
+    "No notifications yet": "暂无通知",
+    "You'll see your notifications here when you receive them": "收到通知后会显示在这里",
+    "informationNotFound": "未找到相关信息",
+    "postedBy": "发布者："
+  },
+  "day": {
+    "mon": "周一",
+    "tue": "周二",
+    "wed": "周三",
+    "thu": "周四",
+    "fri": "周五",
+    "sat": "周六"
+  },
+  "checkin": {
+    "clockInSuccess": "您的出勤已记录，地址：{{address}} 时间：{{datetime}}",
+    "location not available": "无法获取位置",
+    "Cannot clock in without location": "没有定位信息无法签到",
+    "Clock in now?": "现在签到吗？",
+    "Failed to get ongoing session info.": "无法获取当前课程信息。"
+  },
+  "changeClass": {
+    "Failed to save classroom. Please try again later": "保存班级失败，请稍后再试。",
+    "Classroom updated successfully. You will be signed out now.": "班级更新成功，现在将退出登录。",
+    "Failed to get classroom info": "获取班级信息失败"
+  },
+  "assignmentDetails": {
+    "duedate": "截止日期",
+    "title": "标题",
+    "description": "描述",
+    "files": "文件",
+    "url": "链接",
+    "markAsDone": "标记为完成",
+    "submitted": "已提交"
+  },
+  "personalDataSum": {
+    "saveAsImage": "保存为图片",
+    "Personal data card saved to gallery!": "个人资料卡已保存到相册！",
+    "Failed to save image": "保存图片失败"
+  },
+  "fileDownloader": {
+    "downloading": "正在下载文件...",
+    "downloadFailed": "下载失败。",
+    "downloadCancelled": "下载失败或已取消。",
+    "sharingNotAvailable": "此设备不支持分享功能。",
+    "saveFile": "保存文件",
+    "saveOrShareFile": "保存或分享文件",
+    "successAndroid": "文件已下载！请保存到您喜欢的位置。",
+    "successIOS": "文件已保存到“文档”文件夹！可在“文件”应用中访问。",
+    "userCancelled": "用户已取消下载。",
+    "fileSavedSharingCancelled": "文件已保存，但分享被取消。",
+    "errorTitle": "错误",
+    "successTitle": "成功",
+    "infoTitle": "信息",
+    "fileDownloadFailed": "文件下载失败。",
+    "cacheCleanedUp": "缓存文件已清理",
+    "couldNotDeleteCache": "无法删除缓存文件"
+  }
+}

@@ -27,7 +27,6 @@ export default function AssignmentDetails() {
   const { download } = useFileDownloader();
   const { t } = useTranslation();
 
-
   useEffect(() => {
     const fetchAssignment = async () => {
       try {
@@ -82,6 +81,7 @@ export default function AssignmentDetails() {
         "SUBMITTED"
       );
       app.showModal("Info", response, undefined, false);
+      setAssignment((prev) => (prev ? { ...prev, isSubmitted: true } : prev));
     } catch (error: any) {
       app.showModal("Info", error.message, undefined, false);
     }

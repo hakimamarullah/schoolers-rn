@@ -44,7 +44,8 @@
   },
   "biometric": {
      "signInFailed": "Gagal masuk menggunakan biometrik. Coba lagi ya!",
-     "authFailed": "Autentikasi biometrik gagal. Gunakan password saja! Hadeh!"
+     "authFailed": "Autentikasi biometrik gagal. Gunakan password saja! Hadeh!",
+     "disabled": "Biometrik tidak aktif"
   },
   "profile": {
     "sections" : {

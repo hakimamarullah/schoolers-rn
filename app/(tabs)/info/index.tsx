@@ -16,6 +16,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import { useNotifications } from '@/hooks/UseNotification'
 
 export default function InfoScreen() {
   const router = useRouter()
@@ -27,6 +28,7 @@ export default function InfoScreen() {
   const [error, setError] = useState<string | null>(null)
   const [initialLoad, setInitialLoad] = useState(true)
   const { t } = useTranslation()
+  const { refreshUnreadCount } = useNotifications();
 
   const loadingRef = useRef(false)
   const PAGE_SIZE = 20
@@ -84,6 +86,7 @@ export default function InfoScreen() {
     setHasMore(true)
     setPage(0)
     fetchInformations(0, true)
+    refreshUnreadCount()
   }, [])
 
   const handleLoadMore = useCallback(() => {

@@ -15,7 +15,8 @@
   },
   "biometric": {
      "signInFailed": "Sign in with Biometric failed. Please try again.",
-     "authFailed": "Biometric authentication was cancelled or failed"
+     "authFailed": "Biometric authentication was cancelled or failed",
+     "disabled": "Biometric login is disabled"
   },
   "loginForm": {
     "Password": "Password",

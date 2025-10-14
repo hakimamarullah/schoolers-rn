@@ -26,7 +26,7 @@ export default function LoginForm({
     const { isEnabled } = await biometricService.getBiometricInfo();
 
     if (!isEnabled) {
-      app.showModal("Info", "Biometric login is disabled", undefined, false);
+      app.showModal("Info", t("biometric.disabled"), undefined, false);
       return;
     }
     onBiometricLogin?.();

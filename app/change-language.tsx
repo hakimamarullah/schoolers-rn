@@ -18,6 +18,8 @@ export default function ChangeLanguageScreen() {
   const languages = [
     { label: "Bahasa Indonesia", value: "id" },
     { label: "English", value: "en" },
+    { label: "Chinese (Simplified)", value: "zh" },
+    { label: "Japanese", value: "ja" },
   ];
 
   useEffect(() => {
