@@ -1,11 +1,10 @@
 import { CONFIG } from '@/constants/common';
+import i18n from '@/i18n/i18n'; // Update path to your i18n config
 import configService from '@/services/config.service';
 import sessionService from '@/services/session.service';
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import * as Location from 'expo-location';
 import StorageService from '../services/storage.service';
-import i18n from '@/i18n/i18n'; // Update path to your i18n config
-import { handleError } from '@/scripts/utils';
 
 let apiClientInstance: AxiosInstance | null = null;
 let apiClientInstanceInsecure: AxiosInstance | null = null;
@@ -237,7 +236,7 @@ export const destroyApiClient = (): void => {
 };
 
 const errorHandler = (error: any): any => {
-  // If server responded
+
   if (error.response) {
     const status = error.response.status;
     const serverMessage = error.response.data?.message;

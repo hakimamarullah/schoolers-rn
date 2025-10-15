@@ -9,7 +9,7 @@
     "failedGetSessionInfo": "Oops can't get sessions info :("
   },
    "login": {
-    "Please enter your password": "Masukkan password kamu dulu ya!",
+    "Please enter your password": "Please enter you password!",
     "Failed Login": "Failed Login",
     "Login failed. Please try again later": "Login failed. Please try again later"
   },

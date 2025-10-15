@@ -47,7 +47,6 @@ function PersonalDataForm({ onSubmit, fieldErrors }: PersonalDataFormProps) {
         const options: Option[] = response?.map(it => ({ label: it.name, value: String(it.id) }));
         setClassroomOptions(options);
       } catch (error) {
-        console.error(error);
         app.showModal("Error", "Failed to get classroom info", undefined, false);
       }
     };
@@ -133,7 +132,7 @@ function PersonalDataForm({ onSubmit, fieldErrors }: PersonalDataFormProps) {
   );
 }
 
-// ✅ Only re-render if fieldErrors or input values change
+
 export default memo(PersonalDataForm);
 
 const styles = StyleSheet.create({

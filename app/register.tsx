@@ -60,13 +60,12 @@ export default function RegisterScreen() {
     }
   };
 
-  
   const performRefresh = () => {
     setRefreshing(true);
     clearErrors();
     setRefreshSignal(prev => prev + 1);
     setRefreshing(false);
-  }
+  };
 
   const onRefresh = useCallback(async () => {
     try {
@@ -80,13 +79,15 @@ export default function RegisterScreen() {
     <PageLayout title="Personal Data">
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={"padding"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={true}
+          scrollEventThrottle={16}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -104,5 +105,8 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { flexGrow: 1, paddingBottom: 20 },
+  scrollContent: { 
+    flexGrow: 1,
+    paddingBottom: 150,
+  },
 });

@@ -95,12 +95,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
   // Get FCM token
   try {
     token = await getToken(getMessaging());
-    
-    const oldToken = await AsyncStorage.getItem(FCM_TOKEN_STORAGE_KEY);
     await AsyncStorage.setItem(FCM_TOKEN_STORAGE_KEY, token)
-    if (oldToken === token) {
-      return token;
-    }
     await sendTokenToServer(token)
     
   } catch (error) {
@@ -110,9 +105,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
   return token
 }
 
-/**
- * Setup token refresh listener
- */
+
 export function setupTokenRefreshListener() {
   return onTokenRefresh(getMessaging(), async (newToken) => {
     console.log('FCM Token refreshed:', newToken)
