@@ -49,6 +49,9 @@ export function NotificationProvider({
   const isNavigating = useRef(false);
   const pendingNavigation = useRef<string | null>(null);
   const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // NEW: Store notification target when user is not logged in
+  const pendingNotificationTarget = useRef<string | null>(null);
 
   // notification listener refs
   const tokenRefreshUnsubscribe = useRef<(() => void) | null>(null);
@@ -74,6 +77,14 @@ export function NotificationProvider({
   const navigateToTarget = useCallback(
     (url: string) => {
       if (!url || !isMounted.current) return;
+      
+      // NEW: If not logged in, store the target for later
+      if (!session) {
+        console.log("📌 User not logged in. Storing notification target:", url);
+        pendingNotificationTarget.current = url;
+        return;
+      }
+      
       if (!isRouterReady || isNavigating.current) return;
 
       // prevent repeated navigation to same target
@@ -94,8 +105,24 @@ export function NotificationProvider({
         }, 800);
       }
     },
-    [isRouterReady, router]
+    [isRouterReady, router, session]
   );
+
+  /** NEW: Navigate to pending notification target after login */
+  useEffect(() => {
+    if (session && isRouterReady && pendingNotificationTarget.current) {
+      const target = pendingNotificationTarget.current;
+      pendingNotificationTarget.current = null;
+      
+      console.log("🎯 User logged in. Navigating to pending notification:", target);
+      
+      // Small delay to ensure navigation stack is ready
+      setTimeout(() => {
+        navigateToTarget(target);
+        refreshUnreadCount();
+      }, 500);
+    }
+  }, [session, isRouterReady, navigateToTarget, refreshUnreadCount]);
 
   /** Refresh unread count when app becomes active */
   useEffect(() => {
@@ -113,12 +140,12 @@ export function NotificationProvider({
     return () => subscription.remove();
   }, [session, refreshUnreadCount]);
 
-  /** Setup push notification logic */
+  /** Setup push notification logic - MODIFIED to work without session */
   useEffect(() => {
-    if (!session || !isRouterReady) return;
+    if (!isRouterReady) return;
     let isSubscribed = true;
 
-    // register push token
+    // Register push token (works without session)
     registerForPushNotificationsAsync()
       .then((token) => {
         if (token && isSubscribed && isMounted.current)
@@ -126,14 +153,14 @@ export function NotificationProvider({
       })
       .catch((err) => console.error("Push registration error:", err));
 
-    /** Handle initial notification only once */
+    /** Handle initial notification - works without session */
     const handleInitial = async () => {
       try {
         const remoteMessage = await handleInitialNotification();
         if (remoteMessage?.data?.target && isSubscribed && isMounted.current) {
           navigateToTarget(remoteMessage.data.target);
-          refreshUnreadCount();
-          console.log("SHIIT");
+          if (session) refreshUnreadCount();
+          console.log("📬 Initial notification handled");
         }
       } catch (err) {
         console.error("Error handling initial notification:", err);
@@ -141,7 +168,7 @@ export function NotificationProvider({
     };
     handleInitial();
 
-    /** Handle last tapped notification */
+    /** Handle last tapped notification - works without session */
     const response = Notifications.getLastNotificationResponse();
     if (response) {
       const url = response?.notification?.request?.content?.data?.target;
@@ -151,21 +178,23 @@ export function NotificationProvider({
       }
     }
 
-    /** Foreground listener */
+    /** Foreground listener - only refresh count if logged in */
     foregroundMessageUnsubscribe.current = setupForegroundMessageHandler(
       async () => {
-        if (isSubscribed && isMounted.current) await refreshUnreadCount();
+        if (isSubscribed && isMounted.current && session) {
+          await refreshUnreadCount();
+        }
       }
     );
 
-    /** When notification is tapped */
+    /** When notification is tapped - works without session */
     notificationResponseSubscription.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const url = response.notification.request.content.data?.target;
         if (typeof url === "string" && isSubscribed && isMounted.current) {
           navigateToTarget(url);
-          refreshUnreadCount();
-          console.log("DAMN FUCK");
+          if (session) refreshUnreadCount();
+          console.log("🔔 Notification tapped");
         }
       });
 
@@ -178,7 +207,7 @@ export function NotificationProvider({
       tokenRefreshUnsubscribe.current?.();
       foregroundMessageUnsubscribe.current?.();
     };
-  }, [session, isRouterReady, navigateToTarget, refreshUnreadCount]);
+  }, [isRouterReady, navigateToTarget, refreshUnreadCount, session]);
 
   /** Cleanup on unmount */
   useEffect(() => {
