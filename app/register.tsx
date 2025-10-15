@@ -1,7 +1,7 @@
 import { PageLayout } from "@/components/PageLayout";
 import PersonalDataForm from "@/components/PersonalDataForm";
 import { useApp } from "@/hooks/useApp";
-import { useFieldErrors } from "@/hooks/useFieldErros";
+import { useFieldErrors } from "@/hooks/useFieldErrors";
 import { useSession } from "@/hooks/useSession";
 import { handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
@@ -60,9 +60,7 @@ export default function RegisterScreen() {
     }
   };
 
-  /**
-   * Handle pull-to-refresh (reset form & reload any dropdown data)
-   */
+  
   const performRefresh = () => {
     setRefreshing(true);
     clearErrors();
@@ -82,7 +80,7 @@ export default function RegisterScreen() {
     <PageLayout title="Personal Data">
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={"padding"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
       >
         <ScrollView

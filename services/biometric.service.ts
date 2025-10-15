@@ -4,6 +4,7 @@ import * as Crypto from 'expo-crypto';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { RSA } from 'react-native-rsa-native';
 import storageService from './storage.service';
+import i18n from '@/i18n/i18n';
 
 
 
@@ -36,7 +37,7 @@ class BiometricService {
   async authenticate(promptMessage?: string): Promise<boolean> {
     try {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: promptMessage || CONFIG.BIOMETRIC_PROMPT_SUBTITLE,
+        promptMessage: promptMessage || i18n.t("biometric.promptSubtitle"),
         fallbackLabel: 'Use Password',
         disableDeviceFallback: false,
         cancelLabel: 'Cancel',

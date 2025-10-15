@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { enUS, id } from 'date-fns/locale';
+import { enUS, id, ja, zhCN } from 'date-fns/locale';
 import { Locale } from 'date-fns';
 import i18n from '@/i18n/i18n';
 
@@ -7,6 +7,8 @@ import i18n from '@/i18n/i18n';
 const locales: Record<string, Locale> = {
   en: enUS,
   id: id,
+  zh: zhCN,
+  ja: ja
 };
 
 export const useDateLocale = () => {
@@ -24,13 +26,13 @@ export const useDateLocale = () => {
       }
     };
 
-    // Set initial locale
+    
     updateLocale();
 
-    // Listen for language changes
+    
     i18n.on('languageChanged', updateLocale);
 
-    // Cleanup listener
+    
     return () => {
       i18n.off('languageChanged', updateLocale);
     };

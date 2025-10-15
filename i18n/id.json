@@ -43,18 +43,29 @@
     "Notification": "Notifikasi"
   },
   "biometric": {
-     "signInFailed": "Gagal masuk menggunakan biometrik. Coba lagi ya!",
-     "authFailed": "Autentikasi biometrik gagal. Gunakan password saja! Hadeh!",
-     "disabled": "Biometrik tidak aktif"
+    "signInFailed": "Gagal masuk menggunakan biometrik. Coba lagi ya!",
+    "authFailed": "Autentikasi biometrik gagal. Gunakan password saja! Hadeh!",
+    "disabled": "Biometrik tidak aktif",
+    "failedToDisabled": "Gagal menonaktifkan biometrik",
+    "failedToEnabled": "Gagal mengaktifkan biometrik",
+    "failedToRegister": "Gagal mendaftarkan biometrik",
+    "authenticateToDisable": "Autentikasi untuk menonaktifkan biometrik",
+    "disableBiometric?": "Nonaktifkan biometrik?",
+    "promptSubtitle": "Silakan autentikasi untuk melanjutkan",
+    "authenticateToEnable": "Silakan autentikasi untuk mengaktifkan login biometrik",
+    "biometricIsNotSetupOnDevice": "Perangkat ini belum menyiapkan autentikasi biometrik",
+    "biometricCredentialNotRegistered": "Kredensial biometrik tidak ditemukan. Silakan daftar biometrik terlebih dahulu.",
+    "privateKeyNotFound": "Kunci privat tidak ditemukan. Silakan daftar biometrik kembali.",
+    "mustLoginToRegister": "Kamu harus login terlebih dahulu untuk mendaftar biometrik."
   },
   "profile": {
-    "sections" : {
-       "Account": "Akun",
-       "Personalization": "Personalisasi",
-       "Security": "Keamanan",
-       "Others": "Lainnya"
+    "sections": {
+      "Account": "Akun",
+      "Personalization": "Personalisasi",
+      "Security": "Keamanan",
+      "Others": "Lainnya"
     },
-    "menuItem" : {
+    "menuItem": {
       "Personal Data": "Data Pribadi",
       "Language": "Bahasa",
       "Change Classroom": "Ganti Kelas",
@@ -62,7 +73,7 @@
       "Log Out": "Keluar"
     }
   },
-  "common" : {
+  "common": {
     "Logout": "Keluar",
     "Sign out now?": "Keluar sekarang?",
     "No Schedule": "Tidak Ada Jadwal",
@@ -109,9 +120,8 @@
     "You'll see your notifications here when you receive them": "Kamu dapat melihat informasi di sini jika ada",
     "informationNotFound": "Informasi tidak ditemukan",
     "postedBy": "Diposting oleh:"
-
   },
-  "day" : {
+  "day": {
     "mon": "Sen",
     "tue": "Sel",
     "wed": "Rab",
@@ -126,10 +136,10 @@
     "Clock in now?": "Clock in sekarang?",
     "Failed to get ongoing session info.": "Gagal memuat informasi sesi."
   },
-  "changeClass" : {
+  "changeClass": {
     "Failed to save classroom. Please try again later": "Gagal menyimpan kelas. Coba lagi nanti.",
     "Classroom updated successfully. You will be signed out now.": "Berhasil mengganti kelas. Kamu akan logout sekarang.",
-     "Failed to get classroom info": "Gagal memuat informasi kelas."
+    "Failed to get classroom info": "Gagal memuat informasi kelas."
   },
   "assignmentDetails": {
     "duedate": "Batas Pengumpulan",

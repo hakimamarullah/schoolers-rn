@@ -11,6 +11,7 @@ export interface ScheduleInfo {
   subjectName: string;
   teacherName: string;
   dayOfWeek: string;
+  displayDay: string;
   startTime: string;
   endTime: string;
 

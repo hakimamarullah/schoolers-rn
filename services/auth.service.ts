@@ -19,6 +19,7 @@ import { default as DeviceService, default as deviceService } from './device.ser
 import sessionService from './session.service';
 import { default as StorageService, default as storageService } from './storage.service';
 import i18n from '@/i18n/i18n';
+import { AppError } from '@/types/error.type';
 
 
 class AuthService {
@@ -99,12 +100,12 @@ class AuthService {
       const apiClient = getApiClient();
       const biometricInfo = await BiometricService.getBiometricInfo();
       if (!biometricInfo.enrolled) {
-        throw new Error('Biometric authentication is not set up on this device');
+        throw new AppError(i18n.t("biometric.biometricIsNotSetupOnDevice"));
       }
 
       const publicKeyHash = await StorageService.getBiometricPublicKeyHash();
       if (!publicKeyHash) {
-        throw new Error('Biometric credentials not found. Please register biometric first.');
+        throw new AppError(i18n.t("biometric.biometricCredentialNotRegistered"));
       }
 
       const deviceInfo = await DeviceService.getDeviceInfo();
@@ -122,7 +123,7 @@ class AuthService {
 
       return response.data?.data;
     } catch (error) {
-      throw handleError(error);
+      return handleError(error);
     }
   }
 
@@ -137,7 +138,7 @@ class AuthService {
       // Get private key
       const privateKey = await StorageService.getBiometricPrivateKey();
       if (!privateKey) {
-        throw new Error('Private key not found. Please register biometric again.');
+        throw new AppError(i18n.t("biometric.privateKeyNotFound"));
       }
 
       // Sign challenge
@@ -181,20 +182,20 @@ class AuthService {
       const apiClient = getSecureApiClient();
       const token = await StorageService.getAccessToken();
       if (!token) {
-        throw new Error('You must be logged in to register biometric');
+        throw new AppError(i18n.t("biometric.mustLoginToRegister"));
       }
 
       const biometricInfo = await BiometricService.getBiometricInfo();
       if (!biometricInfo.enrolled) {
-        throw new Error('Please set up biometric authentication in your device settings first');
+        throw new AppError(i18n.t("biometric.biometricIsNotSetupOnDevice"));
       }
 
       // Authenticate first
       const authenticated = await BiometricService.authenticate(
-        'Authenticate to enable biometric login'
+        i18n.t("biometric.authenticateToEnable")
       );
       if (!authenticated) {
-        throw new Error('Biometric authentication was cancelled');
+        throw new AppError('Biometric authentication was cancelled');
       }
 
       // Generate RSA key pair

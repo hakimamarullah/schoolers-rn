@@ -16,7 +16,20 @@
   "biometric": {
      "signInFailed": "Sign in with Biometric failed. Please try again.",
      "authFailed": "Biometric authentication was cancelled or failed",
-     "disabled": "Biometric login is disabled"
+     "disabled": "Biometric login is disabled",
+     "failedToDisabled": "Failed to disable biometric",
+     "failedToEnabled": "Failed to enabled biometric",
+     "failedToRegister": "Failed to register biometric",
+     "authenticateToDisable": "Authenticate to disable biometric",
+     "disableBiometric?": "Disable Biometric?",
+     "promptSubtitle": "Please authenticate to continue",
+     "authenticateToEnable": "Authenticate to enable biometric login",
+     "biometricIsNotSetupOnDevice": "Biometric authentication is not set up on this device",
+     "biometricCredentialNotRegistered": "Biometric credentials not found. Please register biometric first.",
+     "privateKeyNotFound": "Private key not found. Please register biometric again.",
+     "mustLoginToRegister": "You must be logged in to register biometric"
+
+
   },
   "loginForm": {
     "Password": "Password",

@@ -64,7 +64,7 @@ export default function SchedulesScreen() {
             title: it.subjectName?.toLowerCase(),
             room: data?.classroomName,
             teacher: it.teacherName,
-            datetime: `${it.dayOfWeek.toLowerCase()}, ${it.startTime} - ${it.endTime}`,
+            datetime: `${it.displayDay.toLowerCase()}, ${it.startTime} - ${it.endTime}`,
           }))}
           isLoading={isLoading}
         />

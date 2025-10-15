@@ -16,7 +16,18 @@
   "biometric": {
     "signInFailed": "使用生物识别登录失败，请重试。",
     "authFailed": "生物识别验证被取消或失败",
-    "disabled": "生物识别登录已禁用"
+    "disabled": "生物识别登录已禁用",
+    "failedToDisabled": "停用生物识别失败",
+    "failedToEnabled": "启用生物识别失败",
+    "failedToRegister": "注册生物识别失败",
+    "authenticateToDisable": "请验证身份以停用生物识别",
+    "disableBiometric?": "要停用生物识别吗？",
+    "promptSubtitle": "请验证以继续",
+    "authenticateToEnable": "请验证以启用生物识别登录",
+    "biometricIsNotSetupOnDevice": "此设备尚未设置生物识别验证",
+    "biometricCredentialNotRegistered": "未找到生物识别凭证。请先注册生物识别。",
+    "privateKeyNotFound": "未找到私钥。请重新注册生物识别。",
+    "mustLoginToRegister": "您必须先登录才能注册生物识别。"
   },
   "loginForm": {
     "Password": "密码",

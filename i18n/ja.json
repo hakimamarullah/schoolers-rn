@@ -16,7 +16,18 @@
   "biometric": {
     "signInFailed": "生体認証でのサインインに失敗しました。もう一度お試しください。",
     "authFailed": "生体認証がキャンセルまたは失敗しました",
-    "disabled": "生体認証ログインは無効になっています"
+    "disabled": "生体認証ログインは無効になっています",
+    "failedToDisabled": "生体認証の無効化に失敗しました",
+    "failedToEnabled": "生体認証の有効化に失敗しました",
+    "failedToRegister": "生体認証の登録に失敗しました",
+    "authenticateToDisable": "生体認証を無効にするには認証してください",
+    "disableBiometric?": "生体認証を無効にしますか？",
+    "promptSubtitle": "続行するには認証してください",
+    "authenticateToEnable": "生体認証ログインを有効にするには認証してください",
+    "biometricIsNotSetupOnDevice": "このデバイスでは生体認証が設定されていません",
+    "biometricCredentialNotRegistered": "生体認証の資格情報が見つかりません。まず登録してください。",
+    "privateKeyNotFound": "秘密鍵が見つかりません。もう一度生体認証を登録してください。",
+    "mustLoginToRegister": "生体認証を登録するにはログインが必要です。"
   },
   "loginForm": {
     "Password": "パスワード",

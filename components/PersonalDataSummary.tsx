@@ -36,13 +36,13 @@ const PersonalDataSummary: React.FC = () => {
         return;
       }
 
-      // Capture the card as image
+      
       const uri = await captureRef(cardRef, {
         format: "png",
         quality: 1,
       });
 
-      // Save to media library
+     
       await MediaLibrary.saveToLibraryAsync(uri);
     
       app.showModal(
@@ -87,7 +87,7 @@ const PersonalDataSummary: React.FC = () => {
                 <Text style={styles.detailValue}>{session?.loginId}</Text>
 
                 <Text style={[styles.detailLabel, styles.marginTop]}>
-                  Gender
+                  {t("common.gender")}
                 </Text>
                 <Text style={styles.detailValue}>{session?.gender}</Text>
               </View>

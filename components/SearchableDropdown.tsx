@@ -39,7 +39,7 @@ export default function SearchableDropdown({
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState("");
 
-  // Update selected when selectedValue prop changes
+ 
   useEffect(() => {
     if (selectedValue) {
       setSelected(selectedValue);
@@ -55,10 +55,16 @@ export default function SearchableDropdown({
   );
 
   const handleSelect = (value: string) => {
+    Keyboard.dismiss();
     setVisible(false);
     setSearch("");
     setSelected(value);
     onSelect(value);
+  };
+
+  const handleBackdropPress = () => {
+    Keyboard.dismiss();
+    setVisible(false);
   };
 
   return (
@@ -89,48 +95,51 @@ export default function SearchableDropdown({
         animationType="slide"
         onRequestClose={() => setVisible(false)}
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.modalOverlay}>
-            <KeyboardAvoidingView
-              behavior={"padding"}
-              style={styles.keyboardAvoid}
-            >
-              <View style={styles.modalContainer}>
-                <Text style={styles.modalTitle}>{label || "Select Option"}</Text>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardAvoid}
+        >
+          <TouchableWithoutFeedback onPress={handleBackdropPress}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+                <View style={styles.modalContainer}>
+                  <Text style={styles.modalTitle}>{label || "Select Option"}</Text>
 
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder={`${t("common.search")}...`}
-                  value={search}
-                  onChangeText={setSearch}
-                />
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder={`${t("common.search")}...`}
+                    value={search}
+                    onChangeText={setSearch}
+                  />
 
-                <FlatList
-                  data={filtered}
-                  keyExtractor={(item) => item.value}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={styles.option}
-                      onPress={() => handleSelect(item.value)}
-                    >
-                      <Text style={styles.optionText}>{item.label}</Text>
-                    </TouchableOpacity>
-                  )}
-                  ListEmptyComponent={
-                    <Text style={styles.emptyText}>{t("common.no results found")}</Text>
-                  }
-                />
+                  <FlatList
+                    data={filtered}
+                    keyExtractor={(item) => item.value}
+                    keyboardShouldPersistTaps="handled"
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.option}
+                        onPress={() => handleSelect(item.value)}
+                      >
+                        <Text style={styles.optionText}>{item.label}</Text>
+                      </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={
+                      <Text style={styles.emptyText}>{t("common.no results found")}</Text>
+                    }
+                  />
 
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => setVisible(false)}
-                >
-                  <Text style={styles.cancelText}>{t("common.cancel")}</Text>
-                </TouchableOpacity>
-              </View>
-            </KeyboardAvoidingView>
-          </View>
-        </TouchableWithoutFeedback>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => setVisible(false)}
+                  >
+                    <Text style={styles.cancelText}>{t("common.cancel")}</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -156,7 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 20,
   },
-  keyboardAvoid: { flex: 1, justifyContent: "center" },
+  keyboardAvoid: { flex: 1 },
   modalContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,

@@ -2,9 +2,10 @@ import LoginForm from "@/components/LoginForm";
 import { PageLayout } from "@/components/PageLayout";
 import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
-import { handleResponse } from "@/scripts/utils";
+import { getAppErrorMessageOrDefault, handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
 import biometricService from "@/services/biometric.service";
+import { AppError } from "@/types/error.type";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
@@ -59,7 +60,7 @@ export default function LoginScreen() {
     
       const authenticated = await biometricService.authenticate();
       if (!authenticated) {
-        throw new Error('Biometric authentication was cancelled or failed');
+        throw new AppError(t("biometric.authFailed"));
       }
       app.showOverlay("Logging in...");
       const response = await authService.loginWithBiometric(
@@ -73,7 +74,7 @@ export default function LoginScreen() {
         throw new Error("Error login using biometric. no access token on response.");
       }
     } catch (error: any) {
-      app.showModal("Error", t("biometric.signInFailed"), undefined, false);
+      app.showModal("Error", getAppErrorMessageOrDefault(error, t("biometric.signInFailed")), undefined, false);
       console.log(error.message);
     } finally {
       app.hideOverlay();

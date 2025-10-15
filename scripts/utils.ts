@@ -1,5 +1,6 @@
 import i18n from "@/i18n/i18n";
 import { ApiResponse } from "@/types/api.type";
+import { AppError } from "@/types/error.type";
 
 export const getGreetingText = (hour: number) => {
   if (hour >= 5 && hour < 12) return "Good Morning";
@@ -107,6 +108,9 @@ export const censorString = (
 
 
 export const handleError = (error: any): any => {
+    if (error instanceof AppError) {
+      throw error;
+    }
     if (error.response?.data) {
       if (error.response?.data.code >= 500 && error.response.data.code <= 599) {
         throw new Error(i18n.t("common.systemUnavailable"));
@@ -133,3 +137,12 @@ export const removeTime = (datetime: string): string => {
 
   return parts.join(" ");
 };
+
+
+export const getAppErrorMessageOrDefault = (error: any, defaultMessage?: string): string  =>  {
+    if (error instanceof AppError) {
+      return error.message;
+    }
+
+    return defaultMessage ?? i18n.t("common.systemUnavailable");
+}

@@ -3,7 +3,7 @@ import ProfileMenu from "@/components/ProfileMenu";
 import ProfilePicture from "@/components/ProfilePicture";
 import { useApp } from "@/hooks/useApp";
 import { useSession } from "@/hooks/useSession";
-import { handleResponse } from "@/scripts/utils";
+import { getAppErrorMessageOrDefault, handleResponse } from "@/scripts/utils";
 import authService from "@/services/auth.service";
 import biometricService from "@/services/biometric.service";
 import storageService from "@/services/storage.service";
@@ -47,20 +47,20 @@ export default function ProfileScreen() {
       }
     } catch (error: any) {
       await storageService.clearBiometricCredentials();
-      app.showModal("Error", error.message ?? "Failed to register biometric", undefined, false);
+      app.showModal("Error", getAppErrorMessageOrDefault(error, t("biometric.failedToRegister")), undefined, false);
     }
   };
 
   const handleDisableBiometric = async () => {
     try {
-      const authenticated = await biometricService.authenticate("Authenticate to disable biometric");
+      const authenticated = await biometricService.authenticate(t("biometric.authenticateToDisable"));
       if (authenticated) {
         setEnableBiometric(false);
         await authService.disableBiometric();
       }
     } catch (error: any) {
       console.log(error.message)
-      app.showModal("Failed", "Failed to disable biometric", undefined, false);
+      app.showModal("Failed", t("biometric.failedToDisabled"), undefined, false);
     }
   }
   const handleEnableBiometric = async (status: boolean) => {
@@ -75,11 +75,11 @@ export default function ProfileScreen() {
         return;
       }
     } catch (error: any) {
-      app.showModal("Error", error.message ?? "Failed to enable biometric.", undefined, false);
+      app.showModal("Error", getAppErrorMessageOrDefault(error, t("biometric.failedToEnabled")), undefined, false);
       console.log(error.message)
       return;
     }
-    app.showModal("Biometric", "Disable biometric?", handleDisableBiometric);
+    app.showModal(t("common.Biometric"), t("biometric.disableBiometric?"), handleDisableBiometric);
   };
   useEffect(() => {
     const getBiometricStatus = async () => {

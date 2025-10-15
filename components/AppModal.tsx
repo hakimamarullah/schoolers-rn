@@ -64,8 +64,8 @@ const AppModal = forwardRef<AppModalRef, {}>((_, ref) => {
 
   const handleConfirm = async () => {
     const callback = onConfirmRef.current;
-    onConfirmRef.current = undefined; // Clear it immediately to prevent double execution
-    await handleClose(); // ensure modal fully hides first
+    onConfirmRef.current = undefined; 
+    await handleClose();
     if (callback) {
       try {
         callback();

@@ -3,6 +3,7 @@ import { PageLayout } from '@/components/PageLayout';
 import { useApp } from '@/hooks/useApp';
 import i18n from '@/i18n/i18n';
 import storageService from '@/services/storage.service';
+import userService from '@/services/user.service';
 import * as Localization from "expo-localization";
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -46,11 +47,12 @@ export default function ChangeLanguageScreen() {
 
   const handleLanguageSelect = async (lang: string) => {
     try {
+      await userService.updateLocale(lang);
       await storageService.setLanguage(lang);
       await i18n.changeLanguage(lang);
       router.back();
-    } catch (error) {
-      app.showModal("Error", "Failed to change language", undefined, false);
+    } catch (error: any) {
+      app.showModal("Error", error.message, undefined, false);
     }
   };
 
