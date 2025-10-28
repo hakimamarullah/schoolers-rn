@@ -61,6 +61,7 @@ export interface BiometricAuthCompleteRequest {
   challengeToken: string;
   signedChallenge: string;
   deviceId: string;
+  deviceName: string;
 }
 
 export interface BiometricRegistrationRequest {

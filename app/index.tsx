@@ -38,7 +38,10 @@ export default function SetupHostScreen() {
           throw new Error("Unreachable");
         }
 
-        await response.json();
+        const { data } = await response.json();
+        if (data?.status !== "UP") {
+           throw new Error("Unreachable");
+        }
       
         app.hideOverlay();
         setHost(host);

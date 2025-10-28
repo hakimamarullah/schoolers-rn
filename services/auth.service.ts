@@ -150,6 +150,7 @@ class AuthService {
         challengeToken,
         signedChallenge,
         deviceId: deviceInfo.deviceId,
+        deviceName: deviceInfo.deviceName
       };
 
       const response = await apiClient.post<ApiResponse<AuthResponse>>(
