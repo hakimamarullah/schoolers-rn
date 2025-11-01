@@ -1,41 +1,47 @@
-import React, { memo } from "react";
+import { MenuItem } from "@/types/classroom.type";
+import { useRouter } from "expo-router";
+import React, { memo, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MenuItem from "./MenuItem";
-
-type MenuItemData = {
-  iconName: string;
-  title: string;
-  iconColor?: string;
-  bgColor?: string;
-  showBadge?: boolean;
-  badgeText?: string;
-  onPress: () => void;
-};
+import MenuItemIcon from "./MenuItem";
 
 type MenuSectionProps = {
   title: string;
-  data: MenuItemData[];
+  menuItems: MenuItem[];
 };
 
-const MenuSection = ({ title, data }: MenuSectionProps) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <View style={styles.menuGrid}>
-      {data.map((item, idx) => (
-        <MenuItem
-          key={idx}
-          iconName={item.iconName as any}
-          title={item.title}
-          iconColor={item.iconColor}
-          bgColor={item.bgColor}
-          showBadge={item.showBadge}
-          badgeText={item.badgeText}
-          onPress={item.onPress}
-        />
-      ))}
+const MenuSection = ({ title, menuItems }: MenuSectionProps) => {
+  const router = useRouter();
+  const items = useMemo(
+    () =>
+      menuItems.map((it) => ({
+        ...it,
+        onPress: () => {
+          if (it.route && it.isEnabled) {
+            router.push(it.route);
+          }
+        },
+      })),
+    [router]
+  );
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.menuGrid}>
+        {items.map((item, idx) => (
+          <MenuItemIcon
+            key={idx}
+            iconName={item.iconName as any}
+            title={item.title}
+            iconColor={item.iconColor}
+            showBadge={!!item.badgeText}
+            badgeText={item.badgeText}
+            onPress={item.onPress}
+          />
+        ))}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 export default memo(MenuSection);
 
@@ -48,7 +54,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 18,
-    paddingBottom: 6
+    paddingBottom: 6,
   },
   menuGrid: {
     flexDirection: "row",

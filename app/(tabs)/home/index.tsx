@@ -6,16 +6,14 @@ import MenuSection from "@/components/MenuSection";
 import { PageLayout } from "@/components/PageLayout";
 import ProfilePicture from "@/components/ProfilePicture";
 import SessionInfoSection from "@/components/ScheduleSection";
-import { MAIN_MENU } from "@/constants/menuConfig";
 import { useApp } from "@/hooks/useApp";
 import { useSafeTimeout } from "@/hooks/useSafeTimeout";
 import { useSession } from "@/hooks/useSession";
 import homepageInfoService from "@/services/homepageInfo.service";
 import sessionService from "@/services/session.service";
-import { AttendanceStats, SessionInfo } from "@/types/classroom.type";
+import { AttendanceStats, MenuItem, SessionInfo } from "@/types/classroom.type";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   RefreshControl,
@@ -26,7 +24,6 @@ import {
 } from "react-native";
 
 export default function HomeScreen() {
-  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { signOut, session } = useSession();
@@ -35,6 +32,7 @@ export default function HomeScreen() {
   const [cancelledSessions, setCancelledSessions] = useState<SessionInfo[]>([]);
   const [sessionStats, setSessionStats] = useState<AttendanceStats | undefined>(undefined);
   const [finishedSession, setFinishedSession] = useState<SessionInfo[]>([]);
+  const [mainMenu, setMainMenu] = useState<MenuItem[]>([]);
   const app = useApp();
   const { t } = useTranslation();
   const { setSafeTimeout } = useSafeTimeout();
@@ -47,20 +45,7 @@ export default function HomeScreen() {
     }, 1500);
   }, [setSafeTimeout]);
 
-  const mainMenu = useMemo(
-    () =>
-      MAIN_MENU.map((it) => ({
-        ...it,
-        onPress: () => {
-          if (it.route) {
-            router.push(it.route);
-          } else {
-            it.onPress;
-          }
-        },
-      })),
-    [router]
-  );
+ 
 
   const handleLogout = () => {
     sessionService.setSignOutCallback(() => {});
@@ -76,6 +61,7 @@ export default function HomeScreen() {
         setUpcomingSessions(data?.upcomingSessions);
         setCancelledSessions(data?.cancelledSessions);
         setFinishedSession(data?.finishedSessions);
+        setMainMenu(data?.mainMenuItems)
       } catch (error: any) {
         console.log({ error: error.message });
         app.showModal(
@@ -133,7 +119,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </LinearGradient>
-        <MenuSection title={t("home.Main Menu")} data={mainMenu} />
+        <MenuSection title={t("home.Main Menu")} menuItems={mainMenu} />
 
         <SessionInfoSection title={t("home.Ongoing")} data={ongoingSessions} />
         <SessionInfoSection title={t("home.Upcoming")} data={upcomingSessions} />

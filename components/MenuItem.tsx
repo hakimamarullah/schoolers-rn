@@ -1,6 +1,6 @@
-import React from "react";
-import { Pressable, Text, StyleSheet, View, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 interface MenuItemProps {
   iconName: keyof typeof Ionicons.glyphMap;
@@ -13,15 +13,15 @@ interface MenuItemProps {
   style?: ViewStyle;
 }
 
-export default function MenuItem({ 
-  iconName, 
-  title, 
-  onPress, 
+export default function MenuItemIcon({
+  iconName,
+  title,
+  onPress,
   iconColor = "#FFB800",
   bgColor = "#FFECC2",
   showBadge = false,
   badgeText = "NEW",
-  style 
+  style,
 }: MenuItemProps) {
   return (
     <Pressable
@@ -37,7 +37,12 @@ export default function MenuItem({
       <View style={styles.container}>
         {/* Icon container with rounded square background */}
         <View style={styles.iconWrapperContainer}>
-          <View style={[styles.iconWrapper, { backgroundColor: bgColor, transform: [{ rotate: '45deg' }] }]} />
+          <View
+            style={[
+              styles.iconWrapper,
+              { backgroundColor: bgColor, transform: [{ rotate: "45deg" }] },
+            ]}
+          />
           {/* Optional badge */}
           {showBadge && (
             <View style={styles.badge}>
@@ -45,10 +50,15 @@ export default function MenuItem({
             </View>
           )}
           <View style={styles.iconAbsolute}>
-            <Ionicons name={iconName} size={28} color={iconColor} style={{ transform: [{ rotate: '-20deg'}]}} />
+            <Ionicons
+              name={iconName}
+              size={28}
+              color={iconColor}
+              style={{ transform: [{ rotate: "-20deg" }] }}
+            />
           </View>
         </View>
-        
+
         {/* Title */}
         <Text style={styles.title} numberOfLines={2}>
           {title}
@@ -79,7 +89,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     borderColor: "#ffd800",
     borderWidth: 0.2,
-    transform: [{ rotate: '45deg' }],
+    transform: [{ rotate: "45deg" }],
   },
   iconAbsolute: {
     position: "absolute",

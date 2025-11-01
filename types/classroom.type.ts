@@ -1,3 +1,5 @@
+import { RelativePathString } from "expo-router";
+
 export interface SimpleClassroomInfo {
   id: number;
   name: string;
@@ -58,6 +60,18 @@ export interface HomepageInfo {
   upcomingSessions: SessionInfo[];
   cancelledSessions: SessionInfo[];
   finishedSessions: SessionInfo[];
+  mainMenuItems: MenuItem[]
+}
+
+export interface MenuItem {
+  id: number;
+  iconName: string;
+  title: string;
+  badgeText?: string;
+  route?: RelativePathString,
+  isEnabled: boolean;
+  iconColor?: string;
+
 }
 
 export interface GetClassroomSessionRequest {
