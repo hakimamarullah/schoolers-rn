@@ -2,7 +2,7 @@ import { MenuItem } from "@/types/classroom.type";
 import { useRouter } from "expo-router";
 import React, { memo, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MenuItemIcon from "./MenuItem";
+import MenuItemIcon from "./MenuItemIcon";
 
 type MenuSectionProps = {
   title: string;
@@ -21,15 +21,16 @@ const MenuSection = ({ title, menuItems }: MenuSectionProps) => {
           }
         },
       })),
-    [router]
+    [router, menuItems]
   );
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.menuGrid}>
-        {items.map((item, idx) => (
+        {items.map((item, _) => (
           <MenuItemIcon
-            key={idx}
+            key={item.id}
             iconName={item.iconName as any}
             title={item.title}
             iconColor={item.iconColor}
