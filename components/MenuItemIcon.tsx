@@ -29,35 +29,38 @@ export default function MenuItemIcon({
       style={({ pressed }) => [
         styles.wrapper,
         style,
-        {
-          opacity: pressed ? 0.7 : 1,
-        },
+        { opacity: pressed ? 0.7 : 1 },
       ]}
     >
       <View style={styles.container}>
-        {/* Icon container with rounded square background */}
-        <View style={styles.iconWrapperContainer}>
+        {/* Icon section */}
+        <View style={styles.iconSection}>
+          {/* Diamond background */}
           <View
             style={[
-              styles.iconWrapper,
-              { backgroundColor: bgColor, transform: [{ rotate: "45deg" }] },
+              styles.iconBackground,
+              { backgroundColor: bgColor },
             ]}
           />
-          {/* Optional badge */}
-          {showBadge && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{badgeText}</Text>
-            </View>
-          )}
-          <View style={styles.iconAbsolute}>
-            <Ionicons
-              name={iconName}
-              size={28}
-              color={iconColor}
-              style={{ transform: [{ rotate: "-20deg" }] }}
-            />
-          </View>
+          {/* Icon */}
+          <Ionicons
+            name={iconName}
+            size={28}
+            color={iconColor}
+            style={styles.icon}
+          />
         </View>
+        
+        {/* Badge - separate from icon, centered below it */}
+        {showBadge && (
+          <View style={styles.badgeWrapper}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText} allowFontScaling={false}>
+                {badgeText}
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Title */}
         <Text style={styles.title} numberOfLines={2}>
@@ -70,49 +73,52 @@ export default function MenuItemIcon({
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: 60,
+    alignItems: "center",
+    width: 80,
   },
   container: {
     alignItems: "center",
-    justifyContent: "flex-start",
+    width: "100%",
   },
-  iconWrapperContainer: {
+  iconSection: {
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
     width: 48,
     height: 48,
-    position: "relative",
-    marginBottom: 4,
   },
-  iconWrapper: {
+  iconBackground: {
     width: 48,
     height: 48,
     borderRadius: 14,
-    position: "absolute",
-    borderColor: "#ffd800",
-    borderWidth: 0.2,
     transform: [{ rotate: "45deg" }],
+    borderColor: "#ffd800",
+    borderWidth: 0.3,
   },
-  iconAbsolute: {
+  icon: {
     position: "absolute",
-    width: 48,
-    height: 48,
+    transform: [{ rotate: "-20deg" }],
+  },
+  badgeWrapper: {
+    position: "absolute",
+    top: 40,
+    left: 0,
+    right: 0,
     alignItems: "center",
-    justifyContent: "center",
+    zIndex: 10,
   },
   badge: {
-    position: "absolute",
-    bottom: -7,
-    left: "50%",
-    marginLeft: -17,
     backgroundColor: "#FF9800",
     paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
     borderWidth: 1.5,
     borderColor: "#fff",
+    flexShrink: 0,
   },
   badgeText: {
     fontSize: 8,
-    fontWeight: "700",
+    fontWeight: "600",
     color: "#fff",
     letterSpacing: 0.3,
   },
@@ -121,8 +127,8 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#333",
     textAlign: "center",
-    lineHeight: 12,
-    marginTop: 2,
-    maxWidth: 60,
+    lineHeight: 13,
+    maxWidth: 80,
+    marginTop: 10,
   },
 });
